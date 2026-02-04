@@ -1,0 +1,16 @@
+{
+  "devDependencies": {
+    "@commitlint/cli": "^19.8.1",
+    "@commitlint/config-conventional": "^19.8.1",
+    "husky": "^9.1.7"
+  },
+  "scripts": {
+    "prepare": "husky",
+    "end-2-end": "cd FrontEnd && npm run end-2-end"
+  },
+  "dependencies": {
+    "nativewind": "^4.2.1",
+    "prettier-plugin-tailwindcss": "^0.5.14",
+    "tailwindcss": "^3.4.18"
+  }
+}

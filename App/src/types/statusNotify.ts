@@ -1,0 +1,1 @@
+export type AlertStatus = "success" | "error" | "loading" | "alert";
