@@ -1,20 +1,16 @@
 #!/bin/sh
-# ...existing code...
+. "$(dirname "$0")/_/husky.sh"
 
-# Verifica se .env existe
 if [ ! -f .env ]; then
   echo "[ERRO] Arquivo .env não encontrado. Abortando commit."
   exit 1
 fi
 
-# Carrega variáveis do .env (ignora comentários)
 export $(grep -v '^#' .env | xargs)
 
-# Verifica se o token está definido
 if [ -z "$GIT_TOKEN" ]; then
   echo "[ERRO] GIT_TOKEN não definido no .env. Abortando commit."
   exit 1
 fi
 
 echo "[OK] GIT_TOKEN encontrado. Prosseguindo com o commit."
-exit 0
