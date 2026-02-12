@@ -19,7 +19,10 @@ function useHookLogin() {
   const handleLogin = useCallback(
     async (data: LoginForm) => {
       try {
-        notify({ status: "loading", message: "Efetuando login..." });
+        notify({
+          status: "loading",
+          message: "Efetuando login...",
+        });
 
         await http.post("/login", {
           cpf: data.cpf,
@@ -41,7 +44,16 @@ function useHookLogin() {
     [notify]
   );
 
-  return { handleLogin, control, handleSubmit, errors };
+  const rules = {
+    cpf: {
+      required: "CPF é obrigatório",
+    },
+    senha: {
+      required: "Senha é obrigatória",
+    },
+  }
+
+  return { handleLogin, control, handleSubmit, errors, rules };
 }
 
 export default useHookLogin;

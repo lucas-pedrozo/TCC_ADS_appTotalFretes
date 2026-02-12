@@ -14,7 +14,10 @@ type ThemeContextValue = {
 const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 
 export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
-  const [mode, setMode] = useState<ThemeMode>("dark");
+  const [mode, setMode] = useState<ThemeMode>(() => {
+    colorScheme.set("dark");
+    return "dark";
+  });
 
   const toggleMode = useCallback(() => {
     setMode((prev) => {
@@ -29,7 +32,7 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
       ...DefaultTheme,
       colors: {
         ...DefaultTheme.colors,
-        background: mode === "dark" ? "#000000" : "#FFFFFF",
+        background: mode === "dark" ? "#000000" : "#FAFAFA",
         text: mode === "dark" ? "#FFFFFF" : "#000000",
       },
     };

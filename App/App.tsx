@@ -2,12 +2,12 @@ import React from "react";
 
 import "./global.css";
 import Routes from "./src/routes/Routes";
-
-import { SafeAreaProvider } from "react-native-safe-area-context";
-import { useNotification, NotificationProvider } from "./src/context/NotificationContext";
-import { KeyboardProvider } from "react-native-keyboard-controller";
-import AlertNotification from "./src/components/alert/AlertNotification";
 import { ThemeProvider } from "./src/context/ThemeContext";
+import { SafeAreaProvider } from "react-native-safe-area-context";
+import { KeyboardProvider } from "react-native-keyboard-controller";
+
+import AlertNotification from "./src/components/alert/AlertNotification";
+import { useNotification, NotificationProvider } from "./src/context/NotificationContext";
 
 const AlertNotificationGlobal = () => {
   const { notification, hideNotification } = useNotification();
