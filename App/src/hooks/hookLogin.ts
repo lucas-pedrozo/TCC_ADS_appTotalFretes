@@ -2,22 +2,27 @@ import { useCallback } from "react";
 
 import http from "../service/http";
 import { useNotification } from "@/src/context/NotificationContext";
+import { useForm } from "react-hook-form";
 
-interface LoginResponse {
-  email: string;
+interface LoginForm {
+  cpf: string;
   senha: string;
 }
 
 function useHookLogin() {
   const { notify } = useNotification();
 
+  const { control, handleSubmit, formState: { errors } } = useForm<LoginForm>({
+    defaultValues: { cpf: "", senha: "" },
+  });
+
   const handleLogin = useCallback(
-    async (data: LoginResponse) => {
+    async (data: LoginForm) => {
       try {
         notify({ status: "loading", message: "Efetuando login..." });
 
         await http.post("/login", {
-          email: data.email,
+          cpf: data.cpf,
           senha: data.senha,
         });
 
@@ -36,7 +41,7 @@ function useHookLogin() {
     [notify]
   );
 
-  return { handleLogin };
+  return { handleLogin, control, handleSubmit, errors };
 }
 
 export default useHookLogin;

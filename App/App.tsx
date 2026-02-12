@@ -4,10 +4,10 @@ import "./global.css";
 import Routes from "./src/routes/Routes";
 
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import { useNotification } from "./src/context/NotificationContext";
+import { useNotification, NotificationProvider } from "./src/context/NotificationContext";
 import { KeyboardProvider } from "react-native-keyboard-controller";
-import { NotificationProvider } from "./src/context/NotificationContext";
 import AlertNotification from "./src/components/alert/AlertNotification";
+import { ThemeProvider } from "./src/context/ThemeContext";
 
 const AlertNotificationGlobal = () => {
   const { notification, hideNotification } = useNotification();
@@ -25,12 +25,14 @@ const AlertNotificationGlobal = () => {
 function App() {
   return (
     <SafeAreaProvider>
-      <NotificationProvider>
-        <KeyboardProvider>
-          <AlertNotificationGlobal />
-          <Routes />
-        </KeyboardProvider>
-      </NotificationProvider>
+      <ThemeProvider>
+        <NotificationProvider>
+          <KeyboardProvider>
+            <AlertNotificationGlobal />
+            <Routes />
+          </KeyboardProvider>
+        </NotificationProvider>
+      </ThemeProvider>
     </SafeAreaProvider>
   );
 }
