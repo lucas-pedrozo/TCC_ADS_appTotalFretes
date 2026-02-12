@@ -18,11 +18,11 @@ type InputProps = {
 const STYLES_INPUT = {
 	default: {
 		label: `text-lightText dark:text-darkText font-semibold text-base pl-2.5`,
-		input: `bg-lightBgSecondary dark:bg-darkBgSecondary rounded-lg p-2.5 font-semibold text-base placeholder:text-white/60 text-darkText`,
+		input: `bg-lightBgTertiary dark:bg-darkBgSecondary rounded-lg p-2.5 font-semibold text-base placeholder:text-lightTextSecondary dark:placeholder:text-darkTextSecondary text-lightText dark:text-darkText`,
 	},
 	error: {
 		label: `text-red-500 font-semibold text-base pl-2.5`,
-		input: `bg-lightBgSecondary dark:bg-darkBgSecondary rounded-lg p-2.5 font-semibold text-base placeholder:text-red-500 dark:placeholder:text-red-500 text-red-500`,
+		input: `bg-lightBgTertiary dark:bg-darkBgSecondary rounded-lg p-2.5 font-semibold text-base placeholder:text-red-500 dark:placeholder:text-red-500 text-red-500`,
 	}
 }
 
