@@ -6,6 +6,7 @@ import { ThemeProvider } from "./src/context/ThemeContext";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 
+import { AuthProvider } from "./src/context/AuthContext";
 import AlertNotification from "./src/components/alert/AlertNotification";
 import { useNotification, NotificationProvider } from "./src/context/NotificationContext";
 
@@ -26,12 +27,14 @@ function App() {
   return (
     <SafeAreaProvider>
       <ThemeProvider>
-        <NotificationProvider>
-          <KeyboardProvider>
-            <AlertNotificationGlobal />
-            <Routes />
-          </KeyboardProvider>
-        </NotificationProvider>
+        <AuthProvider>
+          <NotificationProvider>
+            <KeyboardProvider>
+              <AlertNotificationGlobal />
+              <Routes />
+            </KeyboardProvider>
+          </NotificationProvider>
+        </AuthProvider>
       </ThemeProvider>
     </SafeAreaProvider>
   );

@@ -1,8 +1,10 @@
 import { useCallback } from "react";
 
 import http from "../service/http";
-import { useNotification } from "@/src/context/NotificationContext";
+import { cpf } from 'cpf-cnpj-validator';
 import { useForm } from "react-hook-form";
+import { useNotification } from "@/src/context/NotificationContext";
+
 
 interface LoginForm {
   cpf: string;
@@ -47,13 +49,20 @@ function useHookLogin() {
   const rules = {
     cpf: {
       required: "CPF é obrigatório",
+      validate: (value: string) => cpf.isValid(value) || "CPF inválido"
     },
     senha: {
       required: "Senha é obrigatória",
     },
   }
 
-  return { handleLogin, control, handleSubmit, errors, rules };
+  return {
+    handleLogin,
+    handleSubmit,
+    control,
+    errors,
+    rules
+  };
 }
 
 export default useHookLogin;
