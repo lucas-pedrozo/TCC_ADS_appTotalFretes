@@ -1,11 +1,11 @@
 import { useCallback } from "react";
 
 import { Text, View } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { ButtonDefault } from "@/src/components/fom/buttons/ButtonDefauilt";
 
 import { useNavigation } from "@react-navigation/native";
 import { RootStackParamList } from "@/src/routes/Routes";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;

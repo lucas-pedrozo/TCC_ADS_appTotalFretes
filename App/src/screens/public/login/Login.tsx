@@ -1,13 +1,16 @@
-import useHookLogin from "@/src/hooks/hookLogin";
+import useHookLogin from "@/src/hooks/login/hookLogin";
 import { Pressable, Text, View } from "react-native";
-import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 
-import { InputCpfCnpj } from "@/src/components/fom/inputs/inputCpfCnpj";
-import { InputDefault } from "@/src/components/fom/inputs/InputDefault";
+import { InputDefault, InputCpf } from "@/src/components/fom/inputs/InputDefault";
 import { ButtonDefault } from "@/src/components/fom/buttons/ButtonDefauilt";
 
-function Login() {
+/**
+ * @description Componente de login
+ * @returns Componente de login
+ */
+const Login = () => {
   const { control, rules, handleSubmit, handleLogin } = useHookLogin();
   const insets = useSafeAreaInsets();
 
@@ -18,7 +21,7 @@ function Login() {
       keyboardShouldPersistTaps="handled"
     >
       <View className="gap-4 flex-1">
-        <InputCpfCnpj
+        <InputCpf
           name="cpf"
           label="CPF"
           placeholder="Digite seu CPF"

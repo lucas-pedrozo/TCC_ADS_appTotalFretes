@@ -1,18 +1,22 @@
 import React from "react"
-import { View, Text, TextInput } from "react-native"
 import { Controller } from "react-hook-form"
+import { maskCpf, maskDate } from "@/src/utils/formMask";
+import { View, Text, TextInput } from "react-native"
 
 type InputProps = {
 	label?: string;
 	placeholder?: string;
 	type?: "default" | "email-address" | "numeric" | "phone-pad";
 	secureTextEntry?: boolean;
+	maxLength?: number;
 
 	id?: string;
 	control: any;
 	name: string;
 	rules?: object;
 }
+
+const onlyDigits = (text: string) => text.replace(/\D/g, "")
 
 const STYLES_INPUT = {
 	default: {
@@ -25,7 +29,7 @@ const STYLES_INPUT = {
 	}
 }
 
-export const InputDefault = ({ id, control, name, rules, label, placeholder, type, secureTextEntry }: InputProps) => {
+export const InputDefault = ({ id, control, name, rules, label, placeholder, type, secureTextEntry, maxLength }: InputProps) => {
 	return (
 		<Controller
 			control={control}
@@ -40,12 +44,13 @@ export const InputDefault = ({ id, control, name, rules, label, placeholder, typ
 						{label ? <Text className={error ? STYLES_INPUT.error.label : STYLES_INPUT.default.label}>{label}</Text> : null}
 						<TextInput
 							id={id}
-							placeholder={placeholder}
-							keyboardType={type}
-							secureTextEntry={secureTextEntry}
-							onChangeText={onChange}
-							onBlur={onBlur}
 							value={value}
+							onBlur={onBlur}
+							keyboardType={type}
+							maxLength={maxLength}
+							onChangeText={onChange}
+							placeholder={placeholder}
+							secureTextEntry={secureTextEntry}
 							className={`${error ? STYLES_INPUT.error.input : STYLES_INPUT.default.input}`}
 						/>
 						{error ? <Text className="text-red-500 text-sm pl-2.5 pt-1">{error.message}</Text> : null}
@@ -55,4 +60,71 @@ export const InputDefault = ({ id, control, name, rules, label, placeholder, typ
 		>
 		</Controller>
 	)
+}
+
+export const InputCpf = ({ id, control, name, rules, label, placeholder, secureTextEntry, maxLength }: InputProps) => {
+	return (
+		<Controller
+			control={control}
+			name={name}
+			rules={rules}
+			render={({
+				field: { onChange, onBlur, value },
+				fieldState: { error }
+			}) => {
+				return (
+					<View>
+						{label ? <Text className={error ? STYLES_INPUT.error.label : STYLES_INPUT.default.label}>{label}</Text> : null}
+						<TextInput
+							id={id}
+							onBlur={onBlur}
+							maxLength={maxLength}
+							keyboardType="numeric"
+							placeholder={placeholder}
+							secureTextEntry={secureTextEntry}
+							value={maskCpf(String(value ?? ""))}
+							onChangeText={(text) => onChange(onlyDigits(text))}
+							className={`${error ? STYLES_INPUT.error.input : STYLES_INPUT.default.input}`}
+						/>
+						{error ? <Text className="text-red-500 text-sm pl-2.5 pt-1">{error.message}</Text> : null}
+					</View>
+				)
+			}}
+		>
+		</Controller>
+	)
+}
+
+
+export const InputDate = ({ id, control, name, rules, label, placeholder, secureTextEntry, maxLength }: InputProps) => {
+    return (
+        <Controller
+            control={control}
+            name={name}
+            rules={rules}
+            render={({
+                field: { onChange, onBlur, value },
+                fieldState: { error }
+            }) => {
+                return (
+                    <View>
+                        {label ? <Text className={error ? STYLES_INPUT.error.label : STYLES_INPUT.default.label}>{label}</Text> : null}
+                        <TextInput
+                            id={id}
+                            value={maskDate(String(value ?? ""))}
+                            onBlur={onBlur}
+                            keyboardType="numeric"
+                            maxLength={maxLength ?? 10}
+                            onChangeText={(text) => onChange(onlyDigits(text))}
+                            placeholder={placeholder ?? "dd/mm/aaaa"}
+                            secureTextEntry={secureTextEntry}
+                            className={`${error ? STYLES_INPUT.error.input : STYLES_INPUT.default.input}`}
+                        />
+                        {error ? <Text className="text-red-500 text-sm pl-2.5 pt-1">{error.message}</Text> : null}
+                    </View>
+                )
+            }}
+        >
+        </Controller>
+    )
 }

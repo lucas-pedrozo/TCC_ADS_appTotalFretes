@@ -11,6 +11,11 @@ import Animated, {
 
 const BASE_DURATION = 300;
 
+/**
+ * @description Animacao de entrada do iPhone notification
+ * @param values Valores da animacao
+ * @returns Objeto com as animacoes
+ */
 const iPhoneNotificationEnter = (values: { targetHeight: number }) => {
   "worklet";
   return {
@@ -37,6 +42,11 @@ const iPhoneNotificationEnter = (values: { targetHeight: number }) => {
   };
 };
 
+/**
+ * @description Animacao de saida do iPhone notification
+ * @param values Valores da animacao
+ * @returns Objeto com as animacoes
+ */
 const iPhoneNotificationExit = (values: { currentHeight: number }) => {
   "worklet";
   return {
@@ -58,18 +68,30 @@ const iPhoneNotificationExit = (values: { currentHeight: number }) => {
   };
 };
 
+/**
+ * @description Objeto com as animacoes de entrada
+ * @returns Objeto com as animacoes
+ */
 export const enter = {
   fade: FadeIn.duration(BASE_DURATION),
   fadeDown: FadeInDown.duration(BASE_DURATION),
   iPhoneBounce: iPhoneNotificationEnter,
 };
 
+/**
+ * @description Objeto com as animacoes de saida
+ * @returns Objeto com as animacoes
+ */
 export const exit = {
   fade: FadeOut.duration(BASE_DURATION),
   fadeDown: FadeOutUp.duration(BASE_DURATION),
   iPhoneBounce: iPhoneNotificationExit,
 };
 
+/**
+ * @description Tipo de props para o componente Animated.View
+ * @returns Tipo de props para o componente Animated.View
+ */
 export type AnimatedViewProps = React.ComponentProps<typeof Animated.View>;
 type EnterExit = { entering?: any; exiting?: any };
 
@@ -77,6 +99,13 @@ const AnimatedView = Animated.View as unknown as React.ComponentType<
   AnimatedViewProps & EnterExit
 >;
 
+/**
+ * @description Componente de animacao de fade
+ * @param entering Animacao de entrada
+ * @param exiting Animacao de saida
+ * @param rest Resto das props
+ * @returns Componente de animacao de fade
+ */
 export function Fade(
   { entering = enter.fade, exiting = exit.fade, ...rest }: AnimatedViewProps & EnterExit
 ) {

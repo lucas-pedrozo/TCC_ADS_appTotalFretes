@@ -2,11 +2,19 @@ import { createContext, useState, ReactNode, useContext } from "react";
 import * as SecureStore from "expo-secure-store";
 import { jwtDecode } from "jwt-decode";
 
+/**
+ * @description Interface de token decodificado
+ * @returns Interface de token decodificado
+ */
 interface DecodedToken {
 	id_user: number;
 	accessLevel: string;
 }
 
+/**
+ * @description Interface de contexto de autenticacao
+ * @returns Interface de contexto de autenticacao
+ */
 interface AuthContextType {
 	token: string | null;
 	id_user: number | null;
@@ -17,6 +25,10 @@ interface AuthContextType {
 	logout: () => void;
 }
 
+/**
+ * @description Contexto de autenticacao default
+ * @returns Contexto de autenticacao default
+ */
 const defaultAuthContext: AuthContextType = {
 	token: null,
 	id_user: null,
@@ -26,6 +38,11 @@ const defaultAuthContext: AuthContextType = {
 	logout: () => { },
 };
 
+/**
+ * @description Funcao para decodificar token
+ * @param token Token a ser decodificado
+ * @returns Token decodificado
+ */
 const decodeToken = (token: string) => {
 	try {
 		const decoded: DecodedToken = jwtDecode(token);
@@ -38,6 +55,11 @@ const decodeToken = (token: string) => {
 
 export const AuthContext = createContext<AuthContextType>(defaultAuthContext);
 
+/**
+ * @description Provider de autenticacao
+ * @param children Filhos do provider
+ * @returns Provider de autenticacao
+ */
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
 	const [token, setToken] = useState<string | null>(null);
 	const [id_user, setId_user] = useState<number | null>(null);
@@ -70,6 +92,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 	);
 } 
 
+/**
+ * @description Hook para usar o contexto de autenticacao
+ * @returns Hook para usar o contexto de autenticacao
+ */
 export const useAuth = () => {
     const context = useContext(AuthContext);
     if (!context) {

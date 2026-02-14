@@ -1,13 +1,50 @@
-export function maskCpf(value: string): string {
-    const digits = value.replace(/\D/g, "").slice(0, 11);
-    const part1 = digits.slice(0, 3);
-    const part2 = digits.slice(3, 6);
-    const part3 = digits.slice(6, 9);
-    const part4 = digits.slice(9, 11);
+/**
+ * @description Máscara de formatação de CPF
+ * @param value Valor a ser formatado
+ * @returns Valor formatado
+ */
+export const maskCpf = (value: string) => {
+  return value
+    .replace(/\D/g, '')
+    .replace(/(\d{3})(\d)/, '$1.$2')
+    .replace(/(\d{3})(\d)/, '$1.$2')
+    .replace(/(\d{3})(\d{1,2})/, '$1-$2')
+    .replace(/(-\d{2})\d+$/, '$1'); 
+};
 
-    let result = part1;
-    if (part2) result += `.${part2}`;
-    if (part3) result += `.${part3}`;
-    if (part4) result += `-${part4}`;
-    return result;
-}
+/**
+ * @description Máscara de formatação de telefone
+ * @param value Valor a ser formatado
+ * @returns Valor formatado
+ */
+export const maskPhone = (value: string) => {
+  return value
+    .replace(/\D/g, '')
+    .replace(/(\d{2})(\d)/, '($1) $2')
+    .replace(/(\d{5})(\d)/, '$1-$2')
+    .replace(/(-\d{4})\d+$/, '$1'); 
+};
+
+/**
+ * @description Máscara de formatação de CEP
+ * @param value Valor a ser formatado
+ * @returns Valor formatado
+ */
+export const maskCep = (value: string) => {
+  return value
+    .replace(/\D/g, '')
+    .replace(/(\d{5})(\d)/, '$1-$2')
+    .replace(/(-\d{3})\d+$/, '$1'); 
+};
+
+/**
+ * @description Máscara de formatação de data
+ * @param value Valor a ser formatado
+ * @returns Valor formatado
+ */
+export const maskDate = (value: string) => {
+  return value
+    .replace(/\D/g, '')
+    .replace(/(\d{2})(\d)/, '$1/$2')
+    .replace(/(\d{4})(\d)/, '$1'); 
+};

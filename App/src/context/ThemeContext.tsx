@@ -3,8 +3,16 @@ import React, { createContext, useCallback, useContext, useMemo, useState } from
 import { DefaultTheme, Theme } from "@react-navigation/native";
 import { colorScheme } from "nativewind";
 
+/**
+ * @description Tipo de modo de tema
+ * @returns Tipo de modo de tema
+ */
 type ThemeMode = "light" | "dark";
 
+/**
+ * @description Interface de contexto de tema
+ * @returns Interface de contexto de tema
+ */
 type ThemeContextValue = {
   mode: ThemeMode;
   theme: Theme;
@@ -13,6 +21,11 @@ type ThemeContextValue = {
 
 const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 
+/**
+ * @description Provider de tema
+ * @param children Filhos do provider
+ * @returns Provider de tema
+ */
 export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   const [mode, setMode] = useState<ThemeMode>(() => {
     colorScheme.set("dark");
@@ -45,6 +58,10 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
+/**
+ * @description Hook para usar o contexto de tema
+ * @returns Hook para usar o contexto de tema
+ */
 export const useThemeMode = () => {
   const context = useContext(ThemeContext);
   if (!context) {

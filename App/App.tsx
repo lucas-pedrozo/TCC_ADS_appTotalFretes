@@ -9,6 +9,7 @@ import { KeyboardProvider } from "react-native-keyboard-controller";
 import { AuthProvider } from "./src/context/AuthContext";
 import AlertNotification from "./src/components/alert/AlertNotification";
 import { useNotification, NotificationProvider } from "./src/context/NotificationContext";
+import { SingUpProvider } from "./src/context/SingUpContext";
 
 const AlertNotificationGlobal = () => {
   const { notification, hideNotification } = useNotification();
@@ -30,8 +31,10 @@ function App() {
         <AuthProvider>
           <NotificationProvider>
             <KeyboardProvider>
-              <AlertNotificationGlobal />
-              <Routes />
+              <SingUpProvider>
+                <AlertNotificationGlobal />
+                <Routes />
+              </SingUpProvider>
             </KeyboardProvider>
           </NotificationProvider>
         </AuthProvider>
