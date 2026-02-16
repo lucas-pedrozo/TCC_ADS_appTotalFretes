@@ -24,19 +24,20 @@ const Login = () => {
         <InputCpf
           name="cpf"
           label="CPF"
-          placeholder="Digite seu CPF"
+          placeholder="000.000.000-00"
+          maxLength={14}
           control={control}
           rules={rules.cpf}
         />
 
         <InputDefault
-          name="senha"
+          name="password"
           label="Senha"
           placeholder="Digite sua senha"
           type="default"
           secureTextEntry
           control={control}
-          rules={rules.senha}
+          rules={rules.password}
         />
 
         <Pressable onPress={() => {}} className="self-start">

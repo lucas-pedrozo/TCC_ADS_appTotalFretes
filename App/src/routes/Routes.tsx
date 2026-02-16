@@ -1,5 +1,5 @@
 import "react-native-gesture-handler";
-import { StatusBar } from "react-native";
+import { StatusBar, View } from "react-native";
 import Header from "../components/header/Header";
 import { useThemeMode } from "../context/ThemeContext";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -41,11 +41,9 @@ export default function Routes() {
       <Stack.Navigator 
         initialRouteName="Start" 
         screenOptions={{ 
-          contentStyle: { backgroundColor }, 
-          animation: "none",
           header: ({ options }) => (
             options.title ? (
-              <SafeAreaView style={{paddingHorizontal: 20}}>
+              <SafeAreaView edges={["top"]} style={{ paddingHorizontal: 20, backgroundColor }}>
                 <Header title={options.title} />
               </SafeAreaView>
             ) : null
@@ -54,7 +52,6 @@ export default function Routes() {
       >
 
         <Stack.Screen name="Home" component={Home} options={{headerShown: false}} />
-
         <Stack.Screen name="Start" component={Start} options={{headerShown: false}} />
         <Stack.Screen name="Login" component={Login} options={{title: "Login"}} />
         

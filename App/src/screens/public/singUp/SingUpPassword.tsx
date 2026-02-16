@@ -28,21 +28,21 @@ const SingUpPassword = () => {
 
 			<View className="gap-4 flex-1">
 				<InputDefault
-					name="senha"
+					name="password"
 					control={control}
 					placeholder="Senha"
 					label="Senha"
 					secureTextEntry
-					rules={rules.senha}
+					rules={rules.password}
 				/>
 
 				<InputDefault
-					name="confirmarSenha"
+					name="confirmPassword"
 					control={control}
 					placeholder="Confirmar Senha"
 					label="Confirmar Senha"
 					secureTextEntry
-					rules={rules.confirmarSenha}
+					rules={rules.confirmPassword}
 				/>
 
 				<View className="flex-1 justify-end py-4">

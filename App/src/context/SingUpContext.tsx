@@ -5,13 +5,13 @@ import React, { createContext, useCallback, useContext, useMemo, useState } from
  * @returns Interface de dados de pessoa
  */
 export type SingUpPersonaData = {
-  nome: string;
+  fullName: string;
   email: string;
-  dataNascimento: string;
-  numeroTelefone: string;
+  birthDate: string;
+  phoneNumber: string;
   cpf: string;
-  deficiencia?: string;
-  sexo?: string;
+  disability?: string;
+  gender?: string;
 };
 
 /**
@@ -19,10 +19,11 @@ export type SingUpPersonaData = {
  * @returns Interface de dados de CNH
  */
 export type SingUpCnhData = {
+  fullNameCnh: string;
   cnh: string;
-  oculos: string;
-  orgaoEmissor: string;
-  tipoCnh: string;
+  glasses: string;
+  issuingAgency: string;
+  typeCnh: string;
 };
 
 /**
@@ -30,8 +31,8 @@ export type SingUpCnhData = {
  * @returns Interface de dados de senha
  */
 export type SingUpPasswordData = {
-  senha: string;
-  confirmarSenha: string;
+  password: string;
+  confirmPassword: string;
 };
 
 /**
@@ -63,13 +64,13 @@ type SingUpContextValue = {
  * @returns Dados de pessoa default
  */
 const defaultPersona: SingUpPersonaData = {
-  nome: "",
+  fullName: "",
   email: "",
-  dataNascimento: "",
-  numeroTelefone: "",
+  birthDate: "",
+  phoneNumber: "",
   cpf: "",
-  deficiencia: "",
-  sexo: "",
+  disability: "",
+  gender: "",
 };
 
 /**
@@ -77,10 +78,11 @@ const defaultPersona: SingUpPersonaData = {
  * @returns Dados de CNH default
  */
 const defaultCnh: SingUpCnhData = {
+  fullNameCnh: "",
   cnh: "",
-  oculos: "",
-  orgaoEmissor: "",
-  tipoCnh: "",
+  glasses: "",
+  issuingAgency: "",
+  typeCnh: "",
 };
 
 /**
@@ -88,8 +90,8 @@ const defaultCnh: SingUpCnhData = {
  * @returns Dados de senha default
  */
 const defaultPassword: SingUpPasswordData = {
-  senha: "",
-  confirmarSenha: "",
+  password: "",
+  confirmPassword: "",
 };
 
 const SingUpContext = createContext<SingUpContextValue | undefined>(undefined);

@@ -21,13 +21,8 @@ export function useHookCnh(options?: UseHookSingUpCnhOptions) {
     mode: "onSubmit",
   });
 
-  /**
-   * @description Funcao para navegar para o proximo passo
-   * @returns Funcao para navegar para o proximo passo
-   */
   const handleNext = useCallback(() => {
-    handleSubmit(
-      (data) => {
+    handleSubmit((data) => {
         setCnh(data);
         options?.onNext?.();
       },
@@ -35,10 +30,11 @@ export function useHookCnh(options?: UseHookSingUpCnhOptions) {
   }, [handleSubmit, options, setCnh]);
 
   const rules = {
-    orgaoEmissor: validationRules.orgaoEmissor,
-    deficiencia: validationRules.deficiencia,
-    tipoCnh: validationRules.tipoCnh,
-    oculos: validationRules.oculos,
+    fullNameCnh: validationRules.fullNameCnh,
+    issuingAgency: validationRules.issuingAgency,
+    disability: validationRules.disability,
+    typeCnh: validationRules.typeCnh,
+    glasses: validationRules.glasses,
     cnh: validationRules.cnh,
   };
 

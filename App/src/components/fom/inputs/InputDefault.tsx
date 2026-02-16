@@ -1,6 +1,6 @@
 import React from "react"
 import { Controller } from "react-hook-form"
-import { maskCpf, maskDate } from "@/src/utils/formMask";
+import { maskCpf, maskDate, maskPhone } from "@/src/utils/formMask";
 import { View, Text, TextInput } from "react-native"
 
 type InputProps = {
@@ -95,7 +95,6 @@ export const InputCpf = ({ id, control, name, rules, label, placeholder, secureT
 	)
 }
 
-
 export const InputDate = ({ id, control, name, rules, label, placeholder, secureTextEntry, maxLength }: InputProps) => {
     return (
         <Controller
@@ -127,4 +126,38 @@ export const InputDate = ({ id, control, name, rules, label, placeholder, secure
         >
         </Controller>
     )
+}
+
+
+export const InputPhone = ({ id, control, name, rules, label, placeholder, secureTextEntry, maxLength }: InputProps) => {
+	return (
+		<Controller
+			control={control}
+			name={name}
+			rules={rules}
+			render={({
+				field: { onChange, onBlur, value },
+				fieldState: { error }
+			}) => {
+				return (
+					<View>
+						{label ? <Text className={error ? STYLES_INPUT.error.label : STYLES_INPUT.default.label}>{label}</Text> : null}
+						<TextInput
+							id={id}
+							onBlur={onBlur}
+							maxLength={maxLength}
+							keyboardType="phone-pad"
+							placeholder={placeholder}
+							secureTextEntry={secureTextEntry}
+							value={maskPhone(String(value ?? ""))}
+							onChangeText={(text) => onChange(onlyDigits(text))}
+							className={`${error ? STYLES_INPUT.error.input : STYLES_INPUT.default.input}`}
+						/>
+						{error ? <Text className="text-red-500 text-sm pl-2.5 pt-1">{error.message}</Text> : null}
+					</View>
+				)
+			}}
+		>
+		</Controller>
+	)
 }

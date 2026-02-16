@@ -6,7 +6,7 @@ import { cpf, cnpj } from 'cpf-cnpj-validator';
  * @param value Valor a ser validado
  * @returns true se o valor for valido, false caso contrario
  */
-export const validateName = (value: string) => {
+export const validateFullName = (value: string) => {
   return validator.isLength(value, { min: 2, max: 100 }) && validator.matches(value, /^[a-zA-Z\s]+$/);
 };
 
@@ -52,7 +52,7 @@ export const validatePhone = (value: string) => {
  * @returns true se o valor for valido, false caso contrario
  */
 export const validateBirthDate = (value: string) => {
-  return validator.isDate(value, { format: 'DD/MM/YYYY' });
+  return validator.isDate(value, { format: 'DD/MM/YYYY' }) && validator.isBefore(value, new Date().toISOString());
 };
 
 /**
@@ -69,7 +69,7 @@ export const validateCNH = (value: string) => {
  * @param value Valor a ser validado
  * @returns true se o valor for valido, false caso contrario
  */
-export const validateCNHCategory = (value: string) => {
+export const validateTypeCnh = (value: string) => {
   return validator.isLength(value, { min: 1, max: 2 });
 };
 
@@ -78,7 +78,7 @@ export const validateCNHCategory = (value: string) => {
  * @param value Valor a ser validado
  * @returns true se o valor for valido, false caso contrario
  */
-export const validateYesNo = (value: string) => {
+export const validateGlasses = (value: string) => {
   return validator.isIn(value, ['sim', 'nao']);
 };
 
@@ -87,7 +87,7 @@ export const validateYesNo = (value: string) => {
  * @param value Valor a ser validado
  * @returns true se o valor for valido, false caso contrario
  */
-export const validateIssuingAgency = (value: string) => {
+export const validateIssuingAgencyCnh = (value: string) => {
   return validator.isLength(value, { min: 1, max: 2 });
 };
 
@@ -96,7 +96,7 @@ export const validateIssuingAgency = (value: string) => {
  * @param value Valor a ser validado
  * @returns true se o valor for valido, false caso contrario
  */
-export const validatePassword = (value: string) => {
+export const validatePasswordConfirmation = (value: string) => {
   return validator.isLength(value, { min: 8, max: 16 });
 };
 
@@ -105,7 +105,7 @@ export const validatePassword = (value: string) => {
  * @param value Valor a ser validado
  * @returns true se o valor for valido, false caso contrario
  */
-export const validateSex = (value: string) => {
+export const validateGender = (value: string) => {
   return validator.isIn(value, ['masculino', 'feminino']);
 };
 
@@ -114,7 +114,7 @@ export const validateSex = (value: string) => {
  * @param value Valor a ser validado
  * @returns true se o valor for valido, false caso contrario
  */
-export const validatePasswordMatch = (value: string, confirmValue: string) => {
+export const validatePasswordConfirmationMatch = (value: string, confirmValue: string) => {
   return value === confirmValue;
 };
 
@@ -122,9 +122,13 @@ export const validatePasswordMatch = (value: string, confirmValue: string) => {
  * @description Objeto com todas as regras de validacao do react-hook-form
  */
 export const validationRules = {
-  nome: {
-    required: "Nome e obrigatorio",
-    validate: validateName,
+  cnh: {
+    required: "CNH e obrigatoria",
+    validate: validateCNH,
+  },
+  fullName: {
+    required: "Nome e obrigatorio", 
+    validate: validateFullName,
   },
   email: {
     required: "Email e obrigatorio",
@@ -138,42 +142,43 @@ export const validationRules = {
     required: "CNPJ e obrigatorio",
     validate: validateCNPJ,
   },
-  numeroTelefone: {
+  phoneNumber: {
     required: "Numero de telefone e obrigatorio",
     validate: validatePhone,
   },
-  dataNascimento: {
+  birthDate: {
     required: "Data de nascimento e obrigatoria",
     validate: validateBirthDate,
   },
-  cnh: {
-    required: "CNH e obrigatoria",
+  fullNameCnh: {
+    required: "Nome completo da CNH e obrigatorio",
     validate: validateCNH,
   },
-  tipoCnh: {
+  typeCnh: {
     required: "Categoria de CNH e obrigatoria",
-    validate: validateCNHCategory,
+    validate: validateTypeCnh,
   },
-  oculos: {
+  glasses: {
     required: "Este campo e obrigatorio",
-    validate: validateYesNo,
+    validate: validateGlasses,
   },
-  deficiencia: {
+  disability: {
     required: "Este campo e obrigatorio",
-    validate: validateYesNo,
+    validate: validateGender,
   },
-  orgaoEmissor: {
+  issuingAgency: {
     required: "Orgao emissor e obrigatorio",
-    validate: validateIssuingAgency,
+    validate: validateIssuingAgencyCnh,
   },
-  senha: {
+  password: {
     required: "Senha e obrigatoria",
-    validate: validatePassword,
+    validate: validatePasswordConfirmation,
   },
-  sexo:{
+  gender:{
     required: "Sexo e obrigatorio",
   },
-  confirmarSenha: {
+  confirmPassword: {
     required: "Confirmacao de senha e obrigatoria",
+    validate: validatePasswordConfirmationMatch,
   },
 };

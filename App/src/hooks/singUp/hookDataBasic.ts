@@ -17,23 +17,24 @@ export function useHookDataBasic(options?: UseHookSingUpPersonaOptions) {
   });
 
   const handleNext = useCallback(() => {
-    handleSubmit((data) => {
-      setPersona(data);
-      options?.onNext?.();
-    })();
+      handleSubmit(async (data) => {
+      await setPersona(data);
+      await options?.onNext?.();
+    },
+    )();
   },
     [handleSubmit, options, setPersona]
   );
 
 
   const rules = {
-    nome: validationRules.nome,
+    fullName: validationRules.fullName,
     email: validationRules.email,
-    dataNascimento: validationRules.dataNascimento,
-    numeroTelefone: validationRules.numeroTelefone,
     cpf: validationRules.cpf,
-    deficiencia: validationRules.deficiencia,
-    sexo: validationRules.sexo,
+    phoneNumber: validationRules.phoneNumber,
+    gender: validationRules.gender,
+    birthDate: validationRules.birthDate,
+    disability: validationRules.disability,
   };
 
   return {

@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 
 import { useHookSingUp } from "./hookSingUp";
 import { SingUpPasswordData, useSingUpContext } from "../../context/SingUpContext";
-import { validationRules, validatePasswordMatch } from "../../utils/formValidations";
+import { validationRules, validatePasswordConfirmationMatch } from "../../utils/formValidations";
 
 type UseHookSingUpPasswordOptions = {
   onSuccess?: () => void;
@@ -37,10 +37,10 @@ export function useHookPassword(options?: UseHookSingUpPasswordOptions) {
   }, [getPayload, handleSingUp, handleSubmit, options, setPassword]);
 
   const rules = {
-    senha: validationRules.senha,
-    confirmarSenha: {
-      ...validationRules.confirmarSenha,
-      validate: (value: string) => validatePasswordMatch(value, watch("senha")),
+    password: validationRules.password,
+    confirmPassword: {
+      ...validationRules.confirmPassword,
+      validate: (value: string) => validatePasswordConfirmationMatch(value, watch("password")),
     },
   };
 

@@ -20,7 +20,7 @@ const STYLES_INPUT = {
   default: {
     label: "text-lightText dark:text-darkText font-semibold text-base pl-2.5",
     button: "bg-lightBgTertiary dark:bg-darkBgSecondary rounded-lg px-6 py-3 items-center",
-    text: "text-lightText dark:text-darkText font-semibold text-base",
+    text: "text-lightText dark:text-darkText font-semibold text-sm",
   },
   selected: {
     button: "bg-green-500 dark:bg-green-500",
@@ -44,7 +44,7 @@ export const InputGroup = ({ label, name, control, rules, options, wrap = true }
         return (
           <View>
             <Text className={error ? STYLES_INPUT.error.label : STYLES_INPUT.default.label}> {label}</Text>
-            <View className={`flex-row gap-4 pt-3 ${wrap ? "flex-wrap" : ""}`}>
+            <View className={`flex-row gap-2.5 pt-3 ${wrap ? "flex-wrap" : ""}`}>
               {options.map((option) => {
                 const isSelected = String(selectedValue) === option.value;
 

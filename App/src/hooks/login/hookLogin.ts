@@ -7,49 +7,43 @@ import { useNotification } from "@/src/context/NotificationContext";
 
 interface LoginForm {
   cpf: string;
-  senha: string;
+  password: string;
 }
 
 function useHookLogin() {
   const { notify } = useNotification();
 
-  const notifyWithDelay = useCallback(
-    async (payload: { status: "loading" | "success" | "error"; message?: string }) => {
-      await new Promise((resolve) => setTimeout(resolve, 100));
-      await notify(payload);
-    },
-    [notify]
-  );
-
   const { control, handleSubmit, formState: { errors } } = useForm<LoginForm>({
-    defaultValues: { cpf: "", senha: "" },
+    defaultValues: { cpf: "", password: "" },
     mode: "onSubmit",
   });
 
-  const handleLogin = useCallback(
-    async (data: LoginForm) => {
+  const handleLogin = useCallback( async (data: LoginForm) => {
       try {
-        await notifyWithDelay({
-          status: "loading",
-          message: "Efetuando login...",
-        });
+
+        setTimeout(() => {
+          notify({
+            status: "loading",
+            message: "Efetuando login...",
+          });
+        }, 100);
 
         await http.post("/login", data);
 
-        await notifyWithDelay({
+        await notify({
           status: "success",
           message: "Login efetuado com sucesso!",
         });
 
       } catch (error) {
-         console.error("Login error:", error);
-        await notifyWithDelay({
+        console.error("Login error:", error);
+        await notify({
           status: "error",
           message: "Erro ao efetuar login. Verifique suas credenciais.",
         });
       }
     },
-    [notifyWithDelay]
+    [notify]
   );
 
   /**
@@ -61,7 +55,7 @@ function useHookLogin() {
       required: "CPF é obrigatório",
       validate: (value: string) => cpf.isValid(value) || "CPF inválido"
     },
-    senha: {
+    password: {
       required: "Senha é obrigatória",
     },
   }

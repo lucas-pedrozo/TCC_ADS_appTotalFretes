@@ -1,6 +1,6 @@
 import { View } from "react-native";
 
-import { InputDefault, InputCpf } from "@/src/components/fom/inputs/InputDefault";
+import { InputDefault, InputCpf, InputPhone, InputDate } from "@/src/components/fom/inputs/InputDefault";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { ButtonDefault } from "@/src/components/fom/buttons/ButtonDefauilt";
 
@@ -38,17 +38,18 @@ const SingUp = () => {
 
       <View className="gap-4 flex-1">
         <InputDefault
-          name="nome"
+          name="fullName"
           control={control}
           label="Nome Completo"
+          maxLength={100}
           placeholder="Nome Completo"
-          rules={rules.nome}
+          rules={rules.fullName}
         />
 
         <InputDefault
           name="email"
           control={control}
-          placeholder="Email"
+          placeholder="email@exemplo.com"
           label="Email"
           rules={rules.email}
         />
@@ -56,40 +57,49 @@ const SingUp = () => {
         <InputCpf
           name="cpf"
           control={control}
-          placeholder="CPF"
+          maxLength={14}
+          placeholder="000.000.000-00"
           label="CPF"
           rules={rules.cpf}
         />
 
-        <InputDefault
-          name="numeroTelefone"
+        <InputPhone
+          name="phoneNumber"
           control={control}
-          placeholder="Número de Telefone"
-          maxLength={11}
+          placeholder="00 00000-0000"
+          maxLength={15}
           label="Número de Telefone"
-          rules={rules.numeroTelefone}
+          rules={rules.phoneNumber}
+        />
+
+        <InputDate
+          name="birthDate"
+          control={control}
+          placeholder="dd/mm/aaaa"
+          label="Data de Nascimento"
+          rules={rules.birthDate}
         />
 
         <InputGroup
-          name="sexo"
+          name="gender"
           control={control}
           label="Sexo"
-          rules={rules.sexo}
+          rules={rules.gender}
           options={[
             { label: "Masculino", value: "masculino" },
             { label: "Feminino", value: "feminino" },
-            { label: "Não Informar", value: "outro" },
+            { label: "Não Informar", value: "naoInformar" },
           ]}
         />
 
         <InputGroup
-          name="deficiencia"
+          name="disability"
           control={control}
           label="Possui deficiencia?"
-          rules={rules.deficiencia}
+          rules={rules.disability}
           options={[
             { label: "Sim", value: "sim" },
-            { label: "Nao", value: "nao" },
+            { label: "Não", value: "nao" },
           ]}
         />
 

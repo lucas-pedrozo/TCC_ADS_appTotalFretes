@@ -39,28 +39,37 @@ const SingUpCNH = () => {
 
 			<View className="gap-4 flex-1">
 				<InputDefault
+					name="fullNameCnh"
+					control={control}
+					placeholder="Nome Completo"
+					label="Nome Completo da CNH"
+					maxLength={100}
+					rules={rules.fullNameCnh}
+				/>
+				
+				<InputDefault
 					name="cnh"
 					control={control}
-					placeholder="CNH"
+					placeholder="00000000000"
 					label="CNH"
-					maxLength={11}
+					maxLength={12}
 					rules={rules.cnh}
 				/>
 
 				<InputDefault
-					name="orgaoEmissor"
+					name="issuingAgency"
 					control={control}
 					placeholder="Órgão Emissor"
 					label="Órgão Emissor"
 					maxLength={2}
-					rules={rules.orgaoEmissor}
+					rules={rules.issuingAgency}
 				/>
 
 				<InputGroup
-					name="tipoCnh"
+					name="typeCnh"
 					control={control}
 					label="Categoria da CNH"
-					rules={rules.tipoCnh}
+					rules={rules.typeCnh}
 					options={[
 						{ label: "A", value: "A" },
 						{ label: "B", value: "B" },
@@ -71,10 +80,10 @@ const SingUpCNH = () => {
 				/>
 
 				<InputGroup
-					name="oculos"
+					name="glasses"
 					control={control}
 					label="Usa oculos?"
-					rules={rules.oculos}
+					rules={rules.glasses}
 					options={[
 						{ label: "Sim", value: "sim" },
 						{ label: "Nao", value: "nao" },

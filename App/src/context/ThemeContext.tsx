@@ -1,7 +1,14 @@
-import React, { createContext, useCallback, useContext, useMemo, useState } from "react";
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 
-import { DefaultTheme, Theme } from "@react-navigation/native";
-import { colorScheme } from "nativewind";
+import { Platform, View } from "react-native"; // Biblioteca para gerenciar a plataforma e a view
+
+import { DefaultTheme, Theme } from "@react-navigation/native"; // Biblioteca para gerenciar o tema da aplicacao
+
+import { colorScheme } from "nativewind"; // Biblioteca para gerenciar o tema da aplicacao
+
+import * as SystemUI from "expo-system-ui"; // Biblioteca para gerenciar o sistema de cores do sistema operacional
+
+import { setStatusBarStyle } from "expo-status-bar"; // Biblioteca para gerenciar o status bar
 
 /**
  * @description Tipo de modo de tema
@@ -41,19 +48,35 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   const theme = useMemo<Theme>(() => {
+    const background = mode === "dark" ? "#000000" : "#FAFAFA";
+    const text = mode === "dark" ? "#FFFFFF" : "#000000";
+
     return {
       ...DefaultTheme,
       colors: {
         ...DefaultTheme.colors,
-        background: mode === "dark" ? "#000000" : "#FAFAFA",
-        text: mode === "dark" ? "#FFFFFF" : "#000000",
+        background,
+        card: background,
+        border: background,
+        text,
       },
     };
   }, [mode]);
 
+  useEffect(() => {
+    if (Platform.OS !== "android") {
+      return;
+    }
+
+    SystemUI.setBackgroundColorAsync(theme.colors.background);
+    setStatusBarStyle(mode === "dark" ? "light" : "dark");
+  }, [mode, theme.colors.background]);
+
   return (
     <ThemeContext.Provider value={{ mode, theme, toggleMode }}>
-      {children}
+      <View style={{ flex: 1, backgroundColor: theme.colors.background }}>
+        {children}
+      </View>
     </ThemeContext.Provider>
   );
 };
