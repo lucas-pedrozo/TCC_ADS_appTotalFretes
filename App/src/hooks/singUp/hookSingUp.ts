@@ -5,16 +5,15 @@ import { useNotification } from "@/src/context/NotificationContext";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
 
 export interface SingUpFormData {
-  cnh?: string;
+  cnhNumber?: string;
   cpf?: string;
-  fullName?: string;
-  senha?: string;
+  name?: string;
+  password?: string;
   email?: string;
   sex?: string;
-  glasses?: string;
-  typeCnh?: string;
-  disability?: string;
-  fullNameCnh?: string;
+  useGlasses?: boolean;
+  typeCnh?: number;
+  isDeficient?: boolean;
   issuingAgency?: string;
   birthDate?: string;
   phoneNumber?: string;

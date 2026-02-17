@@ -6,7 +6,7 @@ import { cpf, cnpj } from 'cpf-cnpj-validator';
  * @param value Valor a ser validado
  * @returns true se o valor for valido, false caso contrario
  */
-export const validateFullName = (value: string) => {
+export const validateName = (value: string) => {
   return validator.isLength(value, { min: 2, max: 100 }) && validator.matches(value, /^[a-zA-Z\s]+$/);
 };
 
@@ -60,7 +60,7 @@ export const validateBirthDate = (value: string) => {
  * @param value Valor a ser validado
  * @returns true se o valor for valido, false caso contrario
  */
-export const validateCNH = (value: string) => {
+export const validateCnhNumber = (value: string) => {
   return validator.isLength(value, { min: 11, max: 11 });
 };
 
@@ -70,7 +70,7 @@ export const validateCNH = (value: string) => {
  * @returns true se o valor for valido, false caso contrario
  */
 export const validateTypeCnh = (value: string) => {
-  return validator.isLength(value, { min: 1, max: 2 });
+  return validator.isInt(value, { min: 1, max: 5 });
 };
 
 /**
@@ -78,8 +78,8 @@ export const validateTypeCnh = (value: string) => {
  * @param value Valor a ser validado
  * @returns true se o valor for valido, false caso contrario
  */
-export const validateGlasses = (value: string) => {
-  return validator.isIn(value, ['sim', 'nao']);
+export const validateUseGlasses = (value: string) => {
+  return validator.isBoolean(value);
 };
 
 /**
@@ -105,8 +105,8 @@ export const validatePasswordConfirmation = (value: string) => {
  * @param value Valor a ser validado
  * @returns true se o valor for valido, false caso contrario
  */
-export const validateGender = (value: string) => {
-  return validator.isIn(value, ['masculino', 'feminino']);
+export const validateSex = (value: string) => {
+  return validator.isIn(value, ['M', 'F', 'N']);
 };
 
 /**
@@ -119,16 +119,25 @@ export const validatePasswordConfirmationMatch = (value: string, confirmValue: s
 };
 
 /**
+ * @description Validacao de deficiencia
+ * @param value Valor a ser validado
+ * @returns true se o valor for valido, false caso contrario
+ */
+export const validateDisability = (value: string) => {
+  return validator.isBoolean(value);
+};
+
+/**
  * @description Objeto com todas as regras de validacao do react-hook-form
  */
 export const validationRules = {
-  cnh: {
+  cnhNumber: {
     required: "CNH e obrigatoria",
-    validate: validateCNH,
+    validate: validateCnhNumber,
   },
-  fullName: {
+  name: {
     required: "Nome e obrigatorio", 
-    validate: validateFullName,
+    validate: validateName,
   },
   email: {
     required: "Email e obrigatorio",
@@ -150,23 +159,19 @@ export const validationRules = {
     required: "Data de nascimento e obrigatoria",
     validate: validateBirthDate,
   },
-  fullNameCnh: {
-    required: "Nome completo da CNH e obrigatorio",
-    validate: validateCNH,
-  },
   typeCnh: {
     required: "Categoria de CNH e obrigatoria",
     validate: validateTypeCnh,
   },
-  glasses: {
+  useGlasses: {
     required: "Este campo e obrigatorio",
-    validate: validateGlasses,
+    validate: validateUseGlasses,
   },
-  disability: {
+  isDeficient: {
     required: "Este campo e obrigatorio",
-    validate: validateGender,
+    validate: validateDisability,
   },
-  issuingAgency: {
+  issuingAgencyCnh: {
     required: "Orgao emissor e obrigatorio",
     validate: validateIssuingAgencyCnh,
   },
@@ -174,8 +179,9 @@ export const validationRules = {
     required: "Senha e obrigatoria",
     validate: validatePasswordConfirmation,
   },
-  gender:{
+  sex:{
     required: "Sexo e obrigatorio",
+    validate: validateSex,
   },
   confirmPassword: {
     required: "Confirmacao de senha e obrigatoria",

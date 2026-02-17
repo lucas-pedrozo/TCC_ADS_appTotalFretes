@@ -5,13 +5,13 @@ import React, { createContext, useCallback, useContext, useMemo, useState } from
  * @returns Interface de dados de pessoa
  */
 export type SingUpPersonaData = {
-  fullName: string;
+  name: string;
   email: string;
   birthDate: string;
   phoneNumber: string;
   cpf: string;
-  disability?: string;
-  gender?: string;
+  isDeficient?: boolean;
+  sex?: string;
 };
 
 /**
@@ -19,11 +19,10 @@ export type SingUpPersonaData = {
  * @returns Interface de dados de CNH
  */
 export type SingUpCnhData = {
-  fullNameCnh: string;
-  cnh: string;
-  glasses: string;
-  issuingAgency: string;
-  typeCnh: string;
+  cnhNumber: string;
+  useGlasses?: boolean;
+  issuingAgencyCnh: string;
+  typeCnh?: number;  
 };
 
 /**
@@ -64,13 +63,13 @@ type SingUpContextValue = {
  * @returns Dados de pessoa default
  */
 const defaultPersona: SingUpPersonaData = {
-  fullName: "",
+  name: "",
   email: "",
   birthDate: "",
   phoneNumber: "",
   cpf: "",
-  disability: "",
-  gender: "",
+  isDeficient: undefined,
+  sex: "",
 };
 
 /**
@@ -78,11 +77,10 @@ const defaultPersona: SingUpPersonaData = {
  * @returns Dados de CNH default
  */
 const defaultCnh: SingUpCnhData = {
-  fullNameCnh: "",
-  cnh: "",
-  glasses: "",
-  issuingAgency: "",
-  typeCnh: "",
+  cnhNumber: "",
+  useGlasses: undefined,
+  issuingAgencyCnh: "",
+  typeCnh: undefined,
 };
 
 /**

@@ -22,20 +22,21 @@ export function useHookCnh(options?: UseHookSingUpCnhOptions) {
   });
 
   const handleNext = useCallback(() => {
-    handleSubmit((data) => {
+    try {
+      handleSubmit((data) => {
         setCnh(data);
         options?.onNext?.();
-      },
-    )();
+      },)();
+    } catch (error) {
+      console.error(error)
+    }
   }, [handleSubmit, options, setCnh]);
 
   const rules = {
-    fullNameCnh: validationRules.fullNameCnh,
-    issuingAgency: validationRules.issuingAgency,
-    disability: validationRules.disability,
+    cnhNumber: validationRules.cnhNumber,
+    issuingAgencyCnh: validationRules.issuingAgencyCnh,
     typeCnh: validationRules.typeCnh,
-    glasses: validationRules.glasses,
-    cnh: validationRules.cnh,
+    useGlasses: validationRules.useGlasses,
   };
 
   return {

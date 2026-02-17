@@ -113,7 +113,7 @@ export const InputDate = ({ id, control, name, rules, label, placeholder, secure
                             value={maskDate(String(value ?? ""))}
                             onBlur={onBlur}
                             keyboardType="numeric"
-                            maxLength={maxLength ?? 10}
+                            maxLength={maxLength}
                             onChangeText={(text) => onChange(onlyDigits(text))}
                             placeholder={placeholder ?? "dd/mm/aaaa"}
                             secureTextEntry={secureTextEntry}

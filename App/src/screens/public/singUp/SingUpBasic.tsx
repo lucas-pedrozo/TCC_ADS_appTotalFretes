@@ -43,7 +43,7 @@ const SingUp = () => {
           label="Nome Completo"
           maxLength={100}
           placeholder="Nome Completo"
-          rules={rules.fullName}
+          rules={rules.name}
         />
 
         <InputDefault
@@ -77,6 +77,7 @@ const SingUp = () => {
           control={control}
           placeholder="dd/mm/aaaa"
           label="Data de Nascimento"
+          maxLength={10}
           rules={rules.birthDate}
         />
 
@@ -84,11 +85,11 @@ const SingUp = () => {
           name="gender"
           control={control}
           label="Sexo"
-          rules={rules.gender}
+          rules={rules.sex}
           options={[
-            { label: "Masculino", value: "masculino" },
-            { label: "Feminino", value: "feminino" },
-            { label: "Não Informar", value: "naoInformar" },
+            { label: "Masculino", value: "M" },
+            { label: "Feminino", value: "F" },
+            { label: "Não Informar", value: "N" },
           ]}
         />
 
@@ -96,10 +97,10 @@ const SingUp = () => {
           name="disability"
           control={control}
           label="Possui deficiencia?"
-          rules={rules.disability}
+          rules={rules.isDeficient}
           options={[
-            { label: "Sim", value: "sim" },
-            { label: "Não", value: "nao" },
+            { label: "Sim", value: "true" },
+            { label: "Não", value: "false" },
           ]}
         />
 
