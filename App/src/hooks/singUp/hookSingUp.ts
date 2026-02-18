@@ -31,7 +31,7 @@ export function useHookSingUp() {
         message: "Criando conta..."
       });
 
-      const createUserResponse = await http.post("/user", {
+      await http.post("/end-account", {
         cnhNumber: data.cnhNumber,
         cpf: data.cpf,
         name: data.name,
@@ -43,15 +43,9 @@ export function useHookSingUp() {
         issuingAgency: data.issuingAgency,
         birthDate: data.birthDate,
         phoneNumber: data.phoneNumber,
-      });
 
-      const userId = createUserResponse.data.user.id;
-
-      await http.post("/account", {
-        email: data.email,
         password: data.password,
         account_type_id: 1,
-        subject_id: userId,
       });
 
       await notify({
@@ -63,7 +57,10 @@ export function useHookSingUp() {
 
     } catch (error) {
       console.error("SingUp error:", error);
-      await notify({ status: "error", message: "Erro ao criar conta. Verifique os dados e tente novamente." });
+      await notify({
+        status: "error",
+        message: "Erro ao criar conta. Verifique os dados e tente novamente."
+      });
     }
   }
 

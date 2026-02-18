@@ -20,7 +20,7 @@ function Start() {
 		<SafeAreaView className="flex-1 justify-center items-center px-5">
 			<View className="pt-4">
 				<Text className="text-lightText dark:text-darkText text-5xl font-bold text-center">
-					Total Fretes
+					Total Frete
 				</Text>
 			</View>
 

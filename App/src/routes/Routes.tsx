@@ -13,6 +13,7 @@ import Login from "../screens/public/login/Login";
 import SingUp from "../screens/public/singUp/SingUpBasic";
 import SingUpCNH from "../screens/public/singUp/SingUpCNH";
 import SingUpPassword from "../screens/public/singUp/SingUpPassword";
+import ForgotPassword from "../screens/public/newPassword/ForgotPassword";
 
 
 export type RootStackParamList = {
@@ -20,8 +21,9 @@ export type RootStackParamList = {
   Login: undefined;
   Start: undefined;
   SingUp: undefined;
-  SingUpPassword: undefined;
   SingUpCNH: undefined;
+  SingUpPassword: undefined;
+  ForgotPassword: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -58,6 +60,8 @@ export default function Routes() {
         <Stack.Screen name="SingUp" component={SingUp} options={{title: "Dados Pessoais"}} />
         <Stack.Screen name="SingUpCNH" component={SingUpCNH} options={{title: "Dados CNH"}} />  
         <Stack.Screen name="SingUpPassword" component={SingUpPassword} options={{title: "Senha"}} />
+
+        <Stack.Screen name="ForgotPassword" component={ForgotPassword} options={{title: "Esqueci minha senha "}} />
       </Stack.Navigator>
     </NavigationContainer>
   );
