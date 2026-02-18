@@ -21,13 +21,13 @@ const Login = () => {
       keyboardShouldPersistTaps="handled"
     >
       <View className="gap-4 flex-1">
-        <InputCpf
-          name="cpf"
-          label="CPF"
-          placeholder="000.000.000-00"
-          maxLength={14}
+        <InputDefault
+          name="email"
+          label="Email"
+          placeholder="Digite seu email"
+          type="default"
           control={control}
-          rules={rules.cpf}
+          rules={rules.email}
         />
 
         <InputDefault
