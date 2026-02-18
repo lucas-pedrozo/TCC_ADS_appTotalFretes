@@ -1,10 +1,16 @@
 import useHookLogin from "@/src/hooks/login/hookLogin";
+
 import { Pressable, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 
-import { InputDefault, InputCpf } from "@/src/components/fom/inputs/InputDefault";
+import { InputDefault } from "@/src/components/fom/inputs/InputDefault";
 import { ButtonDefault } from "@/src/components/fom/buttons/ButtonDefauilt";
+
+import { RootStackParamList } from "@/src/routes/Routes";
+import { useNotification } from "@/src/context/NotificationContext";
+import { NavigationProp, useNavigation } from "@react-navigation/native";
+import { useCallback } from "react";
 
 /**
  * @description Componente de login
@@ -12,7 +18,10 @@ import { ButtonDefault } from "@/src/components/fom/buttons/ButtonDefauilt";
  */
 const Login = () => {
   const { control, rules, handleSubmit, handleLogin } = useHookLogin();
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const insets = useSafeAreaInsets();
+
+  const goForgotPassword = useCallback(() => navigation.navigate("ForgotPassword"), [navigation]);
 
   return (
     <KeyboardAwareScrollView
@@ -40,7 +49,7 @@ const Login = () => {
           rules={rules.password}
         />
 
-        <Pressable onPress={() => {}} className="self-start">
+        <Pressable onPress={goForgotPassword} className="self-start">
           <Text className="text-lightText dark:text-darkText font-medium underline text-base pl-2.5 pt-2.5">
             Esqueci minha Senha
           </Text>
