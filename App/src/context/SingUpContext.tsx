@@ -103,7 +103,7 @@ export function SingUpProvider({ children }: { children: React.ReactNode }) {
   const [persona, setPersonaState] = useState<SingUpPersonaData>(defaultPersona);
   const [cnh, setCnhState] = useState<SingUpCnhData>(defaultCnh);
   const [password, setPasswordState] = useState<SingUpPasswordData>(defaultPassword);
-
+  
   const setPersona = useCallback((data: SingUpPersonaData) => setPersonaState(data), []);
   const setCnh = useCallback((data: SingUpCnhData) => setCnhState(data), []);
   const setPassword = useCallback((data: SingUpPasswordData) => setPasswordState(data), []);

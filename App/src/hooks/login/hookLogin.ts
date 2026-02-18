@@ -1,48 +1,52 @@
 import { useCallback } from "react";
 
 import http from "../../service/http";
-import { cpf } from 'cpf-cnpj-validator';
 import { useForm } from "react-hook-form";
 import { useNotification } from "@/src/context/NotificationContext";
+import { validateEmail } from "@/src/utils/formValidations";
+
+import { useAuth } from "@/src/context/AuthContext";
+
 
 interface LoginForm {
-  cpf: string;
+  email: string;
   password: string;
 }
 
 function useHookLogin() {
   const { notify } = useNotification();
+  const { login } = useAuth();
 
   const { control, handleSubmit, formState: { errors } } = useForm<LoginForm>({
-    defaultValues: { cpf: "", password: "" },
+    defaultValues: { email: "", password: "" },
     mode: "onSubmit",
   });
 
-  const handleLogin = useCallback( async (data: LoginForm) => {
-      try {
+  const handleLogin = useCallback(async (data: LoginForm) => {
+    try {
 
-        setTimeout(() => {
-          notify({
-            status: "loading",
-            message: "Efetuando login...",
-          });
-        }, 100);
+      notify({
+        status: "loading",
+        message: "Efetuando login...",
+      });
 
-        await http.post("/login", data);
+      const response = await http.post("auth/login", data);
+      const token = response.data.token;
+      login(token);
 
-        await notify({
-          status: "success",
-          message: "Login efetuado com sucesso!",
-        });
+      await notify({
+        status: "success",
+        message: "Login efetuado com sucesso!",
+      });
 
-      } catch (error) {
-        console.error("Login error:", error);
-        await notify({
-          status: "error",
-          message: "Erro ao efetuar login. Verifique suas credenciais.",
-        });
-      }
-    },
+    } catch (error) {
+      console.error("Login error:", error);
+      notify({
+        status: "error",
+        message: "Erro ao efetuar login. Verifique suas credenciais.",
+      });
+    }
+  },
     [notify]
   );
 
@@ -51,9 +55,9 @@ function useHookLogin() {
    * @returns Regras de validacao do formulario de login
    */
   const rules = {
-    cpf: {
-      required: "CPF é obrigatório",
-      validate: (value: string) => cpf.isValid(value) || "CPF inválido"
+    email: {
+      required: "Email é obrigatório",
+      validate: (value: string) => validateEmail(value) || "Email inválido"
     },
     password: {
       required: "Senha é obrigatória",

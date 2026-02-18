@@ -1,5 +1,6 @@
 import validator from 'validator';
 import { cpf, cnpj } from 'cpf-cnpj-validator';
+import { maskDate } from './formMask';
 
 /**
  * @description Validacao de nome
@@ -48,11 +49,13 @@ export const validatePhone = (value: string) => {
 
 /**
  * @description Validacao de data de nascimento
- * @param value Valor a ser validado
+ * @param value Valor a ser validado, passando pela mask de data para garantir o formato correto
  * @returns true se o valor for valido, false caso contrario
  */
 export const validateBirthDate = (value: string) => {
-  return validator.isDate(value, { format: 'DD/MM/YYYY' }) && validator.isBefore(value, new Date().toISOString());
+  const valueDate  = maskDate(value);
+  const dataValidated = validator.isDate(valueDate, { format: 'DD/MM/YYYY' }) && validator.isBefore(valueDate, new Date().toISOString().split('T')[0]);
+  return dataValidated;
 };
 
 /**

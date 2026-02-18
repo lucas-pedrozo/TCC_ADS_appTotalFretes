@@ -23,30 +23,47 @@ export interface SingUpFormData {
 export function useHookSingUp() {
   const { notify } = useNotification();
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
-  
-  const notifyWithDelay = async (payload: { status: "loading" | "success" | "error"; message?: string }) => {
-    await new Promise((resolve) => setTimeout(resolve, 100));
-    await notify(payload);
-  };
 
   const handleSingUp = async (data: SingUpFormData) => {
     try {
-      await notifyWithDelay({
+      await notify({
         status: "loading",
         message: "Criando conta..."
       });
 
-      await http.post("/singup", data);
+      const createUserResponse = await http.post("/user", {
+        cnhNumber: data.cnhNumber,
+        cpf: data.cpf,
+        name: data.name,
+        email: data.email,
+        sex: data.sex,
+        useGlasses: data.useGlasses,
+        typeCnh: data.typeCnh,
+        isDeficient: data.isDeficient,
+        issuingAgency: data.issuingAgency,
+        birthDate: data.birthDate,
+        phoneNumber: data.phoneNumber,
+      });
 
-      await notifyWithDelay({ 
-        status: "success", 
+      const userId = createUserResponse.data.user.id;
+
+      await http.post("/account", {
+        email: data.email,
+        password: data.password,
+        account_type_id: 1,
+        subject_id: userId,
+      });
+
+      await notify({
+        status: "success",
         message: "Conta criada com sucesso!",
       });
 
       await navigation.navigate("Login");
+
     } catch (error) {
       console.error("SingUp error:", error);
-      await notifyWithDelay({ status: "error", message: "Erro ao criar conta. Verifique os dados e tente novamente." });
+      await notify({ status: "error", message: "Erro ao criar conta. Verifique os dados e tente novamente." });
     }
   }
 
