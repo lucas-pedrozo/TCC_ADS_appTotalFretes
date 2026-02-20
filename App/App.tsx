@@ -1,5 +1,3 @@
-import React from "react";
-
 import "./global.css";
 import Routes from "./src/routes/Routes";
 import { ThemeProvider } from "./src/context/ThemeContext";
@@ -7,20 +5,20 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { KeyboardProvider } from "react-native-keyboard-controller";
 
 import { AuthProvider } from "./src/context/AuthContext";
-import AlertNotification from "./src/components/alert/AlertNotification";
-import { useNotification, NotificationProvider } from "./src/context/NotificationContext";
 import { SingUpProvider } from "./src/context/SingUpContext";
+import AlertNotification from "./src/components/alert/AlertDefault";
+import { useAlertDefault, AlertDefaultProvider } from "./src/context/AlertDefaultContext";
 
 const AlertNotificationGlobal = () => {
-  const { notification, hideNotification } = useNotification();
+  const { alert, hideAlert } = useAlertDefault();
 
   return (
     <AlertNotification
-      key={`${notification.status}-${notification.message ?? ""}-${notification.visible ? "1" : "0"}`}
-      visible={notification.visible}
-      status={notification.status}
-      message={notification.message}
-      onDismiss={hideNotification}
+      key={`${alert.status}-${alert.message ?? ""}-${alert.visible ? "1" : "0"}`}
+      visible={alert.visible}
+      status={alert.status}
+      message={alert.message}
+      onDismiss={hideAlert}
     />
   );
 };
@@ -30,14 +28,14 @@ function App() {
     <SafeAreaProvider>
       <ThemeProvider>
         <AuthProvider>
-          <NotificationProvider>
+          <AlertDefaultProvider>
             <KeyboardProvider>
               <SingUpProvider>
                 <AlertNotificationGlobal />
                 <Routes />
               </SingUpProvider>
             </KeyboardProvider>
-          </NotificationProvider>
+          </AlertDefaultProvider>
         </AuthProvider>
       </ThemeProvider>
     </SafeAreaProvider>

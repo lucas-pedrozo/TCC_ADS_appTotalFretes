@@ -1,7 +1,7 @@
 import http from "../../service/http";
 
 import { RootStackParamList } from "@/src/routes/Routes";
-import { useNotification } from "@/src/context/NotificationContext";
+import { useAlertDefault } from "@/src/context/AlertDefaultContext";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
 
 export interface SingUpFormData {
@@ -21,7 +21,7 @@ export interface SingUpFormData {
 }
 
 export function useHookSingUp() {
-  const { notify } = useNotification();
+  const { notify } = useAlertDefault();
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
   const handleSingUp = async (data: SingUpFormData) => {

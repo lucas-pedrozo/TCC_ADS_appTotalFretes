@@ -9,7 +9,7 @@ import { CssAlertNotification } from "@/src/css/cssAlertNotification";
 
 type IoniconName = keyof typeof Ionicons.glyphMap;
 
-interface AlertNotificationProps {
+interface AlertDefaultProps {
   visible: boolean;
   status: AlertStatus;
   message?: string;
@@ -44,7 +44,7 @@ const STATUS_CONFIG: Record<AlertStatus, StatusConfig> = {
   },
 };
 
-function AlertNotification({ visible, status, message, onDismiss }: AlertNotificationProps) {
+function AlertDefault({ visible, status, message, onDismiss }: AlertDefaultProps) {
   const insets = useSafeAreaInsets();
   const config = STATUS_CONFIG[status];
   
@@ -85,5 +85,5 @@ function AlertNotification({ visible, status, message, onDismiss }: AlertNotific
   );
 }
 
-export default AlertNotification;
+export default AlertDefault;
 

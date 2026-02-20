@@ -8,7 +8,6 @@ import { InputDefault } from "@/src/components/fom/inputs/InputDefault";
 import { ButtonDefault } from "@/src/components/fom/buttons/ButtonDefauilt";
 
 import { RootStackParamList } from "@/src/routes/Routes";
-import { useNotification } from "@/src/context/NotificationContext";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
 import { useCallback } from "react";
 
