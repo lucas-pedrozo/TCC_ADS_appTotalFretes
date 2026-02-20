@@ -2,7 +2,7 @@ import { useCallback } from "react";
 
 import http from "../../service/http";
 import { useForm } from "react-hook-form";
-import { useNotification } from "@/src/context/NotificationContext";
+import { useNotification } from "@/src/context/AlertDefaultContext";
 import { validateEmail } from "@/src/utils/formValidations";
 
 import { useAuth } from "@/src/context/AuthContext";
