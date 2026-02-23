@@ -1,10 +1,11 @@
 import {Text, View} from 'react-native';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 function Home() {
   return(
-    <View>
-      <Text>Home Screen</Text>
-    </View>
+    <SafeAreaView className="flex-1 justify-center items-center px-5">
+      <Text className='text-lightText dark:text-darkText text-2xl font-bold text-center'>Home Screen</Text>
+    </SafeAreaView>
   ); 
 }
 

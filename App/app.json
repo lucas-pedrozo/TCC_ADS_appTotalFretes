@@ -1,18 +1,25 @@
 {
   "expo": {
-    "name": "App",
-    "slug": "App",
+    "name": "Total Fretes",
+    "slug": "Total Fretes",
     "version": "1.0.0",
     "orientation": "portrait",
     "scheme": "app",
     "userInterfaceStyle": "dark",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "splash": {
+        "image": "./src/assets/logo.jpeg",
+        "resizeMode": "contain",
+        "backgroundColor": "#000000"
+      }
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#000000"
+        "backgroundColor": "#000000",
+        "image": "./src/assets/logo.jpeg",
+        "resizeMode": "contain"
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
@@ -28,8 +35,8 @@
         "expo-splash-screen",
         {
           "backgroundColor": "#000000",
-          "image": "./src/assets/bgStart.png",
-          "resizeMode": "cover"
+          "image": "./src/assets/logo.jpeg",
+          "resizeMode": "contain"
         }
       ]
     ],

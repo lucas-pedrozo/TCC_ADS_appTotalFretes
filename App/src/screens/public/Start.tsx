@@ -7,11 +7,13 @@ import { ButtonDefault } from "@/src/components/fom/buttons/ButtonDefauilt";
 import { useNavigation } from "@react-navigation/native";
 import { RootStackParamList } from "@/src/routes/Routes";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { useTranslation } from "react-i18next";
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
 function Start() {
 	const navigation = useNavigation<NavigationProp>();
+	const { t } = useTranslation();
 
 	const goLogin = useCallback(() => navigation.navigate("Login"), [navigation]);
 	const goSingUp = useCallback(() => navigation.navigate("SingUp"), [navigation]);
@@ -20,7 +22,7 @@ function Start() {
 		<SafeAreaView className="flex-1 justify-center items-center px-5">
 			<View className="pt-4">
 				<Text className="text-lightText dark:text-darkText text-5xl font-bold text-center">
-					Total Frete
+					{t("common.appName")}
 				</Text>
 			</View>
 
@@ -28,11 +30,11 @@ function Start() {
 
 			<View className="w-full gap-4 pb-4">
 				<ButtonDefault
-					title="Entrar"
+					title={t("start.signIn")}
 					onPress={goLogin}
 				/>
 				<ButtonDefault
-					title="Cadastre-se"
+					title={t("start.signUp")}
 					onPress={goSingUp}
 				/>
 			</View>

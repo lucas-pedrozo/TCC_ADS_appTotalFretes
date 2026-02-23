@@ -10,6 +10,7 @@ import { ButtonDefault } from "@/src/components/fom/buttons/ButtonDefauilt";
 import { RootStackParamList } from "@/src/routes/Routes";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
 import { useCallback } from "react";
+import { useTranslation } from "react-i18next";
 
 /**
  * @description Componente de login
@@ -18,6 +19,7 @@ import { useCallback } from "react";
 const Login = () => {
   const { control, rules, handleSubmit, handleLogin } = useHookLogin();
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
 
   const goForgotPassword = useCallback(() => navigation.navigate("ForgotPassword"), [navigation]);
@@ -25,14 +27,14 @@ const Login = () => {
   return (
     <KeyboardAwareScrollView
       className="flex-1"
-      contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 20, paddingTop: insets.top }}
+      contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 20, paddingBottom: insets.bottom + 20 }}
       keyboardShouldPersistTaps="handled"
     >
       <View className="gap-4 flex-1">
         <InputDefault
           name="email"
-          label="Email"
-          placeholder="Digite seu email"
+          label={t("login.emailLabel")}
+          placeholder={t("login.emailPlaceholder")}
           type="default"
           control={control}
           rules={rules.email}
@@ -40,8 +42,8 @@ const Login = () => {
 
         <InputDefault
           name="password"
-          label="Senha"
-          placeholder="Digite sua senha"
+          label={t("login.passwordLabel")}
+          placeholder={t("login.passwordPlaceholder")}
           type="default"
           secureTextEntry
           control={control}
@@ -50,13 +52,13 @@ const Login = () => {
 
         <Pressable onPress={goForgotPassword} className="self-start">
           <Text className="text-lightText dark:text-darkText font-medium underline text-base pl-2.5 pt-2.5">
-            Esqueci minha Senha
+            {t("login.forgotPassword")}
           </Text>
         </Pressable>
 
-        <View className="flex-1 justify-end py-4">
+        <View className="flex-1 justify-end pt-4">
           <ButtonDefault
-            title="Login"
+            title={t("login.submit")}
             onPress={handleSubmit(handleLogin)}
             disabled={false}
             loading={false}
