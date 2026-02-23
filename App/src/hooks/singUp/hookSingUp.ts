@@ -3,6 +3,7 @@ import http from "../../service/http";
 import { RootStackParamList } from "@/src/routes/Routes";
 import { useAlertDefault } from "@/src/context/AlertDefaultContext";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
+import i18n from "@/src/i18n";
 
 export interface SingUpFormData {
   cnhNumber?: string;
@@ -28,7 +29,7 @@ export function useHookSingUp() {
     try {
       await notify({
         status: "loading",
-        message: "Criando conta..."
+        message: i18n.t("notifications.signUpLoading")
       });
 
       await http.post("/end-account", {
@@ -50,16 +51,18 @@ export function useHookSingUp() {
 
       await notify({
         status: "success",
-        message: "Conta criada com sucesso!",
+        message: i18n.t("notifications.signUpSuccess"),
       });
 
+      await new Promise(resolve => setTimeout(resolve, 1200));
+      
       await navigation.navigate("Login");
-
+      
     } catch (error) {
       console.error("SingUp error:", error);
       await notify({
         status: "error",
-        message: "Erro ao criar conta. Verifique os dados e tente novamente."
+        message: i18n.t("notifications.signUpError")
       });
     }
   }

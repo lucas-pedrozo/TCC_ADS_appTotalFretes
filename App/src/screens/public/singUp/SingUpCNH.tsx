@@ -10,6 +10,7 @@ import { useNavigation } from "@react-navigation/native";
 import { RootStackParamList } from "@/src/routes/Routes";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { useTranslation } from "react-i18next";
 
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
@@ -19,6 +20,7 @@ type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
  * @returns Componente de cadastro de CNH
  */
 const SingUpCNH = () => {
+  const { t } = useTranslation();
 
 	const navigation = useNavigation<NavigationProp>();
 	const { control, rules, handleNext } = useHookCnh({
@@ -41,8 +43,8 @@ const SingUpCNH = () => {
 				<InputDefault
 					name="cnhNumber"
 					control={control}
-					placeholder="00000000000"
-					label="CNH"
+					placeholder={t("signUp.cnh.cnhPlaceholder")}
+					label={t("signUp.cnh.cnhLabel")}
 					maxLength={12}
 					rules={rules.cnhNumber}
 				/>
@@ -50,8 +52,8 @@ const SingUpCNH = () => {
 				<InputDefault
 					name="issuingAgencyCnh"
 					control={control}
-					placeholder="Órgão Emissor"
-					label="Órgão Emissor"
+					placeholder={t("signUp.cnh.issuingAgencyPlaceholder")}
+					label={t("signUp.cnh.issuingAgencyLabel")}
 					maxLength={2}
 					rules={rules.issuingAgencyCnh}
 				/>
@@ -59,7 +61,7 @@ const SingUpCNH = () => {
 				<InputGroup
 					name="typeCnh"
 					control={control}
-					label="Categoria da CNH"
+					label={t("signUp.cnh.categoryLabel")}
 					rules={rules.typeCnh}
 					options={[
 						{ label: "A", value: "1" },
@@ -73,17 +75,17 @@ const SingUpCNH = () => {
 				<InputGroup
 					name="useGlasses"
 					control={control}
-					label="Usa oculos?"
+					label={t("signUp.cnh.useGlassesLabel")}
 					rules={rules.useGlasses}
 					options={[
-						{ label: "Sim", value: "true" },
-						{ label: "Nao", value: "false" },
+						{ label: t("signUp.cnh.yes"), value: "true" },
+						{ label: t("signUp.cnh.no"), value: "false" },
 					]}
 				/>
 
 				<View className="flex-1 justify-end py-4">
 					<ButtonDefault
-						title="Proximo"
+						title={t("signUp.cnh.next")}
 						onPress={handleNext}
 					/>
 				</View>

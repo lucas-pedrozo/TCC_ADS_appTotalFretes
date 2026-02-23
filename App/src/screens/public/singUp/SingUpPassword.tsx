@@ -6,12 +6,14 @@ import { ButtonDefault } from "@/src/components/fom/buttons/ButtonDefauilt";
 import { useHookPassword } from "@/src/hooks/singUp/hookPassword";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { StepIndicator } from "../../../components/header/StepIndicator";
+import { useTranslation } from "react-i18next";
 
 /**
  * @description Componente de cadastro de senha
  * @returns Componente de cadastro de senha
  */
 const SingUpPassword = () => {
+	const { t } = useTranslation();
 	const { control, rules, handleFinish } = useHookPassword();
 
 	return (
@@ -30,8 +32,8 @@ const SingUpPassword = () => {
 				<InputDefault
 					name="password"
 					control={control}
-					placeholder="Senha"
-					label="Senha"
+					placeholder={t("signUp.password.passwordPlaceholder")}
+					label={t("signUp.password.passwordLabel")}
 					secureTextEntry
 					rules={rules.password}
 				/>
@@ -39,15 +41,15 @@ const SingUpPassword = () => {
 				<InputDefault
 					name="confirmPassword"
 					control={control}
-					placeholder="Confirmar Senha"
-					label="Confirmar Senha"
+					placeholder={t("signUp.password.confirmPasswordPlaceholder")}
+					label={t("signUp.password.confirmPasswordLabel")}
 					secureTextEntry
 					rules={rules.confirmPassword}
 				/>
 
 				<View className="flex-1 justify-end py-4">
 					<ButtonDefault
-						title="Finalizar"
+						title={t("signUp.password.finish")}
 						onPress={handleFinish}
 						disabled={false}
 						loading={false}

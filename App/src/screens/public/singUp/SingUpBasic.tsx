@@ -1,11 +1,13 @@
 import { View } from "react-native";
 
-import { InputDefault, InputCpf, InputPhone, InputDate } from "@/src/components/fom/inputs/InputDefault";
-import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { ButtonDefault } from "@/src/components/fom/buttons/ButtonDefauilt";
+import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
+import { InputDefault, InputCpf, InputPhone, InputDate } from "@/src/components/fom/inputs/InputDefault";
 
+import { useTranslation } from "react-i18next";
 import { useNavigation } from "@react-navigation/native";
 import { RootStackParamList } from "@/src/routes/Routes";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useHookDataBasic } from "@/src/hooks/singUp/hookDataBasic";
 import { InputGroup } from "@/src/components/fom/inputs/InputGroup";
 import { StepIndicator } from "@/src/components/header/StepIndicator";
@@ -13,11 +15,9 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
-/**
- * @description Componente de cadastro basico
- * @returns Componente de cadastro basico
- */
 const SingUp = () => {
+  const { t } = useTranslation();
+  const insets = useSafeAreaInsets();
 
   const navigation = useNavigation<NavigationProp>();
   const { control, rules, handleNext } = useHookDataBasic({
@@ -27,7 +27,7 @@ const SingUp = () => {
   return (
     <KeyboardAwareScrollView
       className="flex-1"
-      contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 20, }}
+      contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 20, paddingBottom: insets.bottom + 20 }}
       keyboardShouldPersistTaps="handled"
     >
 
@@ -40,17 +40,17 @@ const SingUp = () => {
         <InputDefault
           name="fullName"
           control={control}
-          label="Nome Completo"
+          label={t("signUp.basic.fullNameLabel")}
           maxLength={100}
-          placeholder="Nome Completo"
+          placeholder={t("signUp.basic.fullNamePlaceholder")}
           rules={rules.name}
         />
 
         <InputDefault
           name="email"
           control={control}
-          placeholder="email@exemplo.com"
-          label="Email"
+          placeholder={t("signUp.basic.emailPlaceholder")}
+          label={t("signUp.basic.emailLabel")}
           rules={rules.email}
         />
 
@@ -58,25 +58,25 @@ const SingUp = () => {
           name="cpf"
           control={control}
           maxLength={14}
-          placeholder="000.000.000-00"
-          label="CPF"
+          placeholder={t("signUp.basic.cpfPlaceholder")}
+          label={t("signUp.basic.cpfLabel")}
           rules={rules.cpf}
         />
 
         <InputPhone
           name="phoneNumber"
           control={control}
-          placeholder="00 00000-0000"
+          placeholder={t("signUp.basic.phonePlaceholder")}
           maxLength={15}
-          label="Número de Telefone"
+          label={t("signUp.basic.phoneLabel")}
           rules={rules.phoneNumber}
         />
 
         <InputDate
           name="birthDate"
           control={control}
-          placeholder="dd/mm/aaaa"
-          label="Data de Nascimento"
+          placeholder={t("signUp.basic.birthDatePlaceholder")}
+          label={t("signUp.basic.birthDateLabel")}
           maxLength={10}
           rules={rules.birthDate}
         />
@@ -84,29 +84,29 @@ const SingUp = () => {
         <InputGroup
           name="gender"
           control={control}
-          label="Sexo"
+          label={t("signUp.basic.genderLabel")}
           rules={rules.sex}
           options={[
-            { label: "Masculino", value: "M" },
-            { label: "Feminino", value: "F" },
-            { label: "Não Informar", value: "N" },
+            { label: t("signUp.basic.genderMale"), value: "M" },
+            { label: t("signUp.basic.genderFemale"), value: "F" },
+            { label: t("signUp.basic.genderNotInform"), value: "N" },
           ]}
         />
 
         <InputGroup
           name="disability"
           control={control}
-          label="Possui deficiencia?"
+          label={t("signUp.basic.disabilityLabel")}
           rules={rules.isDeficient}
           options={[
-            { label: "Sim", value: "true" },
-            { label: "Não", value: "false" },
+            { label: t("signUp.basic.yes"), value: "true" },
+            { label: t("signUp.basic.no"), value: "false" },
           ]}
         />
 
-        <View className="flex-1 justify-end py-4">
+        <View className="flex-1 justify-end pt-4">
           <ButtonDefault
-            title="Proximo"
+            title={t("signUp.basic.next")}
             onPress={handleNext}
           />
         </View>

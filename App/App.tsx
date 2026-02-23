@@ -1,4 +1,5 @@
 import "./global.css";
+import "./src/i18n";
 import Routes from "./src/routes/Routes";
 import { ThemeProvider } from "./src/context/ThemeContext";
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -8,6 +9,7 @@ import { AuthProvider } from "./src/context/AuthContext";
 import { SingUpProvider } from "./src/context/SingUpContext";
 import AlertNotification from "./src/components/alert/AlertDefault";
 import { useAlertDefault, AlertDefaultProvider } from "./src/context/AlertDefaultContext";
+import { LanguageProvider } from "./src/context/LanguageContext";
 
 const AlertNotificationGlobal = () => {
   const { alert, hideAlert } = useAlertDefault();
@@ -27,16 +29,18 @@ function App() {
   return (
     <SafeAreaProvider>
       <ThemeProvider>
-        <AuthProvider>
-          <AlertDefaultProvider>
-            <KeyboardProvider>
-              <SingUpProvider>
-                <AlertNotificationGlobal />
-                <Routes />
-              </SingUpProvider>
-            </KeyboardProvider>
-          </AlertDefaultProvider>
-        </AuthProvider>
+        <LanguageProvider>
+          <AuthProvider>
+            <AlertDefaultProvider>
+              <KeyboardProvider>
+                <SingUpProvider>
+                  <AlertNotificationGlobal />
+                  <Routes />
+                </SingUpProvider>
+              </KeyboardProvider>
+            </AlertDefaultProvider>
+          </AuthProvider>
+        </LanguageProvider>
       </ThemeProvider>
     </SafeAreaProvider>
   );
