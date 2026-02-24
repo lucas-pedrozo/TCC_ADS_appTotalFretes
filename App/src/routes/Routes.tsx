@@ -1,11 +1,13 @@
 import "react-native-gesture-handler";
-import { StatusBar, View } from "react-native";
+
+import { StatusBar } from "react-native";
+import PrivateRoute from "./PrivateRoutes";
+import { useTranslation } from "react-i18next";
 import Header from "../components/header/Header";
 import { useThemeMode } from "../context/ThemeContext";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { useTranslation } from "react-i18next";
 
 import Home from "../screens/private/Home";
 
@@ -15,7 +17,7 @@ import SingUp from "../screens/public/singUp/SingUpBasic";
 import SingUpCNH from "../screens/public/singUp/SingUpCNH";
 import SingUpPassword from "../screens/public/singUp/SingUpPassword";
 import ForgotPassword from "../screens/public/newPassword/ForgotPassword";
-import PrivateRoute from "./PrivateRoutes";
+import PasswordValidate from "../screens/public/newPassword/PasswordValidate";
 
 
 export type RootStackParamList = {
@@ -26,6 +28,7 @@ export type RootStackParamList = {
   SingUpCNH: undefined;
   SingUpPassword: undefined;
   ForgotPassword: undefined;
+  PasswordValidate: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -58,11 +61,12 @@ export default function Routes() {
         <Stack.Screen name="Home" component={() => <PrivateRoute><Home /></PrivateRoute>} options={{headerShown: false}} />
    
         <Stack.Screen name="Start" component={Start} options={{headerShown: false}} />
-        <Stack.Screen name="Login" component={Login} options={{title: t("login.title")}} />
+        <Stack.Screen name="Login" component={Login} options={{title: t("routes.login")}} />
         <Stack.Screen name="SingUp" component={SingUp} options={{title: t("routes.signUpBasic")}} />
         <Stack.Screen name="SingUpCNH" component={SingUpCNH} options={{title: t("routes.signUpCnh")}} />  
         <Stack.Screen name="SingUpPassword" component={SingUpPassword} options={{title: t("routes.signUpPassword")}} />
         <Stack.Screen name="ForgotPassword" component={ForgotPassword} options={{title: t("routes.forgotPassword")}} />
+        <Stack.Screen name="PasswordValidate" component={PasswordValidate} options={{title: t("routes.passwordValidate")}} />
 
       </Stack.Navigator>
     </NavigationContainer>

@@ -48,7 +48,7 @@ const decodeToken = (token: string) => {
 		const decoded: DecodedToken = jwtDecode(token);
 		return decoded;
 	} catch (error) {
-		console.error("Erro ao decodificar token:", error);
+		console.log("Erro ao decodificar token:", error);
 		return null;
 	}
 }

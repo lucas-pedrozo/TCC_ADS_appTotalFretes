@@ -28,14 +28,14 @@ export function useHookCnh(options?: UseHookSingUpCnhOptions) {
         options?.onNext?.();
       },)();
     } catch (error) {
-      console.error(error)
+      console.log(error)
     }
   }, [handleSubmit, options, setCnh]);
 
   const rules = {
     cnhNumber: validationRules.cnhNumber,
     issuingAgencyCnh: validationRules.issuingAgencyCnh,
-    typeCnh: validationRules.typeCnh,
+    cnhType_id: validationRules.cnhType_id,
     useGlasses: validationRules.useGlasses,
   };
 

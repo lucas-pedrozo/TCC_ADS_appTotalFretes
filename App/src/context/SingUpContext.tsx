@@ -22,7 +22,7 @@ export type SingUpCnhData = {
   cnhNumber: string;
   useGlasses?: boolean;
   issuingAgencyCnh: string;
-  typeCnh?: number;  
+  cnhType_id?: number;  
 };
 
 /**
@@ -41,7 +41,7 @@ export type SingUpPasswordData = {
 export type SingUpDraftData = SingUpPersonaData &
   SingUpCnhData &
   SingUpPasswordData & {
-    sexo?: string;
+    sex?: string;
   };
 
 /**
@@ -80,7 +80,7 @@ const defaultCnh: SingUpCnhData = {
   cnhNumber: "",
   useGlasses: undefined,
   issuingAgencyCnh: "",
-  typeCnh: undefined,
+  cnhType_id: undefined,
 };
 
 /**
