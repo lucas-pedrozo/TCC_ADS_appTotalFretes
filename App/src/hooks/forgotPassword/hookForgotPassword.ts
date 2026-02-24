@@ -28,7 +28,8 @@ export function useHookForgotPassword() {
         message: "carregando..."
       })
 
-      await http.post("/auth/forgot-password", { email: data.email });
+      // await http.post("/auth/forgot-password", { email: data.email });
+      await new Promise(resolve => setTimeout(resolve, 200));
 
       await notify({
         status: "success",
@@ -37,9 +38,9 @@ export function useHookForgotPassword() {
 
       await new Promise(resolve => setTimeout(resolve, 1200));
 
-      navigation.navigate("Login");
+      navigation.navigate("PasswordValidate");
     } catch (error) {
-      console.error(error)
+      console.log(error)
 
       await notify({
         status: "error",

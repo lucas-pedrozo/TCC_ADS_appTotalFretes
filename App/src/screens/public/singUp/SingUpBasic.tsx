@@ -38,7 +38,7 @@ const SingUp = () => {
 
       <View className="gap-4 flex-1">
         <InputDefault
-          name="fullName"
+          name="name"
           control={control}
           label={t("signUp.basic.fullNameLabel")}
           maxLength={100}
@@ -82,7 +82,7 @@ const SingUp = () => {
         />
 
         <InputGroup
-          name="gender"
+          name="sex"
           control={control}
           label={t("signUp.basic.genderLabel")}
           rules={rules.sex}
@@ -94,7 +94,7 @@ const SingUp = () => {
         />
 
         <InputGroup
-          name="disability"
+          name="isDeficient"
           control={control}
           label={t("signUp.basic.disabilityLabel")}
           rules={rules.isDeficient}

@@ -23,7 +23,7 @@ export function useHookDataBasic(options?: UseHookSingUpPersonaOptions) {
         await options?.onNext?.();
       },)();
     } catch (error) {
-      console.error(error)
+      console.log(error)
     }
   },
     [handleSubmit, options, setPersona]

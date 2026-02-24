@@ -45,7 +45,7 @@ const SingUpCNH = () => {
 					control={control}
 					placeholder={t("signUp.cnh.cnhPlaceholder")}
 					label={t("signUp.cnh.cnhLabel")}
-					maxLength={12}
+					maxLength={11}
 					rules={rules.cnhNumber}
 				/>
 
@@ -59,10 +59,10 @@ const SingUpCNH = () => {
 				/>
 
 				<InputGroup
-					name="typeCnh"
+					name="cnhType_id"
 					control={control}
 					label={t("signUp.cnh.categoryLabel")}
-					rules={rules.typeCnh}
+					rules={rules.cnhType_id}
 					options={[
 						{ label: "A", value: "1" },
 						{ label: "B", value: "2" },

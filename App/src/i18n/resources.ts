@@ -22,10 +22,12 @@ export const resources = {
         submit: "Login",
       },
       routes: {
+        login: "Login",
         signUpBasic: "Dados Pessoais",
         signUpCnh: "Dados CNH",
         signUpPassword: "Senha",
         forgotPassword: "Esqueci minha senha",
+        passwordValidate: "Autenticação de usuario"
       },
       forgotPassword: {
         title: "Solicitação de nova senha",
@@ -137,13 +139,22 @@ export const resources = {
         submit: "Login",
       },
       routes: {
+        login: "Login",
         signUpBasic: "Personal Data",
         signUpCnh: "Driver License",
         signUpPassword: "Password",
         forgotPassword: "Forgot my password",
+        passwordValidate: "authetication"
       },
       forgotPassword: {
         title: "Forgot Password Request",
+        emailLabel: "Email",
+        emailPlaceholder: "Enter your email",
+        submit: "Send",
+        description: "A code will be sent to reset the password, in the registration email",
+      },
+      passwordValidate: {
+        title: "Password Validation",
         emailLabel: "Email",
         emailPlaceholder: "Enter your email",
         submit: "Send",

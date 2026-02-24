@@ -34,7 +34,7 @@ function useHookLogin() {
       notify({
         status: "loading",
         message: i18n.t("notifications.loginLoading"),
-      });
+      }); 
 
       const response = await http.post("/auth/login", data);
       const token = response.data.token;
@@ -49,7 +49,7 @@ function useHookLogin() {
       navigation.navigate("Home");
 
     } catch (error) {
-      console.error("Login error:", error);
+      console.log("Login error:", error);
       notify({
         status: "error",
         message: i18n.t("notifications.loginError"),

@@ -163,7 +163,7 @@ export const validationRules = {
     required: i18n.t("validation.requiredBirthDate"),
     validate: (value: string) => validateBirthDate(value) || i18n.t("validation.invalidBirthDate"),
   },
-  typeCnh: {
+  cnhType_id: {
     required: i18n.t("validation.requiredTypeCnh"),
     validate: (value: string) => validateTypeCnh(value) || i18n.t("validation.invalidTypeCnh"),
   },

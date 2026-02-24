@@ -13,7 +13,7 @@ export interface SingUpFormData {
   email?: string;
   sex?: string;
   useGlasses?: boolean;
-  typeCnh?: number;
+  cnhType_id?: number;
   isDeficient?: boolean;
   issuingAgency?: string;
   birthDate?: string;
@@ -31,20 +31,19 @@ export function useHookSingUp() {
         status: "loading",
         message: i18n.t("notifications.signUpLoading")
       });
-
-      await http.post("/end-account", {
-        cnhNumber: data.cnhNumber,
-        cpf: data.cpf,
+        console.log(data);
+      await http.post("/user/end-account", {
         name: data.name,
         email: data.email,
         sex: data.sex,
+        cpf: data.cpf,
+        cnhNumber: data.cnhNumber,
         useGlasses: data.useGlasses,
-        typeCnh: data.typeCnh,
+        cnhType_id: data.cnhType_id,
         isDeficient: data.isDeficient,
         issuingAgency: data.issuingAgency,
         birthDate: data.birthDate,
         phoneNumber: data.phoneNumber,
-
         password: data.password,
         account_type_id: 1,
       });
@@ -59,7 +58,7 @@ export function useHookSingUp() {
       await navigation.navigate("Login");
       
     } catch (error) {
-      console.error("SingUp error:", error);
+      console.log("SingUp error:", error);
       await notify({
         status: "error",
         message: i18n.t("notifications.signUpError")
