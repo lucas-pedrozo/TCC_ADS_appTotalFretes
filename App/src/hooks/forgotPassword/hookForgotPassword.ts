@@ -5,7 +5,8 @@ import { validateEmail } from "@/src/utils/formValidations";
 import { RootStackParamList } from "@/src/routes/Routes";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
 import { useAlertDefault } from "@/src/context/AlertDefaultContext";
-import http from "@/src/service/http";
+// import http from "@/src/service/http";
+import { AxiosError } from "axios";
 
 interface ForgotPasswordForm {
   email: string;
@@ -44,7 +45,7 @@ export function useHookForgotPassword() {
 
       await notify({
         status: "error",
-        message: "Erro Ao enviar"
+        message: (error as AxiosError<{ message: string }>).response?.data.message,
       })
     }
   }, [notify, navigation])

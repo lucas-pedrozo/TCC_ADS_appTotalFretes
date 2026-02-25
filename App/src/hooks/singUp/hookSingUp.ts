@@ -4,6 +4,7 @@ import { RootStackParamList } from "@/src/routes/Routes";
 import { useAlertDefault } from "@/src/context/AlertDefaultContext";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
 import i18n from "@/src/i18n";
+import { AxiosError } from "axios";
 
 export interface SingUpFormData {
   cnhNumber?: string;
@@ -31,7 +32,7 @@ export function useHookSingUp() {
         status: "loading",
         message: i18n.t("notifications.signUpLoading")
       });
-        console.log(data);
+
       await http.post("/user/end-account", {
         name: data.name,
         email: data.email,
@@ -58,10 +59,9 @@ export function useHookSingUp() {
       await navigation.navigate("Login");
       
     } catch (error) {
-      console.log("SingUp error:", error);
-      await notify({
+      notify({
         status: "error",
-        message: i18n.t("notifications.signUpError")
+        message: (error as AxiosError<{ message: string }>).response?.data.message ?? i18n.t("notifications.signUpError"),
       });
     }
   }
