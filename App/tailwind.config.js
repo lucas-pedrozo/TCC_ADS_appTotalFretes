@@ -16,8 +16,6 @@ module.exports = {
         darkBgOctonary: "#74AEF1",
         darkBgNonary: "rgba(255, 255, 255, 0.1)",
 
-        gradientBg: "linear-gradient(180deg, #16549E 0%, #000000 100%)",
-
         darkText: "#FFFFFF",
         darkTextSecondary: "rgba(255, 255, 255, 0.6)",
         darkTextTertiary: "#000000",
@@ -25,6 +23,22 @@ module.exports = {
         darkTextQuinary: "#FF0000",
         darkTextSenary: "#FFAA2E",
 
+        lightBg: "#FFFFFF",
+        lightBgSecondary: "#3F3F3F",
+        lightBgTertiary: "#E5E5E5",
+        lightBgQuaternary: "#000000",
+        lightBgQuinary: "#D1F9E2",
+        lightBgSenary: "#E3992C",
+        lightBgSeptenary: "#FF0000",
+        lightBgOctonary: "#74AEF1",
+        lightBgNonary: "rgba(0, 0, 0, 0.06)",
+
+        lightText: "#000000",
+        lightTextSecondary: "rgba(0, 0, 0, 0.6)",
+        lightTextTertiary: "#FFFFFF",
+        lightTextQuaternary: "rgba(255, 255, 255, 0.6)",
+        lightTextQuinary: "#FF0000",
+        lightTextSenary: "#FFAA2E",
       },
     },
   },

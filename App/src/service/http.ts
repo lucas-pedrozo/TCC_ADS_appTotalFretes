@@ -1,6 +1,7 @@
 import axios, { InternalAxiosRequestConfig, AxiosError, AxiosResponse } from 'axios';
 import { Platform } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
+import { ENV_BASE_URL } from '@env';
 
 const defaultURL = Platform.select({
   ios: 'http://localhost:3000',
@@ -9,7 +10,7 @@ const defaultURL = Platform.select({
 }) as string;
 
 
-const envUrl = ('').trim();
+const envUrl = (ENV_BASE_URL || '').trim();
 export const baseURL = envUrl || defaultURL;
 
 let authTokenCache: string | null = null;

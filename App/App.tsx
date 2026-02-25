@@ -1,23 +1,26 @@
-import React from "react";
-
 import "./global.css";
+import "./src/i18n";
 import Routes from "./src/routes/Routes";
-
+import { ThemeProvider } from "./src/context/ThemeContext";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import { useNotification } from "./src/context/NotificationContext";
 import { KeyboardProvider } from "react-native-keyboard-controller";
-import { NotificationProvider } from "./src/context/NotificationContext";
-import AlertNotification from "./src/components/alert/AlertNotification";
+
+import { AuthProvider } from "./src/context/AuthContext";
+import { SingUpProvider } from "./src/context/SingUpContext";
+import AlertNotification from "./src/components/alert/AlertDefault";
+import { useAlertDefault, AlertDefaultProvider } from "./src/context/AlertDefaultContext";
+import { LanguageProvider } from "./src/context/LanguageContext";
 
 const AlertNotificationGlobal = () => {
-  const { notification, hideNotification } = useNotification();
+  const { alert, hideAlert } = useAlertDefault();
 
   return (
     <AlertNotification
-      visible={notification.visible}
-      status={notification.status}
-      message={notification.message}
-      onDismiss={hideNotification}
+      key={`${alert.status}-${alert.message ?? ""}-${alert.visible ? "1" : "0"}`}
+      visible={alert.visible}
+      status={alert.status}
+      message={alert.message}
+      onDismiss={hideAlert}
     />
   );
 };
@@ -25,12 +28,20 @@ const AlertNotificationGlobal = () => {
 function App() {
   return (
     <SafeAreaProvider>
-      <NotificationProvider>
-        <KeyboardProvider>
-          <AlertNotificationGlobal />
-          <Routes />
-        </KeyboardProvider>
-      </NotificationProvider>
+      <ThemeProvider>
+        <LanguageProvider>
+          <AuthProvider>
+            <AlertDefaultProvider>
+              <KeyboardProvider>
+                <SingUpProvider>
+                  <AlertNotificationGlobal />
+                  <Routes />
+                </SingUpProvider>
+              </KeyboardProvider>
+            </AlertDefaultProvider>
+          </AuthProvider>
+        </LanguageProvider>
+      </ThemeProvider>
     </SafeAreaProvider>
   );
 }
