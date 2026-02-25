@@ -11,6 +11,7 @@ import { useAuth } from "@/src/context/AuthContext";
 
 import { RootStackParamList } from "@/src/routes/Routes";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
+import { AxiosError } from "axios";
 
 
 interface LoginForm {
@@ -49,10 +50,9 @@ function useHookLogin() {
       navigation.navigate("Home");
 
     } catch (error) {
-      console.log("Login error:", error);
       notify({
         status: "error",
-        message: i18n.t("notifications.loginError"),
+        message: (error as AxiosError<{ message: string }>).response?.data.message ?? i18n.t("notifications.loginError"),
       });
     }
   },
