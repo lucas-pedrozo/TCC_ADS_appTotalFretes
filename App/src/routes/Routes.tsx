@@ -18,7 +18,7 @@ import SingUpCNH from "../screens/public/singUp/SingUpCNH";
 import SingUpPassword from "../screens/public/singUp/SingUpPassword";
 import ForgotPassword from "../screens/public/newPassword/ForgotPassword";
 import PasswordValidate from "../screens/public/newPassword/PasswordValidate";
-
+import NewPassword from "../screens/public/newPassword/NewPassword";
 
 export type RootStackParamList = {
   Home: undefined;
@@ -28,7 +28,8 @@ export type RootStackParamList = {
   SingUpCNH: undefined;
   SingUpPassword: undefined;
   ForgotPassword: undefined;
-  PasswordValidate: undefined;
+  PasswordValidate: { email: string };
+  NewPassword: { email: string; resetToken: string };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -65,8 +66,9 @@ export default function Routes() {
         <Stack.Screen name="SingUp" component={SingUp} options={{title: t("routes.signUpBasic")}} />
         <Stack.Screen name="SingUpCNH" component={SingUpCNH} options={{title: t("routes.signUpCnh")}} />  
         <Stack.Screen name="SingUpPassword" component={SingUpPassword} options={{title: t("routes.signUpPassword")}} />
-        <Stack.Screen name="ForgotPassword" component={ForgotPassword} options={{title: t("routes.forgotPassword")}} />
-        <Stack.Screen name="PasswordValidate" component={PasswordValidate} options={{title: t("routes.passwordValidate")}} />
+        <Stack.Screen name="ForgotPassword" component={ForgotPassword} options={{ title: t("routes.forgotPassword") }} />
+        <Stack.Screen name="PasswordValidate" component={PasswordValidate} options={{ title: t("routes.passwordValidate") }} />
+        <Stack.Screen name="NewPassword" component={NewPassword} options={{ title: t("routes.newPassword") }} />
 
       </Stack.Navigator>
     </NavigationContainer>

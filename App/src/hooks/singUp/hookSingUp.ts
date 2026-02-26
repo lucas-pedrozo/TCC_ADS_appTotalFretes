@@ -3,8 +3,8 @@ import http from "../../service/http";
 import { RootStackParamList } from "@/src/routes/Routes";
 import { useAlertDefault } from "@/src/context/AlertDefaultContext";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
-import i18n from "@/src/i18n";
 import { AxiosError } from "axios";
+import i18n from "@/src/i18n";
 
 export interface SingUpFormData {
   cnhNumber?: string;
@@ -33,7 +33,7 @@ export function useHookSingUp() {
         message: i18n.t("notifications.signUpLoading")
       });
 
-      await http.post("/user/end-account", {
+    const response =  await http.post("/user/end-account", {
         name: data.name,
         email: data.email,
         sex: data.sex,
@@ -51,7 +51,7 @@ export function useHookSingUp() {
 
       await notify({
         status: "success",
-        message: i18n.t("notifications.signUpSuccess"),
+        message: response.data.message ?? i18n.t("notifications.signUpSuccess"),
       });
 
       await new Promise(resolve => setTimeout(resolve, 1200));

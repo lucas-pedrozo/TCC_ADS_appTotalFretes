@@ -43,7 +43,7 @@ function useHookLogin() {
 
       await notify({
         status: "success",
-        message: i18n.t("notifications.loginSuccess"),
+        message: response.data.message ?? i18n.t("notifications.loginSuccess"),
       });
 
       await new Promise(resolve => setTimeout(resolve, 1200));

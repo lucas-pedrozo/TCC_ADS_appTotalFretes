@@ -27,7 +27,8 @@ export const resources = {
         signUpCnh: "Dados CNH",
         signUpPassword: "Senha",
         forgotPassword: "Esqueci minha senha",
-        passwordValidate: "Autenticação de usuario"
+        passwordValidate: "Código de verificação",
+        newPassword: "Nova senha",
       },
       forgotPassword: {
         title: "Solicitação de nova senha",
@@ -113,6 +114,11 @@ export const resources = {
         signUpLoading: "Criando conta...",
         signUpSuccess: "Conta criada com sucesso!",
         signUpError: "Erro ao criar conta. Verifique os dados e tente novamente.",
+        codeValidated: "Código validado com sucesso!",
+        codeInvalid: "Código inválido",
+        codeInvalidLength: "Código deve ter 6 dígitos",
+        codeRequired: "Código é obrigatório",
+        codeValidationLoading: "Validando código...",
       },
     },
   },
@@ -144,7 +150,8 @@ export const resources = {
         signUpCnh: "Driver License",
         signUpPassword: "Password",
         forgotPassword: "Forgot my password",
-        passwordValidate: "authetication"
+        passwordValidate: "Verification code",
+        newPassword: "New password",
       },
       forgotPassword: {
         title: "Forgot Password Request",

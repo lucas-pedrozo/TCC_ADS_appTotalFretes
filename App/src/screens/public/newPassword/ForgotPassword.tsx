@@ -7,7 +7,6 @@ import { InputDefault } from "@/src/components/fom/inputs/InputDefault";
 import { ButtonDefault } from "@/src/components/fom/buttons/ButtonDefauilt";
 import { useHookForgotPassword } from "@/src/hooks/forgotPassword/hookForgotPassword";
 
-
 const ForgotPassword = () => {
 	const insets = useSafeAreaInsets();
 	const { t } = useTranslation();

@@ -3,41 +3,51 @@ import { useTranslation } from "react-i18next";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 
-import { InputDefault } from "@/src/components/fom/inputs/InputDefault";
+import { OtpInput } from "@/src/components/otpInput/OtpInput";
 import { ButtonDefault } from "@/src/components/fom/buttons/ButtonDefauilt";
-import { useHookForgotPassword } from "@/src/hooks/forgotPassword/hookForgotPassword";
-
+import { useHookPasswordValidate } from "@/src/hooks/forgotPassword/hookPasswordValidate";
 
 const PasswordValidate = () => {
 	const insets = useSafeAreaInsets();
 	const { t } = useTranslation();
 
-	const { control, rules, handleForgotPassword, handleSubmit} = useHookForgotPassword();
+	const { control, handleSubmit, rules, handleValidateCode, email } = useHookPasswordValidate();
 
 	return (
 		<KeyboardAwareScrollView
 			className="flex-1"
-			contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 20, paddingBottom: insets.bottom + 20}}
+			contentContainerStyle={{
+				flexGrow: 1,
+				paddingHorizontal: 20,
+				paddingBottom: insets.bottom + 20,
+			}}
 			keyboardShouldPersistTaps="handled"
 		>
+			<Text className="text-lightText dark:text-darkText text-base">
+				{t("forgotPassword.description")} Informe o código para: {email || "—"}
+			</Text>
 
-			<View className="gap-4 flex-1">
-				<Text className="text-lightText dark:text-darkText text-base">
-					Enforma o código enviado para o email: example@example.com
+			<View className="flex-1 pt-8">
+				<Text className="text-lightText dark:text-darkText text-3xl font-semibold text-center pb-5">
+					Código de Redefinição
 				</Text>
-			</View>
-				
-			<View className="flex-1 justify-end pt-4">
-				<ButtonDefault
-					title={t("forgotPassword.submit")}
-					onPress={handleSubmit(handleForgotPassword)}
-					disabled={false}
-					loading={false}
+
+				<OtpInput
+					control={control}
+					name="code"
+					length={6}
+					rules={rules.code}
 				/>
 			</View>
 
+			<View className="flex-1 justify-end pt-4">
+				<ButtonDefault
+					title={t("forgotPassword.submit")}
+					onPress={handleSubmit(handleValidateCode)}
+				/>
+			</View>
 		</KeyboardAwareScrollView>
-	)
-}
+	);
+};
 
 export default PasswordValidate;
