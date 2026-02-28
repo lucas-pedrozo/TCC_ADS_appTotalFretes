@@ -1,0 +1,97 @@
+import { Text, View } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+
+import Home from "@/src/screens/private/home/Home";
+import { useThemeMode } from "@/src/context/ThemeContext";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+
+export type TabParamList = {
+	HomeTab: undefined;
+	FretesTab: undefined;
+	AndamentoTab: undefined;
+	PropostaTab: undefined;
+	PerfilTab: undefined;
+};
+
+const Tab = createBottomTabNavigator<TabParamList>();
+
+function PlaceholderScreen({ title }: { title: string }) {
+	return (
+		<View className="flex-1 items-center justify-center bg-lightBg dark:bg-darkBg">
+			<Text className="text-lightText dark:text-darkText font-semibold text-lg">{title}</Text>
+		</View>
+	);
+}
+
+const FretesScreen = () => <PlaceholderScreen title="Fretes" />;
+const AndamentoScreen = () => <PlaceholderScreen title="Andamento" />;
+const PropostaScreen = () => <PlaceholderScreen title="Proposta" />;
+const PerfilScreen = () => <PlaceholderScreen title="Perfil" />;
+
+const TAB_BAR_HEIGHT = 72;
+
+export default function RoutesTabs() {
+	const { mode } = useThemeMode();
+	const insets = useSafeAreaInsets();
+
+	const isDark = mode === "dark";
+	const activeColor = isDark ? "#74AEF1" : "#0B3B75";
+	const inactiveColor = isDark ? "rgba(255, 255, 255, 0.5)" : "rgba(0, 0, 0, 0.5)";
+	const tabBackground = isDark ? "#1a1a1a" : "#FFFFFF";
+	const borderColor = isDark ? "rgba(255, 255, 255, 0.08)" : "rgba(0, 0, 0, 0.06)";
+
+	return (
+		<Tab.Navigator
+			screenOptions={({ route }) => ({
+				headerShown: false,
+				animation: "shift",
+				tabBarShowLabel: true,
+				tabBarActiveTintColor: activeColor,
+				tabBarInactiveTintColor: inactiveColor,
+				tabBarStyle: {
+					position: "absolute",
+					left: 12,
+					right: 12,
+					bottom: insets.bottom + 8,
+					height: TAB_BAR_HEIGHT,
+					borderRadius: 24,
+					marginHorizontal: 12,
+					backgroundColor: tabBackground,
+					borderTopWidth: 0,
+					borderWidth: 1,
+					borderColor,
+					paddingTop: 10,
+					paddingBottom: 10,
+				},
+				tabBarLabelStyle: {
+					fontSize: 11,
+					fontWeight: "600",
+				},
+				tabBarIcon: ({ color, focused }) => {
+					const iconMap: Record<keyof TabParamList, keyof typeof Ionicons.glyphMap> = {
+						HomeTab: "home",
+						FretesTab: "car",
+						AndamentoTab: "cube",
+						PropostaTab: "document-text",
+						PerfilTab: "person",
+					};
+					const size = focused ? 24 : 22;
+					return (
+						<Ionicons
+							name={iconMap[route.name as keyof TabParamList]}
+							size={size}
+							color={color}
+						/>
+					);
+				},
+			})}
+		>
+			<Tab.Screen name="HomeTab" component={Home} options={{ tabBarLabel: "Home" }} />
+			<Tab.Screen name="FretesTab" component={FretesScreen} options={{ tabBarLabel: "Fretes" }} />
+			<Tab.Screen name="AndamentoTab" component={AndamentoScreen} options={{ tabBarLabel: "Andamento" }} />
+			<Tab.Screen name="PropostaTab" component={PropostaScreen} options={{ tabBarLabel: "Proposta" }} />
+			<Tab.Screen name="PerfilTab" component={PerfilScreen} options={{ tabBarLabel: "Perfil" }} />
+		</Tab.Navigator>
+	);
+}

@@ -1,3 +1,5 @@
+import { title } from "node:process";
+
 export const resources = {
   pt: {
     translation: {
@@ -119,6 +121,12 @@ export const resources = {
         codeInvalidLength: "Código deve ter 6 dígitos",
         codeRequired: "Código é obrigatório",
         codeValidationLoading: "Validando código...",
+      },
+      home: {
+        welcome: "Boa noite",
+        welcome2: "Bom Dia",
+        welcome3: "Boa Tarde",
+        title: "Minha Dashboard"
       },
     },
   },
@@ -244,6 +252,12 @@ export const resources = {
         signUpLoading: "Creating account...",
         signUpSuccess: "Account created successfully!",
         signUpError: "Failed to create account. Check data and try again.",
+      },
+       home: {
+        welcome: "Good evening",
+        welcome2: "Good morning",
+        welcome3: "Good afternoon",
+        title: "My Dashboard"
       },
     },
   },

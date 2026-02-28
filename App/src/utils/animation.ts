@@ -69,6 +69,57 @@ const iPhoneNotificationExit = (values: { currentHeight: number }) => {
 };
 
 /**
+ * @description Animacao de entrada para modal estilo Apple
+ * @param values Valores da animacao
+ * @returns Objeto com as animacoes
+ */
+const appleModalEnter = (values: { targetHeight: number }) => {
+  "worklet";
+  return {
+    initialValues: {
+      opacity: 0,
+      transform: [{ translateY: values.targetHeight }],
+    },
+    animations: {
+      opacity: withTiming(1, { duration: 200 }),
+      transform: [
+        {
+          translateY: withSpring(
+            0,
+          ),
+        },
+      ],
+    },
+  };
+};
+
+/**
+ * @description Animacao de saida para modal estilo Apple
+ * @param values Valores da animacao
+ * @returns Objeto com as animacoes
+ */
+const appleModalExit = (values: { currentHeight: number }) => {
+  "worklet";
+  return {
+    initialValues: {
+      opacity: 1,
+      transform: [{ translateY: 0 }],
+    },
+    animations: {
+      opacity: withTiming(0, { duration: 150 }),
+      transform: [
+        {
+          translateY: withTiming(values.currentHeight, {
+            duration: 250,
+            easing: Easing.in(Easing.cubic),
+          }),
+        },
+      ],
+    },
+  };
+};
+
+/**
  * @description Objeto com as animacoes de entrada
  * @returns Objeto com as animacoes
  */
@@ -76,6 +127,7 @@ export const enter = {
   fade: FadeIn.duration(BASE_DURATION),
   fadeDown: FadeInDown.duration(BASE_DURATION),
   iPhoneBounce: iPhoneNotificationEnter,
+  appleModal: appleModalEnter,
 };
 
 /**
@@ -86,6 +138,7 @@ export const exit = {
   fade: FadeOut.duration(BASE_DURATION),
   fadeDown: FadeOutUp.duration(BASE_DURATION),
   iPhoneBounce: iPhoneNotificationExit,
+  appleModal: appleModalExit,
 };
 
 /**
@@ -124,6 +177,12 @@ export function iPhoneBounceDown(
   return React.createElement(AnimatedView, { entering, exiting, ...rest });
 }
 
+export function appleModal(
+  { entering = enter.appleModal, exiting = exit.appleModal, ...rest }: AnimatedViewProps & EnterExit
+) {
+  return React.createElement(AnimatedView, { entering, exiting, ...rest });
+}
+
 const animation = {
   ...Animated,
   enter,
@@ -131,6 +190,7 @@ const animation = {
   Fade,
   FadeDown,
   iPhoneBounceDown,
+  appleModal,
 };
 
 export default animation;

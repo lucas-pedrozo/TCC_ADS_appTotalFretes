@@ -13,7 +13,7 @@ interface PasswordValidateForm {
 
 export function useHookPasswordValidate() {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
-  const route = useRoute<RouteProp<RootStackParamList, "PasswordValidate">>();
+  const route = useRoute<RouteProp<RootStackParamList, "VerificationCode">>();
   const { notify } = useAlertDefault();
   const email = route.params?.email ?? "";
 
@@ -49,6 +49,8 @@ export function useHookPasswordValidate() {
         return;
       }
 
+      await new Promise((resolve) => setTimeout(resolve, 1200));
+      
       navigation.navigate("NewPassword", { email, resetToken });
 
     } catch (error) {

@@ -19,7 +19,7 @@ function Start() {
 	const goSingUp = useCallback(() => navigation.navigate("SingUp"), [navigation]);
 
 	return (
-		<SafeAreaView className="flex-1 justify-center items-center px-5">
+		<SafeAreaView className="flex-1 justify-center items-center px-3">
 			<View className="pt-4">
 				<Text className="text-lightText dark:text-darkText text-5xl font-bold text-center">
 					{t("common.appName")}

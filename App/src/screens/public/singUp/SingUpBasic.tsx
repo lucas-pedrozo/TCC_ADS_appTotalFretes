@@ -27,7 +27,7 @@ const SingUp = () => {
   return (
     <KeyboardAwareScrollView
       className="flex-1"
-      contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 20, paddingBottom: insets.bottom + 20 }}
+      contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 12, paddingBottom: insets.bottom + 20 }}
       keyboardShouldPersistTaps="handled"
     >
 

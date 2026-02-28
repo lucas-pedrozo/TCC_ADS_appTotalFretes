@@ -7,7 +7,7 @@ import { jwtDecode } from "jwt-decode";
  * @returns Interface de token decodificado
  */
 interface DecodedToken {
-	id_user: number;
+	id: number;
 	accessLevel: string;
 }
 
@@ -17,7 +17,7 @@ interface DecodedToken {
  */
 interface AuthContextType {
 	token: string | null;
-	id_user: number | null;
+	id: number | null;
 	accessLevel: string | null;
 	isAuthenticated: boolean | null;
 
@@ -31,7 +31,7 @@ interface AuthContextType {
  */
 const defaultAuthContext: AuthContextType = {
 	token: null,
-	id_user: null,
+	id: null,
 	accessLevel: null,
 	isAuthenticated: null,
 	login: () => { },
@@ -62,7 +62,7 @@ export const AuthContext = createContext<AuthContextType>(defaultAuthContext);
  */
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
 	const [token, setToken] = useState<string | null>(null);
-	const [id_user, setId_user] = useState<number | null>(null);
+	const [id, setId] = useState<number | null>(null);
 	const [accessLevel, setAccessLevel] = useState<string | null>(null);
 	const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
@@ -70,7 +70,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 		const decoded = decodeToken(token);
 		if (decoded) {
 			setToken(token);
-			setId_user(decoded.id_user);
+			setId(decoded.id);
 			setAccessLevel(decoded.accessLevel);
 			setIsAuthenticated(true);
 			await SecureStore.setItemAsync("authToken", token);
@@ -79,14 +79,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
 	const logout = async () => {
 		setToken(null);
-		setId_user(null);
+		setId(null);
 		setAccessLevel(null);
 		setIsAuthenticated(false);
 		await SecureStore.deleteItemAsync("authToken");
 	};
 
 	return (
-		<AuthContext.Provider value={{ token, id_user, accessLevel, isAuthenticated, login, logout }}>
+		<AuthContext.Provider value={{ token, id, accessLevel, isAuthenticated, login, logout }}>
 			{children}
 		</AuthContext.Provider>
 	);
