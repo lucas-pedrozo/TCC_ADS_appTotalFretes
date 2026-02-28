@@ -1,6 +1,6 @@
 import { View } from "react-native";
 
-interface ProgressBarWithPinsProps {
+type ProgressBarWithPinsProps = {
   steps: number;
   currentStep: number;
   isDark: boolean;

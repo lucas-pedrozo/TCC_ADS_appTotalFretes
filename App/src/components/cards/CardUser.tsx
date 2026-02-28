@@ -14,7 +14,7 @@ export const CardUser = ({ name, cnhType, navegation }: CardUserProps) => {
 
   return (
     <TouchableOpacity onPress={navegation} className="flex-1 min-h-[140px] rounded-2xl bg-lightBgNonary dark:bg-darkBgNonary p-4 border border-lightBgTertiary dark:border-darkBgTertiary">
-      <View className="w-12 h-12 rounded-xl bg-lightBgTertiary dark:bg-darkBgTertiary items-center justify-center">
+      <View className="w-12 h-12 rounded-xl bg-lightBgNonary dark:bg-darkBgNonary items-center justify-center">
         <Ionicons name="person" size={26} color={mode === "dark" ? "#FFFFFF" : "#000000"} />
       </View>
 

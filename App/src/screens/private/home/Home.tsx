@@ -15,8 +15,8 @@ import ModalNotificacoes from "@/src/components/modal/ModalNotificacoes";
 
 import { TabParamList } from "@/src/routes/RoutesTabs";
 import { useNavigation } from "@react-navigation/native";
-import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
 import { CardVehicle } from "@/src/components/cards/CardVehicle";
+import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
 import { CardActivityHome } from "@/src/components/cards/CardActivityHome";
 
 function Home() {

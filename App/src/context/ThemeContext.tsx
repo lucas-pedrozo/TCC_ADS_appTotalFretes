@@ -48,7 +48,7 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   const theme = useMemo<Theme>(() => {
-    const background = mode === "dark" ? "#000000" : "#FAFAFA";
+    const background = mode === "dark" ? "#000000" : "#FFFFFF";
     const text = mode === "dark" ? "#FFFFFF" : "#000000";
 
     return {

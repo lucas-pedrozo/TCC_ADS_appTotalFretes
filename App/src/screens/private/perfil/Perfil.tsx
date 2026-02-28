@@ -1,0 +1,102 @@
+import { useCallback, useEffect, useState } from "react";
+import { useThemeMode } from "@/src/context/ThemeContext";
+import { useLanguage } from "@/src/context/LanguageContext";
+import { SafeAreaView } from "react-native-safe-area-context"
+import { RefreshControl, ScrollView, Text, TouchableOpacity, View } from "react-native"
+import { useHookGetUser } from "@/src/hooks/user/hookGetUser";
+import { HeaderPerfil } from "@/src/components/perfil/HeaderPerfil";
+import { Option } from "@/src/components/perfil/Option";
+import { OptionKey } from "@/src/components/perfil/OptionKey";
+import { OptionSelect } from "@/src/components/perfil/OptionSelect";
+import { useTranslation } from "react-i18next";
+import type { AppLanguage } from "@/src/i18n/resources";
+import { ButtonDefault } from "@/src/components/fom/buttons/ButtonDefauilt";
+import { useAuth } from "@/src/context/AuthContext";
+
+const Perfil = () => {
+  const { t } = useTranslation();
+  const { mode, toggleMode } = useThemeMode();
+  const { language, changeLanguage } = useLanguage();
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const { userData, handleGetUser } = useHookGetUser();
+  const { logout } = useAuth();
+
+  const idiomaOptions = [
+    { value: "pt", label: t("language.pt") },
+    { value: "en", label: t("language.en") },
+  ];
+
+  const handleRefresh = useCallback(async () => {
+    setIsRefreshing(true);
+    try {
+      await handleGetUser();
+    } finally {
+      setIsRefreshing(false);
+    }
+  }, [handleGetUser]);
+
+  useEffect(() => {
+    handleGetUser();
+  }, [handleGetUser]);
+
+  const temCarro = true;
+
+  return (
+    <SafeAreaView style={{ flex: 1 }} className="bg-lightBg dark:bg-darkBg">
+      <ScrollView
+        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 100, paddingTop: 10 }}
+        showsVerticalScrollIndicator={false}
+        className="flex-1"
+        refreshControl={
+          <RefreshControl
+            refreshing={isRefreshing}
+            onRefresh={handleRefresh}
+            tintColor={mode === "dark" ? "#FFFFFF" : "#000000"}
+          />
+        }
+      >
+
+        <HeaderPerfil
+          name={userData?.name || "Não informado"}
+          email={userData?.email || "Não informado"}
+          cpf={userData?.cpf || "Não informado"}
+        />
+
+        <View className="flex-col gap-2.5 mt-14">
+          <Text className="text-sm font-semibold pl-2.5 pb-1.5 text-lightTextSecondary dark:text-darkTextSecondary">Informações Pessoais</Text>
+
+          <Option title="Editar meus Dados" icon="pencil-outline" onPress={() => { }} />
+          <View className="h-0.5 w-full bg-lightBgNonary dark:bg-darkBgNonary rounded-full" />
+          <Option title="Editar Dados da CNH" icon="pencil-outline" onPress={() => { }} />
+          <View className="h-0.5 w-full bg-lightBgNonary dark:bg-darkBgNonary rounded-full" />
+
+          {temCarro ?
+            <Option title="Cadastrar Veículo" icon="car-outline" onPress={() => { }} />
+            :
+            <Option title="Editar Veículo" icon="car-outline" onPress={() => { }} />
+          }
+          
+          <View className="h-0.5 w-full bg-lightBgNonary dark:bg-darkBgNonary rounded-full" />
+          <Option title="Opções Avançadas" icon="settings-outline" onPress={() => { }} />
+        </View>
+
+        <View className="flex-col gap-2.5 mt-5">
+          <Text className="text-sm font-semibold pl-2.5 pb-1.5 text-lightTextSecondary dark:text-darkTextSecondary">Funcionamento do App</Text>
+
+          <OptionSelect
+            title="Idioma"
+            icon="language-outline"
+            options={idiomaOptions}
+            value={language}
+            onValueChange={(value) => changeLanguage(value as AppLanguage)}
+          />
+          <View className="h-0.5 w-full bg-lightBgNonary dark:bg-darkBgNonary rounded-full" />
+          <OptionKey title="Modo Claro" icon="sunny-outline" value={mode === "light"} setValue={() => toggleMode()} />
+          <View className="h-0.5 w-full bg-lightBgNonary dark:bg-darkBgNonary rounded-full" />
+        </View>
+      </ScrollView>
+    </SafeAreaView>
+  )
+}
+
+export default Perfil;

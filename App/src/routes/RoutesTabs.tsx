@@ -1,7 +1,7 @@
 import { Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-
+import Perfil  from "@/src/screens/private/perfil/Perfil";
 import Home from "@/src/screens/private/home/Home";
 import { useThemeMode } from "@/src/context/ThemeContext";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -27,7 +27,6 @@ function PlaceholderScreen({ title }: { title: string }) {
 const FretesScreen = () => <PlaceholderScreen title="Fretes" />;
 const AndamentoScreen = () => <PlaceholderScreen title="Andamento" />;
 const PropostaScreen = () => <PlaceholderScreen title="Proposta" />;
-const PerfilScreen = () => <PlaceholderScreen title="Perfil" />;
 
 const TAB_BAR_HEIGHT = 72;
 
@@ -91,7 +90,7 @@ export default function RoutesTabs() {
 			<Tab.Screen name="FretesTab" component={FretesScreen} options={{ tabBarLabel: "Fretes" }} />
 			<Tab.Screen name="AndamentoTab" component={AndamentoScreen} options={{ tabBarLabel: "Andamento" }} />
 			<Tab.Screen name="PropostaTab" component={PropostaScreen} options={{ tabBarLabel: "Proposta" }} />
-			<Tab.Screen name="PerfilTab" component={PerfilScreen} options={{ tabBarLabel: "Perfil" }} />
+			<Tab.Screen name="PerfilTab" component={Perfil} options={{ tabBarLabel: "Perfil" }} />
 		</Tab.Navigator>
 	);
 }
