@@ -2,7 +2,7 @@ import { Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
-import Home from "@/src/screens/private/Home";
+import Home from "@/src/screens/private/home/Home";
 import { useThemeMode } from "@/src/context/ThemeContext";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -29,14 +29,17 @@ const AndamentoScreen = () => <PlaceholderScreen title="Andamento" />;
 const PropostaScreen = () => <PlaceholderScreen title="Proposta" />;
 const PerfilScreen = () => <PlaceholderScreen title="Perfil" />;
 
+const TAB_BAR_HEIGHT = 72;
+
 export default function RoutesTabs() {
 	const { mode } = useThemeMode();
+	const insets = useSafeAreaInsets();
 
-  const insets = useSafeAreaInsets();
-
-	const activeColor = mode === "dark" ? "#FFFFFF" : "#000000";
-	const inactiveColor = mode === "dark" ? "rgba(255, 255, 255, 0.6)" : "rgba(0, 0, 0, 0.6)";
-	const tabBackground = mode === "dark" ? "#202020" : "#E5E5E5";
+	const isDark = mode === "dark";
+	const activeColor = isDark ? "#74AEF1" : "#0B3B75";
+	const inactiveColor = isDark ? "rgba(255, 255, 255, 0.5)" : "rgba(0, 0, 0, 0.5)";
+	const tabBackground = isDark ? "#1a1a1a" : "#FFFFFF";
+	const borderColor = isDark ? "rgba(255, 255, 255, 0.08)" : "rgba(0, 0, 0, 0.06)";
 
 	return (
 		<Tab.Navigator
@@ -48,31 +51,39 @@ export default function RoutesTabs() {
 				tabBarInactiveTintColor: inactiveColor,
 				tabBarStyle: {
 					position: "absolute",
-					marginHorizontal: 16,
-					marginBottom: insets.bottom,
-					height: 76,
-					borderRadius: 20,
+					left: 12,
+					right: 12,
+					bottom: insets.bottom + 8,
+					height: TAB_BAR_HEIGHT,
+					borderRadius: 24,
+					marginHorizontal: 12,
 					backgroundColor: tabBackground,
 					borderTopWidth: 0,
-					elevation: 0,
-					shadowOpacity: 0,
-					paddingTop: 8,
-					paddingBottom: 8,
+					borderWidth: 1,
+					borderColor,
+					paddingTop: 10,
+					paddingBottom: 10,
 				},
 				tabBarLabelStyle: {
-					fontSize: 13,
+					fontSize: 11,
 					fontWeight: "600",
 				},
-				tabBarIcon: ({ color, size }) => {
+				tabBarIcon: ({ color, focused }) => {
 					const iconMap: Record<keyof TabParamList, keyof typeof Ionicons.glyphMap> = {
-						HomeTab: "home-outline",
-						FretesTab: "car-outline",
-						AndamentoTab: "cube-outline",
-						PropostaTab: "cube-outline",
-						PerfilTab: "person-outline",
+						HomeTab: "home",
+						FretesTab: "car",
+						AndamentoTab: "cube",
+						PropostaTab: "document-text",
+						PerfilTab: "person",
 					};
-
-					return <Ionicons name={iconMap[route.name as keyof TabParamList]} size={size} color={color} />;
+					const size = focused ? 24 : 22;
+					return (
+						<Ionicons
+							name={iconMap[route.name as keyof TabParamList]}
+							size={size}
+							color={color}
+						/>
+					);
 				},
 			})}
 		>

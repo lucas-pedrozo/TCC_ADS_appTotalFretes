@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { Image, RefreshControl, ScrollView, Text, TouchableOpacity, View } from "react-native";
 
 import { Ionicons } from "@expo/vector-icons";
@@ -24,7 +24,6 @@ function Home() {
   const { logout, } = useAuth();
   const { t } = useTranslation();
   const { mode } = useThemeMode();
-  const insets = useSafeAreaInsets();
   const { userData, handleGetUser } = useHookGetUser();
 
   const [isModalLogoutVisible, setIsModalLogoutVisible] = useState(false);
@@ -61,9 +60,11 @@ function Home() {
   ];
 
   return (
-    <SafeAreaView style={{ flex: 1,}}>
+    <SafeAreaView style={{ flex: 1 }} className="bg-lightBg dark:bg-darkBg">
       <ScrollView
-        contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 80, paddingTop: 10 }}
+        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 100, paddingTop: 10 }}
+        showsVerticalScrollIndicator={false}
+        className="flex-1"
         refreshControl={
           <RefreshControl
             refreshing={isRefreshing}
@@ -73,14 +74,14 @@ function Home() {
         }
       >
 
-        <View className="flex-1 items-center justify-between flex-row">
+        <View className="flex-row items-center justify-between w-full">
           <View className="flex-row items-center gap-3">
-            <TouchableOpacity onPress={goToProfile}>
+            <TouchableOpacity onPress={goToProfile} activeOpacity={0.7}>
               <Image source={require('@/src/assets/usuario.jpg')} className="w-14 h-14 rounded-xl" />
             </TouchableOpacity>
             <View className="flex-col">
-              <Text className="text-lightTextSecondary dark:text-darkTextSecondary font-medium text-base">Goodnight</Text>
-              <Text className="text-lightText dark:text-darkText font-medium text-base">{formatName(userData?.name ?? "-----")}</Text>
+              <Text className="text-lightTextSecondary dark:text-darkTextSecondary font-medium text-sm">Goodnight</Text>
+              <Text className="text-lightText dark:text-darkText font-semibold text-base">{formatName(userData?.name ?? "-----")}</Text>
             </View>
           </View>
 
@@ -101,11 +102,11 @@ function Home() {
           </View>
         </View>
 
-        <Text className="text-lightText dark:text-darkText font-semibold text-3xl pt-8 pb-5 pl-2.5">
+        <Text className="text-lightText dark:text-darkText font-bold text-2xl pt-6 pb-4">
           {t("home.title")}
         </Text>
 
-        <View className="flex-row items-center justify-between gap-2.5">
+        <View className="flex-row items-stretch justify-between gap-3">
           <CardUser
             cnhType={userData?.CnhType?.name}
             name={userData?.name}

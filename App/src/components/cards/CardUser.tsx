@@ -13,13 +13,13 @@ export const CardUser = ({ name, cnhType, navegation }: CardUserProps) => {
   
 
   return (
-    <TouchableOpacity onPress={navegation} className="w-[49%] h-44 rounded-2xl bg-lightBgNonary dark:bg-darkBgNonary p-4">
+    <TouchableOpacity onPress={navegation} className="flex-1 min-h-[140px] rounded-2xl bg-lightBgNonary dark:bg-darkBgNonary p-4 border border-lightBgTertiary dark:border-darkBgTertiary">
       <View className="w-12 h-12 rounded-xl bg-lightBgTertiary dark:bg-darkBgTertiary items-center justify-center">
         <Ionicons name="person" size={26} color={mode === "dark" ? "#FFFFFF" : "#000000"} />
       </View>
 
       <Text className="text-lightText dark:text-darkText text-sm mt-4">Nome: {name ?? "Não informado"}</Text>
-      <Text className="text-lightText dark:text-darkText text-sm mt-1">CNH: {cnhType ?? "Não informado"}</Text>
+      <Text className="text-lightText dark:text-darkText text-sm mt-1">Categoria: {cnhType ?? "Não informado"}</Text>
     </TouchableOpacity>
   )
 }

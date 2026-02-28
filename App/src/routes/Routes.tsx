@@ -50,7 +50,7 @@ export default function Routes() {
         screenOptions={{ 
           header: ({ options }) => (
             options.title ? (
-              <SafeAreaView edges={["top"]} style={{ paddingHorizontal: 20, backgroundColor }}>
+              <SafeAreaView edges={["top"]} style={{ paddingHorizontal: 12, backgroundColor }}>
                 <Header title={options.title} />
               </SafeAreaView>
             ) : null

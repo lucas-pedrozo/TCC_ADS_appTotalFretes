@@ -43,7 +43,7 @@ const VerificationCode = () => {
 			className="flex-1"
 			contentContainerStyle={{
 				flexGrow: 1,
-				paddingHorizontal: 20,
+				paddingHorizontal: 12,
 				paddingBottom: insets.bottom + 20,
 			}}
 			keyboardShouldPersistTaps="handled"

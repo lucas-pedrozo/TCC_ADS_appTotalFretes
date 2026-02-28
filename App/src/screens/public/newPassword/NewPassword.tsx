@@ -13,7 +13,7 @@ const NewPassword = () => {
 	return (
 		<KeyboardAwareScrollView
 			className="flex-1"
-			contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 20 }}
+			contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 12 }}
 			keyboardShouldPersistTaps="handled"
 		>
 			<View className="gap-4 flex-1">
