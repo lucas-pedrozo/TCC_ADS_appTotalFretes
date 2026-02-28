@@ -14,7 +14,7 @@ const PrivateRoute = ({ children }: Props) => {
     if (!isAuthenticated) {
       navigation.reset({
         index: 0,
-        routes: [{ name: "Login" as never }],
+        routes: [{ name: "Start" as never }],
       });
     }
   }, [isAuthenticated, navigation]);

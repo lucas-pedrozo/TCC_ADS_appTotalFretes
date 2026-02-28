@@ -1,12 +1,12 @@
+import { AxiosError } from "axios";
 import { useCallback } from "react";
+import http from "@/src/service/http";
 import { useForm } from "react-hook-form";
 import { validationRules } from "@/src/utils/formValidations";
 
 import { RootStackParamList } from "@/src/routes/Routes";
-import { NavigationProp, useNavigation } from "@react-navigation/native";
 import { useAlertDefault } from "@/src/context/AlertDefaultContext";
-import http from "@/src/service/http";
-import { AxiosError } from "axios";
+import { NavigationProp, useNavigation } from "@react-navigation/native";
 
 interface ForgotPasswordForm {
   email: string;
@@ -23,7 +23,7 @@ export function useHookForgotPassword() {
 
   const handleForgotPassword = useCallback(async (data: ForgotPasswordForm) => {
     try {
-      await notify({ status: "loading", message: "Carregando..." });
+      await notify({ status: "loading", message: "Enviando codigo de verificador" });
 
       const response = await http.post("/auth/forgot-password", { email: data.email });
 
@@ -34,13 +34,13 @@ export function useHookForgotPassword() {
 
       await new Promise((resolve) => setTimeout(resolve, 1200));
 
-      navigation.navigate("PasswordValidate", { email: data.email.trim() });
+      navigation.navigate("VerificationCode", { email: data.email.trim() });
     } catch (error) {
       console.log(error)
 
       await notify({
         status: "error",
-        message: (error as AxiosError<{ message: string }>).response?.data.message,
+        message: (error as AxiosError<{ message: string }>).response?.data.message ?? "Erro ao solicitar redefinição. Tente novamente.",
       })
     }
   }, [notify, navigation])
@@ -49,9 +49,9 @@ export function useHookForgotPassword() {
 
   return {
     rules,
+    errors,
     control,
     handleSubmit,
-    errors,
     handleForgotPassword
   }
 }
