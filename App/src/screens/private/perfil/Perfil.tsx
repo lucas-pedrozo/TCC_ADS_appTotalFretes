@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useThemeMode } from "@/src/context/ThemeContext";
 import { useLanguage } from "@/src/context/LanguageContext";
 import { SafeAreaView } from "react-native-safe-area-context"
-import { RefreshControl, ScrollView, Text, TouchableOpacity, View } from "react-native"
+import { RefreshControl, ScrollView, Text, View } from "react-native"
 import { useHookGetUser } from "@/src/hooks/user/hookGetUser";
 import { HeaderPerfil } from "@/src/components/perfil/HeaderPerfil";
 import { Option } from "@/src/components/perfil/Option";
@@ -10,8 +10,6 @@ import { OptionKey } from "@/src/components/perfil/OptionKey";
 import { OptionSelect } from "@/src/components/perfil/OptionSelect";
 import { useTranslation } from "react-i18next";
 import type { AppLanguage } from "@/src/i18n/resources";
-import { ButtonDefault } from "@/src/components/fom/buttons/ButtonDefauilt";
-import { useAuth } from "@/src/context/AuthContext";
 
 const Perfil = () => {
   const { t } = useTranslation();
@@ -19,7 +17,6 @@ const Perfil = () => {
   const { language, changeLanguage } = useLanguage();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const { userData, handleGetUser } = useHookGetUser();
-  const { logout } = useAuth();
 
   const idiomaOptions = [
     { value: "pt", label: t("language.pt") },
@@ -91,7 +88,7 @@ const Perfil = () => {
             onValueChange={(value) => changeLanguage(value as AppLanguage)}
           />
           <View className="h-0.5 w-full bg-lightBgNonary dark:bg-darkBgNonary rounded-full" />
-          <OptionKey title="Modo Claro" icon="sunny-outline" value={mode === "light"} setValue={() => toggleMode()} />
+          <OptionKey title="Modo Escuro" icon="moon-outline" value={mode === "dark"} setValue={() => toggleMode()} />
           <View className="h-0.5 w-full bg-lightBgNonary dark:bg-darkBgNonary rounded-full" />
         </View>
       </ScrollView>

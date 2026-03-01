@@ -29,6 +29,7 @@ function Home() {
   const [isModalLogoutVisible, setIsModalLogoutVisible] = useState(false);
   const [isModalNotificacoesVisible, setIsModalNotificacoesVisible] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   const navigation = useNavigation<BottomTabNavigationProp<TabParamList>>();
   const goToProfile = () => { navigation.navigate("PerfilTab"); }
@@ -46,6 +47,7 @@ function Home() {
     setIsRefreshing(true);
     try {
       await handleGetUser();
+      setRefreshKey((prev) => prev + 1);
     } finally {
       setIsRefreshing(false);
     }
@@ -114,12 +116,16 @@ function Home() {
           />
 
           <CardClime
+            key={`card-clime-${refreshKey}`}
           />
         </View>
 
-        <CardActivityHome />
+        <CardActivityHome
+          key={`card-activity-${refreshKey}`}
+        />
 
         <CardVehicle
+          key={`card-vehicle-${refreshKey}`}
           vehicleId={userData?.vehicleType_id}
         />
 

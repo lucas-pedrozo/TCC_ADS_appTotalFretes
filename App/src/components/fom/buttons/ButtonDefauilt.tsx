@@ -10,7 +10,7 @@ export type ButtonProps = {
 export const ButtonDefault = ({ title, onPress, disabled, loading }: ButtonProps) => {
 	return (
 		<TouchableOpacity
-			className="bg-lightBgQuaternary dark:bg-darkBgQuaternary py-2.5 w-full rounded-lg items-center"
+			className="bg-lightBgQuaternary dark:bg-darkBgQuaternary py-3  w-full rounded-lg items-center"
 			onPress={onPress}
 			disabled={disabled}
 		>
@@ -24,7 +24,7 @@ export const ButtonDefault = ({ title, onPress, disabled, loading }: ButtonProps
 export const ButtonApproved = ({ title, onPress, disabled, loading }: ButtonProps) => {
 	return (
 		<TouchableOpacity
-			className="bg-green-500 py-2.5 w-full rounded-lg items-center"
+			className="bg-green-500 py-3 w-full rounded-lg items-center"
 			onPress={onPress}
 			disabled={disabled}
 		>
@@ -36,7 +36,7 @@ export const ButtonApproved = ({ title, onPress, disabled, loading }: ButtonProp
 export const ButtonCancel = ({ title, onPress, disabled, loading }: ButtonProps) => {
 	return (
 		<TouchableOpacity
-			className="bg-red-500 py-2.5 w-full rounded-lg items-center"
+			className="bg-red-500 py-3 w-full rounded-lg items-center"
 			onPress={onPress}
 			disabled={disabled}
 		>

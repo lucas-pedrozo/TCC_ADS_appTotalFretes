@@ -1,5 +1,3 @@
-import { title } from "node:process";
-
 export const resources = {
   pt: {
     translation: {
