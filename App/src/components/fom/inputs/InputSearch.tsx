@@ -26,7 +26,7 @@ export const InputSearch = (props: InputProps) => {
 				field: { onChange, onBlur, value },
 			}) => {
 				return (
-					<View className="flex-1 flex-row items-center px-2.5 py-1 bg-lightBgTertiary dark:bg-darkBgSecondary rounded-xl">
+					<View className="flex-1 flex-row items-center px-2.5 py-1 bg-lightBgSecondary dark:bg-darkBgSecondary rounded-xl">
              <Ionicons name="search" size={20} color={mode === "dark" ? "#FFFFFF" : "#000000"} />
 						<TextInput
 							id={props.id}

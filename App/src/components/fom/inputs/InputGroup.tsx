@@ -19,7 +19,7 @@ type InputButtonGroupProps = {
 const STYLES_INPUT = {
   default: {
     label: "text-lightText dark:text-darkText font-semibold text-base pl-2.5",
-    button: "bg-lightBgTertiary dark:bg-darkBgSecondary rounded-lg px-6 py-3 items-center",
+    button: "bg-lightBgSecondary dark:bg-darkBgSecondary rounded-lg px-6 py-3 items-center",
     text: "text-lightText dark:text-darkText font-semibold text-sm",
   },
   selected: {

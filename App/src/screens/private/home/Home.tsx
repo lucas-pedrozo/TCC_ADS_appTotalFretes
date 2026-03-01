@@ -34,6 +34,10 @@ function Home() {
   const navigation = useNavigation<BottomTabNavigationProp<TabParamList>>();
   const goToProfile = () => { navigation.navigate("PerfilTab"); }
 
+  const currentHour = new Date().getHours();
+  const greeting = currentHour < 12 ? t("home.welcome2") : currentHour < 18 ? t("home.welcome3") : t("home.welcome");
+
+
   const handleConfirmLogout = () => {
     setIsModalLogoutVisible(false);
     logout();
@@ -82,7 +86,7 @@ function Home() {
               <Image source={require('@/src/assets/usuario.jpg')} className="w-14 h-14 rounded-xl" />
             </TouchableOpacity>
             <View className="flex-col">
-              <Text className="text-lightTextSecondary dark:text-darkTextSecondary font-medium text-sm">Goodnight</Text>
+              <Text className="text-lightTextSecondary dark:text-darkTextSecondary font-medium text-sm">{greeting}</Text>
               <Text className="text-lightText dark:text-darkText font-semibold text-base">{formatName(userData?.name ?? "-----")}</Text>
             </View>
           </View>

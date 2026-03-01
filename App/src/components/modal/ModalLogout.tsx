@@ -30,7 +30,7 @@ function ModalLogout({ visible, onConfirm, onCancel }: ModalLogoutProps) {
 
 				<View className="mt-4 flex-row gap-3">
 					<TouchableOpacity
-						className="flex-1 py-2.5 rounded-lg items-center bg-lightBgTertiary dark:bg-darkBgTertiary"
+						className="flex-1 py-2.5 rounded-lg items-center bg-lightBgSecondary dark:bg-darkBgTertiary"
 						onPress={onCancel}
 					>
 						<Text className="text-lightText dark:text-darkText font-semibold">Não</Text>

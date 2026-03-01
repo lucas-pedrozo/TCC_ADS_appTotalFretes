@@ -14,7 +14,7 @@ const Header = ({ title }: HeaderProps) => {
 	return (
 		<View className="w-full py-4 flex-row items-center justify-between">
 			<TouchableOpacity
-				className="bg-lightBgTertiary dark:bg-darkBgTertiary p-2.5 rounded-md"
+				className="bg-lightBgSecondary dark:bg-darkBgTertiary p-2.5 rounded-md"
 				onPress={() => navigation.goBack()}
 			>
 				<Ionicons name="arrow-back" size={20} color={mode === "dark" ? "#FFFFFF" : "#000000"} />	

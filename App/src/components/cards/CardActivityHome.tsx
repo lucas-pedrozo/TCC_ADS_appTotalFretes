@@ -28,20 +28,20 @@ export const CardActivityHome = () => {
           <View className="w-12 h-12 rounded-xl bg-lightBgNonary dark:bg-darkBgNonary items-center justify-center">
             <Ionicons name="cube-outline" size={26} color={mode === "dark" ? "#FFFFFF" : "#000000"} />
           </View>
-          <Text className="text-lightText dark:text-darkText font-semibold text-base">Reboque Caçamba</Text>
+          <Text className="text-lightText dark:text-darkText font-semibold text-base">Não informado</Text>
         </View>
 
         <View className="flex-row justify-between pt-3 w-full">
-          <Text className="text-lightText dark:text-darkText text-sm">Início: {freightUser?.origin_label}</Text>
-          <Text className="text-lightTextSecondary dark:text-darkTextSecondary text-sm">Cascalho / 20T</Text>
+          <Text className="text-lightText dark:text-darkText text-sm">Início: {freightUser?.origin_label ?? "Não informado"}</Text>
+          <Text className="text-lightTextSecondary dark:text-darkTextSecondary text-sm">Nenhum / N/A</Text>
         </View>
         <View className="flex-row justify-between pt-1 w-full">
-          <Text className="text-lightText dark:text-darkText text-sm">Destino: {freightUser?.destination_label}</Text>
+          <Text className="text-lightText dark:text-darkText text-sm">Destino: {freightUser?.destination_label ?? "Não informado"}</Text>
         </View>
 
         <View className="flex-row justify-between pt-3 w-full">
-          <Text className="text-lightText dark:text-darkText text-sm">Status: {freightUser?.status}</Text>
-          <Text className="text-lightText dark:text-darkText text-sm">Prazo: {freightUser?.time_limit}</Text>
+          <Text className="text-lightText dark:text-darkText text-sm">Status: {freightUser?.status ?? "---"}</Text>
+          <Text className="text-lightText dark:text-darkText text-sm">Prazo: {freightUser?.time_limit ?? "----"}</Text>
         </View>
 
         <ProgressBarWithPins steps={5} currentStep={0} isDark={mode === "dark"} />

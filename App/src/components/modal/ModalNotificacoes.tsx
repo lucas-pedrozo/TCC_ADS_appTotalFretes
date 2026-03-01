@@ -46,8 +46,8 @@ const ModalNotificacoes = ({ visible, onClose, notifications }: ModalNotificacoe
             keyExtractor={(item) => item.id.toString()}
             renderItem={({ item }) => (
               <View className="mb-4 p-3 bg-lightBgSecondary dark:bg-darkBgSecondary rounded-xl">
-                <Text className="text-lightBg dark:text-darkText font-medium text-base">{item.title}</Text>
-                <Text className="text-lightBgTertiary dark:text-darkTextSecondary text-sm mt-1">{item.message}</Text>
+                <Text className="text-lightText dark:text-darkText font-medium text-base">{item.title}</Text>
+                <Text className="text-lightTextSecondary dark:text-darkTextSecondary text-sm mt-1">{item.message}</Text>
               </View>
             )}
             ListEmptyComponent={

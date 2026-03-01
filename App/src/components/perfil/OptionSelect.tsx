@@ -52,7 +52,7 @@ export const OptionSelect = (props: OptionSelectProps) => {
           onPress={() => setModalVisible(false)}
         >
           <View
-            className="mx-4 rounded-2xl overflow-hidden bg-lightBgTertiary dark:bg-darkBgSecondary"
+            className="mx-4 rounded-2xl overflow-hidden bg-lightBgSecondary dark:bg-darkBgSecondary"
             onStartShouldSetResponder={() => true}
           >
             <View className="max-h-80 py-2">

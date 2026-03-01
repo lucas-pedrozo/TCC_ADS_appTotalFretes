@@ -1,5 +1,6 @@
 import "react-native-gesture-handler";
 
+import RoutesTabs from "./RoutesTabs";
 import { StatusBar } from "expo-status-bar";
 import PrivateRoute from "./PrivateRoutes";
 import { useTranslation } from "react-i18next";
@@ -8,7 +9,6 @@ import { useThemeMode } from "../context/ThemeContext";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import RoutesTabs from "./RoutesTabs";
 
 import Start from "../screens/public/Start";
 import Login from "../screens/public/login/Login";
@@ -18,6 +18,12 @@ import SingUpPassword from "../screens/public/singUp/SingUpPassword";
 import ForgotPassword from "../screens/public/newPassword/ForgotPassword";
 import VerificationCode from "../screens/public/newPassword/VerificationCode";
 import NewPassword from "../screens/public/newPassword/NewPassword";
+import EditPerfil from "../screens/private/EditPerfil";
+import { EditPerfilMap } from "../hooks/editPerfil/EditPerfil";
+
+interface EditPerfilRouteParams {
+  editPerfilData: EditPerfilMap;
+}
 
 export type RootStackParamList = {
   Home: undefined;
@@ -28,6 +34,7 @@ export type RootStackParamList = {
   SingUpPassword: undefined;
   ForgotPassword: undefined;
   VerificationCode: { email: string };
+  EditPerfil: EditPerfilRouteParams;
   NewPassword: { email: string; resetToken: string };
 };
 
@@ -45,9 +52,9 @@ export default function Routes() {
         backgroundColor={backgroundColor}
       />
 
-      <Stack.Navigator 
-        initialRouteName="Start" 
-        screenOptions={{ 
+      <Stack.Navigator
+        initialRouteName="Start"
+        screenOptions={{
           header: ({ options }) => (
             options.title ? (
               <SafeAreaView edges={["top"]} style={{ paddingHorizontal: 12, backgroundColor }}>
@@ -55,15 +62,16 @@ export default function Routes() {
               </SafeAreaView>
             ) : null
           ),
-        }} 
+        }}
       >
-        <Stack.Screen name="Home" component={() => <PrivateRoute><RoutesTabs /></PrivateRoute>} options={{headerShown: false}} />
-   
-        <Stack.Screen name="Start" component={Start} options={{headerShown: false}} />
-        <Stack.Screen name="Login" component={Login} options={{title: t("routes.login")}} />
-        <Stack.Screen name="SingUp" component={SingUp} options={{title: t("routes.signUpBasic")}} />
-        <Stack.Screen name="SingUpCNH" component={SingUpCNH} options={{title: t("routes.signUpCnh")}} />  
-        <Stack.Screen name="SingUpPassword" component={SingUpPassword} options={{title: t("routes.signUpPassword")}} />
+        <Stack.Screen name="Home" component={() => <PrivateRoute><RoutesTabs /></PrivateRoute>} options={{ headerShown: false }} />
+        <Stack.Screen name="EditPerfil" component={() => <PrivateRoute><EditPerfil /></PrivateRoute>} options={{ title: "Editar Dados" }} />
+
+        <Stack.Screen name="Start" component={Start} options={{ headerShown: false }} />
+        <Stack.Screen name="Login" component={Login} options={{ title: t("routes.login") }} />
+        <Stack.Screen name="SingUp" component={SingUp} options={{ title: t("routes.signUpBasic") }} />
+        <Stack.Screen name="SingUpCNH" component={SingUpCNH} options={{ title: t("routes.signUpCnh") }} />
+        <Stack.Screen name="SingUpPassword" component={SingUpPassword} options={{ title: t("routes.signUpPassword") }} />
         <Stack.Screen name="ForgotPassword" component={ForgotPassword} options={{ title: t("routes.forgotPassword") }} />
         <Stack.Screen name="VerificationCode" component={VerificationCode} options={{ title: t("routes.verificationCode") }} />
         <Stack.Screen name="NewPassword" component={NewPassword} options={{ title: t("routes.newPassword") }} />
