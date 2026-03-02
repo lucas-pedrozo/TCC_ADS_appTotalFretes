@@ -1,16 +1,19 @@
-import { Image, Text, TouchableOpacity, View } from "react-native";
 import { useTranslation } from "react-i18next";
+import { Image, Text, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { InputGroup } from "@/src/components/fom/inputs/InputGroup";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
+
+import { InputGroup } from "@/src/components/fom/inputs/InputGroup";
+import { useHookEditPerfil } from "@/src/hooks/editPerfil/EditPerfil";
+import { useHookImagePicker } from "@/src/hooks/editPerfil/imagePicker";
 import { ButtonDefault } from "@/src/components/fom/buttons/ButtonDefauilt";
 import { InputCpf, InputDate, InputDefault, InputPhone } from "@/src/components/fom/inputs/InputDefault";
-import { useHookEditPerfil } from "@/src/hooks/editPerfil/EditPerfil";
 
 const EditPerfil = () => {
 	const { t } = useTranslation();
 	const insets = useSafeAreaInsets();
 	const { control, handleSubmit, handleEditPerfil, rules } = useHookEditPerfil();
+	const { imageUri, handlePickFromGallery, handleTakePhoto } = useHookImagePicker();
 
 	return (
 		<KeyboardAwareScrollView
@@ -19,10 +22,13 @@ const EditPerfil = () => {
 			keyboardShouldPersistTaps="handled"
 		>
 			<View className="flex-1 items-center gap-5 mb-8">
-				<Image source={require('../../assets/usuario.jpg')} style={{ width: 80, height: 80, borderRadius: 50 }} />
+				<Image
+					source={imageUri ? { uri: imageUri } : require('../../assets/usuario.jpg')}
+					style={{ width: 80, height: 80, borderRadius: 50 }}
+				/>
 				<View className="flex-row gap-3">
-					<TesteButton title="Tirar" />
-					<TesteButton title="Buscar" />
+					<TesteButton title="Tirar" onPress={handleTakePhoto} />
+					<TesteButton title="Buscar" onPress={handlePickFromGallery} />
 				</View>
 			</View>
 
@@ -110,10 +116,10 @@ const EditPerfil = () => {
 
 export default EditPerfil;
 
-const TesteButton = ({ title }: { title: string }) => {
+const TesteButton = ({ title, onPress }: { title: string, onPress: () => void }) => {
 	return (
 		<TouchableOpacity
-			onPress={() => console.log(title)}
+			onPress={onPress}
 			className="w-24 bg-lightBgNonary dark:bg-darkBgNonary p-2 rounded-xl border border-lightBgTertiary dark:border-darkBgTertiary">
 			<Text className="text-lightText dark:text-darkText text-center text-sm">{title}</Text>
 		</TouchableOpacity>

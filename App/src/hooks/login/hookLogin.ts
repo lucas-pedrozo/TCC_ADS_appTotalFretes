@@ -2,7 +2,7 @@ import { useCallback } from "react";
 import http from "../../service/http";
 import { useForm } from "react-hook-form";
 import { useAlertDefault } from "@/src/context/AlertDefaultContext";
-import { validateEmail } from "@/src/utils/formValidations";
+import { validationRules } from "@/src/utils/formValidations";
 
 import i18n from "@/src/i18n";
 import { AxiosError } from "axios";
@@ -32,7 +32,7 @@ function useHookLogin() {
       notify({
         status: "loading",
         message: i18n.t("notifications.loginLoading"),
-      }); 
+      });
 
       const response = await http.post("/auth/login", data);
       const token = response.data.token;
@@ -56,18 +56,9 @@ function useHookLogin() {
     [notify, login, navigation]
   );
 
-  /**
-   * @description Regras de validacao do formulario de login
-   * @returns Regras de validacao do formulario de login
-   */
   const rules = {
-    email: {
-      required: i18n.t("validation.requiredEmail"),
-      validate: (value: string) => validateEmail(value) || i18n.t("validation.invalidEmail")
-    },
-    password: {
-      required: i18n.t("validation.requiredPassword"),
-    },
+    email: validationRules.email,
+    password: validationRules.password,
   }
 
   return {
