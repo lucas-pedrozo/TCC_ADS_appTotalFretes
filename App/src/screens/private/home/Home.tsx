@@ -21,7 +21,7 @@ import { CardActivityHome } from "@/src/components/cards/CardActivityHome";
 
 function Home() {
 
-  const { logout, } = useAuth();
+  const { logout } = useAuth();
   const { t } = useTranslation();
   const { mode } = useThemeMode();
   const { userData, handleGetUser } = useHookGetUser();

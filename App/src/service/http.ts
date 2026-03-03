@@ -4,9 +4,9 @@ import * as SecureStore from 'expo-secure-store';
 import { ENV_BASE_URL } from '@env';
 
 const defaultURL = Platform.select({
-  ios: 'http://localhost:3000',
-  android: 'http://10.0.2.2:3000',
-  default: 'http://localhost:3000'
+  ios: 'http://localhost:3005',
+  android: 'http://10.0.2.2:3005',
+  default: 'http://localhost:3005'
 }) as string;
 
 

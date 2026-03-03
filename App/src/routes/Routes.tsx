@@ -18,11 +18,18 @@ import SingUpPassword from "../screens/public/singUp/SingUpPassword";
 import ForgotPassword from "../screens/public/newPassword/ForgotPassword";
 import VerificationCode from "../screens/public/newPassword/VerificationCode";
 import NewPassword from "../screens/public/newPassword/NewPassword";
-import EditPerfil from "../screens/private/EditPerfil";
-import { EditPerfilMap } from "../hooks/editPerfil/EditPerfil";
+import EditPerfil from "../screens/private/editPerfil/EditPerfil";
+import EditCnh from "../screens/private/editcnh/EditCnh";
+
+import { EditPerfilMap } from "../hooks/editPerfil/hookEditPerfil";
+import { EditCnhMap } from "../hooks/editcnh/hookEditCnh";
 
 interface EditPerfilRouteParams {
   editPerfilData: EditPerfilMap;
+}
+
+interface EditCnhRouteParams {
+  editCnhData: EditCnhMap;
 }
 
 export type RootStackParamList = {
@@ -35,6 +42,7 @@ export type RootStackParamList = {
   ForgotPassword: undefined;
   VerificationCode: { email: string };
   EditPerfil: EditPerfilRouteParams;
+  EditCnh: EditCnhRouteParams;
   NewPassword: { email: string; resetToken: string };
 };
 

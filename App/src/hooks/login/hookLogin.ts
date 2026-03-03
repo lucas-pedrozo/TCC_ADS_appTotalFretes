@@ -44,9 +44,13 @@ function useHookLogin() {
       });
 
       await new Promise(resolve => setTimeout(resolve, 1200));
-      navigation.navigate("Home");
+      navigation.reset({
+        index: 0,
+        routes: [{ name: "Home" }],
+      }); 
 
     } catch (error) {
+      console.log(error);
       notify({
         status: "error",
         message: (error as AxiosError<{ message: string }>).response?.data.message ?? i18n.t("notifications.loginError"),

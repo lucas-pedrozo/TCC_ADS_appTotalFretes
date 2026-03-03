@@ -1,0 +1,78 @@
+import { View } from "react-native";
+import { useTranslation } from "react-i18next";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
+
+import { InputGroup } from "@/src/components/fom/inputs/InputGroup";
+import { InputDefault } from "@/src/components/fom/inputs/InputDefault";
+import { ButtonDefault } from "@/src/components/fom/buttons/ButtonDefauilt";
+import { useHookEditCnh } from "@/src/hooks/editcnh/hookEditCnh";
+
+const EditCnh = () => {
+
+	const insets = useSafeAreaInsets();
+	const { t } = useTranslation();
+	const { control, rules, handleEditCnh, handleSubmit } = useHookEditCnh();
+
+	return (
+		<KeyboardAwareScrollView
+			className="flex-1"
+			contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 12, paddingBottom: insets.bottom + 20 }}
+			keyboardShouldPersistTaps="handled"
+		>
+
+			<View className="gap-4 flex-1">
+				<InputDefault
+					name="cnhNumber"
+					control={control}
+					placeholder={t("signUp.cnh.cnhPlaceholder")}
+					label={t("signUp.cnh.cnhLabel")}
+					maxLength={11}
+					rules={rules.cnhNumber}
+				/>
+
+				<InputDefault
+					name="issuingAgencyCnh"
+					control={control}
+					placeholder={t("signUp.cnh.issuingAgencyPlaceholder")}
+					label={t("signUp.cnh.issuingAgencyLabel")}
+					maxLength={2}
+					rules={rules.issuingAgencyCnh}
+				/>
+
+				<InputGroup
+					name="cnhType_id"
+					control={control}
+					label={t("signUp.cnh.categoryLabel")}
+					rules={rules.cnhType_id}
+					options={[
+						{ label: "A", value: "1" },
+						{ label: "B", value: "2" },
+						{ label: "C", value: "3" },
+						{ label: "D", value: "4" },
+						{ label: "E", value: "5" },
+					]}
+				/>
+
+				<InputGroup
+					name="useGlasses"
+					control={control}
+					label={t("signUp.cnh.useGlassesLabel")}
+					rules={rules.useGlasses}
+					options={[
+						{ label: t("signUp.cnh.yes"), value: "true" },
+						{ label: t("signUp.cnh.no"), value: "false" },
+					]}
+				/>
+				<View className="flex-1 justify-end pt-4">
+					<ButtonDefault
+						title={t("signUp.basic.next")}
+						onPress={handleSubmit(handleEditCnh)}
+					/>
+				</View>
+			</View>
+		</KeyboardAwareScrollView>
+	)
+}
+
+export default EditCnh;

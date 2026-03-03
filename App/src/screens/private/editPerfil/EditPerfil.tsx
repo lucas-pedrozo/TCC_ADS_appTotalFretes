@@ -4,7 +4,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 
 import { InputGroup } from "@/src/components/fom/inputs/InputGroup";
-import { useHookEditPerfil } from "@/src/hooks/editPerfil/EditPerfil";
+import { useHookEditPerfil } from "@/src/hooks/editPerfil/hookEditPerfil";
 import { useHookImagePicker } from "@/src/hooks/editPerfil/imagePicker";
 import { ButtonDefault } from "@/src/components/fom/buttons/ButtonDefauilt";
 import { InputCpf, InputDate, InputDefault, InputPhone } from "@/src/components/fom/inputs/InputDefault";
@@ -23,7 +23,7 @@ const EditPerfil = () => {
 		>
 			<View className="flex-1 items-center gap-5 mb-8">
 				<Image
-					source={imageUri ? { uri: imageUri } : require('../../assets/usuario.jpg')}
+					source={imageUri ? { uri: imageUri } : require('../../../assets/usuario.jpg')}
 					style={{ width: 80, height: 80, borderRadius: 50 }}
 				/>
 				<View className="flex-row gap-3">

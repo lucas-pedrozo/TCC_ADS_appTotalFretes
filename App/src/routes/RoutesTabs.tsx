@@ -1,6 +1,8 @@
-import { Text, View } from "react-native";
+import { useCallback, useRef } from "react";
+import { BackHandler, Platform, Text, ToastAndroid, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { useFocusEffect } from "@react-navigation/native";
 
 import Freight from "../screens/private/freight/Freight";
 import Perfil  from "@/src/screens/private/perfil/Perfil";
@@ -35,6 +37,8 @@ const TAB_BAR_HEIGHT = 72;
 export default function RoutesTabs() {
 	const { mode } = useThemeMode();
 	const insets = useSafeAreaInsets();
+	const lastBackPress = useRef<number>(0);
+	const currentTab = useRef<keyof TabParamList>("HomeTab");
 
 	const isDark = mode === "dark";
 	const activeColor = isDark ? "#74AEF1" : "#0B3B75";
@@ -42,8 +46,34 @@ export default function RoutesTabs() {
 	const tabBackground = isDark ? "#1a1a1a" : "#FFFFFF";
 	const borderColor = isDark ? "rgba(255, 255, 255, 0.08)" : "rgba(0, 0, 0, 0.06)";
 
+	useFocusEffect(
+		useCallback(() => {
+			if (Platform.OS !== "android") return;
+
+			const onBackPress = () => {
+				if (currentTab.current !== "HomeTab") {
+					return false;
+				}
+
+				const now = Date.now();
+				if (now - lastBackPress.current < 2000) {
+					BackHandler.exitApp();
+					return true;
+				}
+
+				lastBackPress.current = now;
+				ToastAndroid.show("Pressione novamente para sair", ToastAndroid.SHORT);
+				return true;
+			};
+
+			const subscription = BackHandler.addEventListener("hardwareBackPress", onBackPress);
+			return () => subscription.remove();
+		}, [])
+	);
+
 	return (
 		<Tab.Navigator
+			backBehavior="firstRoute"
 			screenOptions={({ route }) => ({
 				headerShown: false,
 				animation: "shift",
@@ -88,11 +118,36 @@ export default function RoutesTabs() {
 				},
 			})}
 		>
-			<Tab.Screen name="HomeTab" component={Home} options={{ tabBarLabel: "Home" }} />
-			<Tab.Screen name="FretesTab" component={Freight} options={{ tabBarLabel: "Fretes" }} />
-			<Tab.Screen name="AndamentoTab" component={AndamentoScreen} options={{ tabBarLabel: "Andamento" }} />
-			<Tab.Screen name="PropostaTab" component={PropostaScreen} options={{ tabBarLabel: "Proposta" }} />
-			<Tab.Screen name="PerfilTab" component={Perfil} options={{ tabBarLabel: "Perfil" }} />
+			<Tab.Screen
+				name="HomeTab"
+				component={Home}
+				options={{ tabBarLabel: "Home" }}
+				listeners={{ focus: () => { currentTab.current = "HomeTab"; } }}
+			/>
+			<Tab.Screen
+				name="FretesTab"
+				component={Freight}
+				options={{ tabBarLabel: "Fretes" }}
+				listeners={{ focus: () => { currentTab.current = "FretesTab"; } }}
+			/>
+			<Tab.Screen
+				name="AndamentoTab"
+				component={AndamentoScreen}
+				options={{ tabBarLabel: "Andamento" }}
+				listeners={{ focus: () => { currentTab.current = "AndamentoTab"; } }}
+			/>
+			<Tab.Screen
+				name="PropostaTab"
+				component={PropostaScreen}
+				options={{ tabBarLabel: "Proposta" }}
+				listeners={{ focus: () => { currentTab.current = "PropostaTab"; } }}
+			/>
+			<Tab.Screen
+				name="PerfilTab"
+				component={Perfil}
+				options={{ tabBarLabel: "Perfil" }}
+				listeners={{ focus: () => { currentTab.current = "PerfilTab"; } }}
+			/>
 		</Tab.Navigator>
 	);
 }
