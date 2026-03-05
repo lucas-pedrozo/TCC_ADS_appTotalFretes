@@ -11,6 +11,7 @@ import { CardUser } from "@/src/components/cards/CardUser";
 import { CardClime } from "@/src/components/cards/CardClime";
 import ModalLogout from "@/src/components/modal/ModalLogout";
 import { useHookGetUser } from "@/src/hooks/user/hookGetUser";
+import { useWeather } from "@/src/hooks/weather/useWeather";
 import ModalNotificacoes from "@/src/components/modal/ModalNotificacoes";
 
 import { TabParamList } from "@/src/routes/RoutesTabs";
@@ -25,11 +26,12 @@ function Home() {
   const { t } = useTranslation();
   const { mode } = useThemeMode();
   const { userData, handleGetUser } = useHookGetUser();
+  const { weatherData, loading: loadingWeather, refetch: refetchWeather } = useWeather();
 
+  const [refreshKey, setRefreshKey] = useState(0);
+  const [isRefreshing, setIsRefreshing] = useState(false);
   const [isModalLogoutVisible, setIsModalLogoutVisible] = useState(false);
   const [isModalNotificacoesVisible, setIsModalNotificacoesVisible] = useState(false);
-  const [isRefreshing, setIsRefreshing] = useState(false);
-  const [refreshKey, setRefreshKey] = useState(0);
 
   const navigation = useNavigation<BottomTabNavigationProp<TabParamList>>();
   const goToProfile = () => { navigation.navigate("PerfilTab"); }
@@ -37,33 +39,24 @@ function Home() {
   const currentHour = new Date().getHours();
   const greeting = currentHour < 12 ? t("home.welcome2") : currentHour < 18 ? t("home.welcome3") : t("home.welcome");
 
-
   const handleConfirmLogout = () => {
     setIsModalLogoutVisible(false);
     logout();
   };
 
-  useEffect(() => {
-    handleGetUser();
-  }, [handleGetUser]);
-
   const handleRefresh = useCallback(async () => {
     setIsRefreshing(true);
     try {
-      await handleGetUser();
+      await Promise.all([handleGetUser(), refetchWeather()]);
       setRefreshKey((prev) => prev + 1);
     } finally {
       setIsRefreshing(false);
     }
-  }, [handleGetUser]);
+  }, [handleGetUser, refetchWeather]);
 
-  const notifications = [
-    { id: 1, title: "Bem-vindo!", message: "Obrigado por usar nosso app." },
-    { id: 2, title: "Atualização", message: "Seu perfil foi atualizado com sucesso." },
-    { id: 3, title: "Atualização", message: "Seu perfil foi atualizado com sucesso." },
-    { id: 4, title: "Atualização", message: "Seu perfil foi atualizado com sucesso." },
-    { id: 5, title: "Atualização", message: "Seu perfil foi atualizado com sucesso." },
-  ];
+  useEffect(() => {
+    handleGetUser();
+  }, [handleGetUser]);
 
   return (
     <SafeAreaView style={{ flex: 1 }} className="bg-lightBg dark:bg-darkBg">
@@ -83,7 +76,12 @@ function Home() {
         <View className="flex-row items-center justify-between w-full">
           <View className="flex-row items-center gap-3">
             <TouchableOpacity onPress={goToProfile} activeOpacity={0.7}>
-              <Image source={require('@/src/assets/usuario.jpg')} className="w-14 h-14 rounded-xl" />
+              {userData?.userImage_id ?
+                <Image source={require('@/src/assets/usuario.jpg')} className="w-14 h-14 rounded-xl" /> :
+                <View className="w-14 h-14 rounded-xl bg-lightBgNonary dark:bg-darkBgNonary items-center justify-center">
+                  <Text className="text-lightText dark:text-darkText">{userData?.name ? userData.name[0] + userData.name[1] : "??"}</Text>
+                </View>
+              }
             </TouchableOpacity>
             <View className="flex-col">
               <Text className="text-lightTextSecondary dark:text-darkTextSecondary font-medium text-sm">{greeting}</Text>
@@ -120,7 +118,11 @@ function Home() {
           />
 
           <CardClime
-            key={`card-clime-${refreshKey}`}
+            loading={loadingWeather}
+            clima={weatherData?.descricao}
+            cidade={weatherData?.cidade}
+            temp={weatherData?.temperatura}
+            weatherCode={weatherData?.weatherCode}
           />
         </View>
 
@@ -144,7 +146,7 @@ function Home() {
       <ModalNotificacoes
         visible={isModalNotificacoesVisible}
         onClose={() => setIsModalNotificacoesVisible(false)}
-        notifications={notifications}
+        notifications={[]}
       />
     </SafeAreaView>
   );

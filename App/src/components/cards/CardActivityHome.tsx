@@ -1,16 +1,21 @@
+import { useEffect } from "react";
 import { Ionicons } from "@expo/vector-icons"
+import { useAuth } from "@/src/context/AuthContext";
 import { useThemeMode } from "@/src/context/ThemeContext";
 import { Text, TouchableOpacity, View } from "react-native"
 import { ProgressBarWithPins } from "./ProgressBarWithPins";
 import { useHookGetFreightUser } from "@/src/hooks/freight/hookGetFreightUser"; 
-// import { useEffect } from "react";
-// import { useAuth } from "@/src/context/AuthContext";
-
 
 export const CardActivityHome = () => {
+  const { id } = useAuth()
   const { mode } = useThemeMode();
-  // const { id } = useAuth()
-  const { freightUser } = useHookGetFreightUser();
+  const { freightUser, handleGetFreightUser } = useHookGetFreightUser();
+
+  useEffect(() => {
+    if (id) {
+      handleGetFreightUser(String(id));
+    }
+  }, [id, handleGetFreightUser]);
     
   return (
     <>
@@ -49,4 +54,4 @@ export const CardActivityHome = () => {
       </TouchableOpacity>
     </>
   )
-}
+} 

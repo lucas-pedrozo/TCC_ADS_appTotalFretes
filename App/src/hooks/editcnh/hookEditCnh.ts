@@ -6,6 +6,9 @@ import { useAuth } from "@/src/context/AuthContext";
 import { validationRules } from "@/src/utils/formValidations";
 import { useAlertDefault } from "@/src/context/AlertDefaultContext";
 
+import { RootStackParamList } from "@/src/routes/Routes";
+import { RouteProp, useRoute } from "@react-navigation/native";
+
 export interface EditCnhMap {
 	cnhNumber: string;
 	issuingAgencyCnh: string;
@@ -17,12 +20,15 @@ export function useHookEditCnh() {
 	const { notify } = useAlertDefault();
 	const { id } = useAuth();
 
+	const route = useRoute<RouteProp<RootStackParamList, "EditCnh">>();
+	const editCnhData = route.params?.editCnhData	;
+
 	const { control, handleSubmit, formState: { errors } } = useForm<EditCnhMap>({
 		defaultValues: {
-			cnhNumber: "",
-			issuingAgencyCnh: "",
-			cnhType_id: "",
-			useGlasses: false,
+			cnhNumber: editCnhData?.cnhNumber ?? "",
+			issuingAgencyCnh: editCnhData?.issuingAgencyCnh ?? "",
+			cnhType_id: editCnhData?.cnhType_id ?? "",
+			useGlasses: editCnhData?.useGlasses ?? "",
 		},
 	});
 

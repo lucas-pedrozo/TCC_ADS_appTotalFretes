@@ -23,6 +23,7 @@ import EditCnh from "../screens/private/editcnh/EditCnh";
 
 import { EditPerfilMap } from "../hooks/editPerfil/hookEditPerfil";
 import { EditCnhMap } from "../hooks/editcnh/hookEditCnh";
+import AdvancedOptions from "../screens/private/advancedOptions/AdvancedOptions";
 
 interface EditPerfilRouteParams {
   editPerfilData: EditPerfilMap;
@@ -43,6 +44,7 @@ export type RootStackParamList = {
   VerificationCode: { email: string };
   EditPerfil: EditPerfilRouteParams;
   EditCnh: EditCnhRouteParams;
+  AdvancedOptions: undefined;
   NewPassword: { email: string; resetToken: string };
 };
 
@@ -74,15 +76,17 @@ export default function Routes() {
       >
         <Stack.Screen name="Home" component={() => <PrivateRoute><RoutesTabs /></PrivateRoute>} options={{ headerShown: false }} />
         <Stack.Screen name="EditPerfil" component={() => <PrivateRoute><EditPerfil /></PrivateRoute>} options={{ title: "Editar Dados" }} />
+        <Stack.Screen name="EditCnh" component={() => <PrivateRoute><EditCnh /></PrivateRoute>} options={{ title: "Editar CNH" }} />
+        <Stack.Screen name="AdvancedOptions" component={() => <PrivateRoute><AdvancedOptions /></PrivateRoute>} options={{ title: "Opções Avançadas" }} />
 
         <Stack.Screen name="Start" component={Start} options={{ headerShown: false }} />
         <Stack.Screen name="Login" component={Login} options={{ title: t("routes.login") }} />
         <Stack.Screen name="SingUp" component={SingUp} options={{ title: t("routes.signUpBasic") }} />
         <Stack.Screen name="SingUpCNH" component={SingUpCNH} options={{ title: t("routes.signUpCnh") }} />
+        <Stack.Screen name="NewPassword" component={NewPassword} options={{ title: t("routes.newPassword") }} />
         <Stack.Screen name="SingUpPassword" component={SingUpPassword} options={{ title: t("routes.signUpPassword") }} />
         <Stack.Screen name="ForgotPassword" component={ForgotPassword} options={{ title: t("routes.forgotPassword") }} />
         <Stack.Screen name="VerificationCode" component={VerificationCode} options={{ title: t("routes.verificationCode") }} />
-        <Stack.Screen name="NewPassword" component={NewPassword} options={{ title: t("routes.newPassword") }} />
 
       </Stack.Navigator>
     </NavigationContainer>

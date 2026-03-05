@@ -2,16 +2,16 @@ import { useCallback, useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context"
 import { RefreshControl, ScrollView, Text, View } from "react-native"
 
-import { useThemeMode } from "@/src/context/ThemeContext";
-import { useLanguage } from "@/src/context/LanguageContext";
-
-import { useTranslation } from "react-i18next";
 import { Option } from "@/src/components/perfil/Option";
-import type { AppLanguage } from "@/src/i18n/resources";
 import { useHookGetUser } from "@/src/hooks/user/hookGetUser";
 import { OptionKey } from "@/src/components/perfil/OptionKey";
 import { HeaderPerfil } from "@/src/components/perfil/HeaderPerfil";
 import { OptionSelect } from "@/src/components/perfil/OptionSelect";
+
+import { useTranslation } from "react-i18next";
+import type { AppLanguage } from "@/src/i18n/resources";
+import { useThemeMode } from "@/src/context/ThemeContext";
+import { useLanguage } from "@/src/context/LanguageContext";
 
 import { useNavigation } from "@react-navigation/native";
 import { RootStackParamList } from "@/src/routes/Routes";
@@ -27,6 +27,8 @@ const Perfil = () => {
   const { userData, handleGetUser } = useHookGetUser();
   const [isRefreshing, setIsRefreshing] = useState(false);
 
+  const goToAdvancedOptions = () => { navigation.navigate("AdvancedOptions"); }
+
   const goToEditPerfil = () => {
     navigation.navigate("EditPerfil", {
       editPerfilData: {
@@ -40,10 +42,21 @@ const Perfil = () => {
       }
     })
   }
-  
+
+  const goToEditCnh = () => {
+    navigation.navigate("EditCnh", {
+      editCnhData: {
+        cnhNumber: userData?.cnhNumber ?? "",
+        issuingAgencyCnh: userData?.issuingAgencyCnh ?? "",
+        cnhType_id: String(userData?.cnhType_id ?? ""),
+        useGlasses: userData?.useGlasses ?? false,
+      }
+    })
+  }
+
   const idiomaOptions = [
-    { value: "pt", label: t("language.pt") },
-    { value: "en", label: t("language.en") },
+    { value: "pt", label: "PT-BR" },
+    { value: "en", label: "EN-US" },
   ];
 
   const handleRefresh = useCallback(async () => {
@@ -82,9 +95,9 @@ const Perfil = () => {
         <View className="flex-col gap-2.5 mt-14">
           <Text className="text-sm font-semibold pl-2.5 pb-1.5 text-lightTextSecondary dark:text-darkTextSecondary">Informações Pessoais</Text>
 
-          <Option title="Editar meus Dados" icon="pencil-outline" onPress={goToEditPerfil} />
+          <Option title="Editar meus Dados" icon="pencil" onPress={goToEditPerfil} />
           <View className="h-0.5 w-full bg-lightBgNonary dark:bg-darkBgNonary rounded-full" />
-          <Option title="Editar Dados da CNH" icon="pencil-outline" onPress={() => { }} />
+          <Option title="Editar Dados da CNH" icon="pencil" onPress={goToEditCnh} />
           <View className="h-0.5 w-full bg-lightBgNonary dark:bg-darkBgNonary rounded-full" />
 
           {!userData?.vehicleType_id ?
@@ -92,8 +105,9 @@ const Perfil = () => {
             :
             <Option title="Editar Veículo" icon="car-outline" onPress={() => { }} />
           }
+
           <View className="h-0.5 w-full bg-lightBgNonary dark:bg-darkBgNonary rounded-full" />
-          <Option title="Opções Avançadas" icon="settings-outline" onPress={() => { }} />
+          <Option title="Opções Avançadas" icon="settings-outline" onPress={goToAdvancedOptions} />
         </View>
 
         <View className="flex-col gap-2.5 mt-5">
@@ -106,6 +120,7 @@ const Perfil = () => {
             value={language}
             onValueChange={(value) => changeLanguage(value as AppLanguage)}
           />
+
           <View className="h-0.5 w-full bg-lightBgNonary dark:bg-darkBgNonary rounded-full" />
           <OptionKey title="Modo claro" icon="sunny-outline" value={mode === "light"} setValue={() => toggleMode()} />
           <View className="h-0.5 w-full bg-lightBgNonary dark:bg-darkBgNonary rounded-full" />
@@ -115,4 +130,4 @@ const Perfil = () => {
   )
 }
 
-export default Perfil;
+export default Perfil;  

@@ -21,6 +21,7 @@
         "image": "./src/assets/logo.jpeg",
         "resizeMode": "contain"
       },
+      "softwareKeyboardLayoutMode": "resize",
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
       "package": "com.lucas_pedrozo.App"
@@ -37,6 +38,15 @@
           "backgroundColor": "#000000",
           "image": "./src/assets/logo.jpeg",
           "resizeMode": "contain"
+        }
+      ],
+      [
+        "@rnmapbox/maps"
+      ],
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location."
         }
       ]
     ],

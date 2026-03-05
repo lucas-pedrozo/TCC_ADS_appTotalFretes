@@ -4,13 +4,12 @@ import * as SecureStore from 'expo-secure-store';
 import { ENV_BASE_URL } from '@env';
 
 const defaultURL = Platform.select({
-  ios: 'http://localhost:3005',
-  android: 'http://10.0.2.2:3005',
-  default: 'http://localhost:3005'
+  ios: 'http://localhost:3005/api',
+  android: 'http://10.0.2.2:3005/api',
+  default: 'http://localhost:3005/api'
 }) as string;
 
-
-const envUrl = (ENV_BASE_URL || '').trim();
+const envUrl = (ENV_BASE_URL ? `${ENV_BASE_URL}/api` : '').trim();
 export const baseURL = envUrl || defaultURL;
 
 let authTokenCache: string | null = null;
@@ -59,6 +58,15 @@ http.interceptors.request.use(
 http.interceptors.response.use(
   (response: AxiosResponse) => response,
   async (error: AxiosError) => {
+    if (error.response?.status === 403) {
+      const message = (error.response.data as { message?: string } | undefined)?.message;
+      console.log('httpAxios 403:', {
+        method: error.config?.method,
+        url: error.config?.url,
+        message,
+      });
+    }
+
     if (error.response?.status === 401) {
     }
     return Promise.reject(error);

@@ -20,28 +20,31 @@ interface FreightUserMap {
 
   time_limit: string;
   status: string;
-
 }
 
 export function useHookGetFreightUser() {
   const { notify } = useAlertDefault();
   const [freightUser, setFreightUser] = useState<FreightUserMap | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleGetFreightUser = useCallback(async (idUser: string) => {
     try {
-
-      const response = await http.get<FreightUserMap>(`/freight/${idUser}`);
-      setFreightUser(response.data);
+      setIsLoading(true);
+      // const response = await http.get<FreightUserMap>(`/freight/${idUser}`);
+      await new Promise(resolve => setTimeout(resolve, 1200));
     } catch (error) {
       notify({
         status: "error",
         message: (error as AxiosError<{ message: string }>).response?.data.message ?? "Erro ao buscar fretes do usuário",
       });
+    } finally {
+      setIsLoading(false);
     }
   }, [notify]);
 
   return {
     handleGetFreightUser,
     freightUser,
+    isLoading,
   }
 }

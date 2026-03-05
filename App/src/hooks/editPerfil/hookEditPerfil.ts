@@ -39,14 +39,6 @@ export function useHookEditPerfil() {
     mode: "onSubmit",
   });
 
-  if(!id) {
-    notify({
-      status: "alert",
-      message: "Erro ao tentar editar perfil. tente mais tarde!",
-    });
-    throw new Error("User ID is required to edit profile");
-  }
-
   const handleEditPerfil = useCallback(async (data: EditPerfilMap) => {
     try {
       notify({

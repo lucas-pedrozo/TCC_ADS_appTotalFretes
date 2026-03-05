@@ -36,7 +36,7 @@ function useHookLogin() {
 
       const response = await http.post("/auth/login", data);
       const token = response.data.token;
-      login(token);
+      await login(token);
 
       await notify({
         status: "success",

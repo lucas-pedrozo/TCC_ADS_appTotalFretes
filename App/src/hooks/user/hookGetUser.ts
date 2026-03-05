@@ -12,6 +12,7 @@ export interface mapUser {
 	cpf: string;
 	sex: string;
 	useGlasses: boolean;
+	issuingAgencyCnh: string;
 	isDeficient: boolean;
 	cnhNumber: string;
 	cnhType_id: number;
@@ -42,7 +43,7 @@ export function useHookGetUser() {
 				message: (error as AxiosError<{ message: string }>).response?.data.message,
 			});
 		}
-	}, [id, notify])
+	}, [id, notify]);
 
 	return {
 		userData,

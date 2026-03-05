@@ -77,6 +77,7 @@ export default function RoutesTabs() {
 			screenOptions={({ route }) => ({
 				headerShown: false,
 				animation: "shift",
+				tabBarHideOnKeyboard: true,
 				tabBarShowLabel: true,
 				tabBarActiveTintColor: activeColor,
 				tabBarInactiveTintColor: inactiveColor,

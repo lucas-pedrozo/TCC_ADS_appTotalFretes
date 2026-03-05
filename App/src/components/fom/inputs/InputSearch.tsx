@@ -35,7 +35,7 @@ export const InputSearch = (props: InputProps) => {
 							keyboardType={"web-search"}
 							onChangeText={onChange}
 							placeholder={props.placeholder}
-              className="text-lightText dark:text-darkText placeholder:text-lightTextSecondary dark:placeholder:text-darkTextSecondary"
+              className="text-lightText dark:text-darkText placeholder:text-lightTextSecondary dark:placeholder:text-darkTextSecondary flex-1"
 						/>
 					</View>
 				)

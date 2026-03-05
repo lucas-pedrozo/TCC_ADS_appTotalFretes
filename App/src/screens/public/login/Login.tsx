@@ -56,7 +56,7 @@ const Login = () => {
           </Text>
         </Pressable>
 
-        <View className="flex-1 justify-end pt-4">
+        <View className="flex-1 justify-end pt-5">
           <ButtonDefault
             title={t("login.submit")}
             onPress={handleSubmit(handleLogin)}
