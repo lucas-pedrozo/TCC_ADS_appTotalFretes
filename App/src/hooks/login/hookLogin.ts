@@ -31,7 +31,7 @@ function useHookLogin() {
 
       notify({
         status: "loading",
-        message: i18n.t("notifications.loginLoading"),
+        message: i18n.t("NOTIFICATIONS.LOGINLOADING"),
       });
 
       const response = await http.post("/auth/login", data);
@@ -40,7 +40,7 @@ function useHookLogin() {
 
       await notify({
         status: "success",
-        message: response.data.message ?? i18n.t("notifications.loginSuccess"),
+        message: response.data.message ?? i18n.t("NOTIFICATIONS.LOGINSUCCESS"),
       });
 
       await new Promise(resolve => setTimeout(resolve, 1200));
@@ -50,11 +50,10 @@ function useHookLogin() {
       }); 
 
     } catch (error) {
-      console.log(error);
-      notify({
-        status: "error",
-        message: (error as AxiosError<{ message: string }>).response?.data.message ?? i18n.t("notifications.loginError"),
-      });
+      const message = (error as AxiosError<{ message: string }>).response?.data?.message ?? "";
+      if (message) {
+        notify({ status: "error", message });
+      }
     }
   },
     [notify, login, navigation]

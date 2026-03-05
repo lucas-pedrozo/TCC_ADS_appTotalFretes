@@ -3,7 +3,11 @@ import Animated, {
   FadeIn,
   FadeOut,
   FadeInDown,
+  FadeInUp,
+  FadeOutDown,
   FadeOutUp,
+  ZoomIn,
+  ZoomOut,
   withSpring,
   withTiming,
   Easing,
@@ -126,6 +130,8 @@ const appleModalExit = (values: { currentHeight: number }) => {
 export const enter = {
   fade: FadeIn.duration(BASE_DURATION),
   fadeDown: FadeInDown.duration(BASE_DURATION),
+  fadeUp: FadeInUp.duration(BASE_DURATION),
+  fadeZoomIn: ZoomIn.duration(BASE_DURATION),
   iPhoneBounce: iPhoneNotificationEnter,
   appleModal: appleModalEnter,
 };
@@ -137,6 +143,8 @@ export const enter = {
 export const exit = {
   fade: FadeOut.duration(BASE_DURATION),
   fadeDown: FadeOutUp.duration(BASE_DURATION),
+  fadeUp: FadeOutDown.duration(BASE_DURATION),
+  fadeZoomIn: ZoomOut.duration(BASE_DURATION),
   iPhoneBounce: iPhoneNotificationExit,
   appleModal: appleModalExit,
 };
@@ -171,6 +179,18 @@ export function FadeDown(
   return React.createElement(AnimatedView, { entering, exiting, ...rest });
 }
 
+export function FadeUp(
+  { entering = enter.fadeUp, exiting = exit.fadeUp, ...rest }: AnimatedViewProps & EnterExit
+) {
+  return React.createElement(AnimatedView, { entering, exiting, ...rest });
+}
+
+export function FadeZoomIn(
+  { entering = enter.fadeZoomIn, exiting = exit.fadeZoomIn, ...rest }: AnimatedViewProps & EnterExit
+) {
+  return React.createElement(AnimatedView, { entering, exiting, ...rest });
+}
+
 export function iPhoneBounceDown(
   { entering = enter.iPhoneBounce, exiting = exit.iPhoneBounce, ...rest }: AnimatedViewProps & EnterExit
 ) {
@@ -189,6 +209,8 @@ const animation = {
   exit,
   Fade,
   FadeDown,
+  FadeUp,
+  FadeZoomIn,
   iPhoneBounceDown,
   appleModal,
 };

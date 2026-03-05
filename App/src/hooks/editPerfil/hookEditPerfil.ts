@@ -4,6 +4,7 @@ import { AxiosError } from "axios";
 import http from "@/src/service/http";
 import { useForm } from "react-hook-form";
 import { useAlertDefault } from "@/src/context/AlertDefaultContext";
+import i18n from "@/src/i18n";
 
 import { RootStackParamList } from "@/src/routes/Routes";
 import { validationRules } from "@/src/utils/formValidations";
@@ -43,20 +44,20 @@ export function useHookEditPerfil() {
     try {
       notify({
         status: "loading",
-        message: "Editando perfil...",
+        message: i18n.t("NOTIFICATIONS.EDITPERFILLOADING"),
       });
 
       await http.patch<EditPerfilMap>(`/user/${id}`, data);
 
       await notify({
         status: "success",
-        message: "Perfil editado com sucesso!",
+        message: i18n.t("NOTIFICATIONS.EDITPERFILSUCCESS"),
       });
     } catch (error) {
-      notify({
-        status: "error",
-        message: (error as AxiosError<{ message: string }>).response?.data.message ?? "Erro ao editar perfil",
-      });
+      const message = (error as AxiosError<{ message: string }>).response?.data?.message ?? "";
+      if (message) {
+        notify({ status: "error", message });
+      }
     }
   }, [notify, id]);
 

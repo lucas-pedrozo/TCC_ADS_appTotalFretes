@@ -30,7 +30,7 @@ export function useHookPasswordValidate() {
     try {
       await notify({
         status: "loading",
-        message: i18n.t("notifications.codeValidationLoading"),
+        message: i18n.t("NOTIFICATIONS.CODEVALIDATIONLOADING"),
       });
 
       const response = await http.post("/auth/validate-code", {
@@ -40,7 +40,7 @@ export function useHookPasswordValidate() {
 
       await notify({
         status: "success",
-        message: response.data.message ?? "Código validado com sucesso",
+        message: response.data.message ?? i18n.t("NOTIFICATIONS.CODEVALIDATED"),
       });
 
       const resetToken = response.data.resetToken as string;
@@ -54,21 +54,19 @@ export function useHookPasswordValidate() {
       navigation.navigate("NewPassword", { email, resetToken });
 
     } catch (error) {
-      await notify({
-        status: "error",
-        message:
-          (error as AxiosError<{ message: string }>).response?.data
-            ?.message ?? "Código inválido",
-      });
+      const message = (error as AxiosError<{ message: string }>).response?.data?.message ?? "";
+      if (message) {
+        await notify({ status: "error", message });
+      }
     }
   }, [email, notify, navigation]);
 
   const rules = {
     code: {
-      required: "Código é obrigatório",
+      required: i18n.t("FORGOTPASSWORDCODE.CODEREQUIRED"),
       minLength: {
         value: 6,
-        message: "Código deve ter 6 dígitos",
+        message: i18n.t("FORGOTPASSWORDCODE.CODEMINLENGTH"),
       },
     },
   };

@@ -49,12 +49,12 @@ const VerificationCode = () => {
 			keyboardShouldPersistTaps="handled"
 		>
 			<Text className="text-lightText dark:text-darkText text-base">
-				{t("forgotPassword.description")} Informe o código para: {email || "—"}
+				{t("FORGOTPASSWORD.DESCRIPTION")} Informe o código para: {email || "—"}
 			</Text>
 
 			<View className="flex-1 pt-8">
 				<Text className="text-lightText dark:text-darkText text-3xl font-semibold text-center pb-5">
-					Código de Redefinição
+					{t("FORGOTPASSWORDCODE.TITLE")}
 				</Text>
 
 				<OtpInput
@@ -68,12 +68,12 @@ const VerificationCode = () => {
 					{canResend ? (
 						<TouchableOpacity onPress={onResendCode}>
 							<Text style={{ color: "white" }}>
-								Reenviar código
+								{t("FORGOTPASSWORDCODE.RESENDCODE")}
 							</Text>
 						</TouchableOpacity>
 					) : (
 						<Text style={{ color: "gray" }}>
-							Reenviar em {timer}s
+							{t("FORGOTPASSWORDCODE.RESENDIN", { seconds: timer })}
 						</Text>
 					)}
 				</View>
@@ -81,7 +81,7 @@ const VerificationCode = () => {
 
 			<View className="flex-1 justify-end pt-4">
 				<ButtonDefault
-					title={t("forgotPassword.submit")}
+					title={t("FORGOTPASSWORD.SUBMIT")}
 					onPress={handleSubmit(handleValidateCode)}
 				/>
 			</View>

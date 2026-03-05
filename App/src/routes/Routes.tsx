@@ -75,18 +75,18 @@ export default function Routes() {
         }}
       >
         <Stack.Screen name="Home" component={() => <PrivateRoute><RoutesTabs /></PrivateRoute>} options={{ headerShown: false }} />
-        <Stack.Screen name="EditPerfil" component={() => <PrivateRoute><EditPerfil /></PrivateRoute>} options={{ title: "Editar Dados" }} />
-        <Stack.Screen name="EditCnh" component={() => <PrivateRoute><EditCnh /></PrivateRoute>} options={{ title: "Editar CNH" }} />
-        <Stack.Screen name="AdvancedOptions" component={() => <PrivateRoute><AdvancedOptions /></PrivateRoute>} options={{ title: "Opções Avançadas" }} />
+        <Stack.Screen name="EditPerfil" component={() => <PrivateRoute><EditPerfil /></PrivateRoute>} options={{ title: t("ROUTES.EDITPERFIL") }} />
+        <Stack.Screen name="EditCnh" component={() => <PrivateRoute><EditCnh /></PrivateRoute>} options={{ title: t("ROUTES.EDITCNH") }} />
+        <Stack.Screen name="AdvancedOptions" component={() => <PrivateRoute><AdvancedOptions /></PrivateRoute>} options={{ title: t("ROUTES.ADVANCEDOPTIONS") }} />
 
         <Stack.Screen name="Start" component={Start} options={{ headerShown: false }} />
-        <Stack.Screen name="Login" component={Login} options={{ title: t("routes.login") }} />
-        <Stack.Screen name="SingUp" component={SingUp} options={{ title: t("routes.signUpBasic") }} />
-        <Stack.Screen name="SingUpCNH" component={SingUpCNH} options={{ title: t("routes.signUpCnh") }} />
-        <Stack.Screen name="NewPassword" component={NewPassword} options={{ title: t("routes.newPassword") }} />
-        <Stack.Screen name="SingUpPassword" component={SingUpPassword} options={{ title: t("routes.signUpPassword") }} />
-        <Stack.Screen name="ForgotPassword" component={ForgotPassword} options={{ title: t("routes.forgotPassword") }} />
-        <Stack.Screen name="VerificationCode" component={VerificationCode} options={{ title: t("routes.verificationCode") }} />
+        <Stack.Screen name="Login" component={Login} options={{ title: t("ROUTES.LOGIN") }} />
+        <Stack.Screen name="SingUp" component={SingUp} options={{ title: t("ROUTES.SIGNUPBASIC") }} />
+        <Stack.Screen name="SingUpCNH" component={SingUpCNH} options={{ title: t("ROUTES.SIGNUPCNH") }} />
+        <Stack.Screen name="NewPassword" component={NewPassword} options={{ title: t("ROUTES.NEWPASSWORD") }} />
+        <Stack.Screen name="SingUpPassword" component={SingUpPassword} options={{ title: t("ROUTES.SIGNUPPASSWORD") }} />
+        <Stack.Screen name="ForgotPassword" component={ForgotPassword} options={{ title: t("ROUTES.FORGOTPASSWORD") }} />
+        <Stack.Screen name="VerificationCode" component={VerificationCode} options={{ title: t("ROUTES.VERIFICATIONCODE") }} />
 
       </Stack.Navigator>
     </NavigationContainer>

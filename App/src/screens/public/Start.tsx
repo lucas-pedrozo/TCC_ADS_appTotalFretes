@@ -22,7 +22,7 @@ function Start() {
 		<SafeAreaView className="flex-1 justify-center items-center px-3">
 			<View className="pt-4">
 				<Text className="text-lightText dark:text-darkText text-5xl font-bold text-center">
-					{t("common.appName")}
+					{t("COMMON.APPNAME")}
 				</Text>
 			</View>
 
@@ -30,11 +30,11 @@ function Start() {
 
 			<View className="w-full gap-4 pb-4">
 				<ButtonDefault
-					title={t("start.signIn")}
+					title={t("START.SIGNIN")}
 					onPress={goLogin}
 				/>
 				<ButtonDefault
-					title={t("start.signUp")}
+					title={t("START.SIGNUP")}
 					onPress={goSingUp}
 				/>
 			</View>

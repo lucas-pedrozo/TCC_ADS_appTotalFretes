@@ -1,24 +1,26 @@
 import { useCallback, useEffect, useState } from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { Image, RefreshControl, ScrollView, Text, TouchableOpacity, View } from "react-native";
 
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
-import { formatName } from "@/src/utils/funcoes";
+import { useNavigation } from "@react-navigation/native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
+import { Image, RefreshControl, ScrollView, Text, TouchableOpacity, View } from "react-native";
+
 import { useAuth } from "@/src/context/AuthContext";
 import { useThemeMode } from "@/src/context/ThemeContext";
+import { useWeather } from "@/src/hooks/weather/useWeather";
+import { useHookGetUser } from "@/src/hooks/user/hookGetUser";
+
 import { CardUser } from "@/src/components/cards/CardUser";
 import { CardClime } from "@/src/components/cards/CardClime";
-import ModalLogout from "@/src/components/modal/ModalLogout";
-import { useHookGetUser } from "@/src/hooks/user/hookGetUser";
-import { useWeather } from "@/src/hooks/weather/useWeather";
+import { CardVehicle } from "@/src/components/cards/CardVehicle";
+
 import ModalNotificacoes from "@/src/components/modal/ModalNotificacoes";
+import { CardActivityHome } from "@/src/components/cards/CardActivityHome";
 
 import { TabParamList } from "@/src/routes/RoutesTabs";
-import { useNavigation } from "@react-navigation/native";
-import { CardVehicle } from "@/src/components/cards/CardVehicle";
-import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
-import { CardActivityHome } from "@/src/components/cards/CardActivityHome";
+import { formatName } from "@/src/utils/funcoes";
 
 function Home() {
 
@@ -30,19 +32,14 @@ function Home() {
 
   const [refreshKey, setRefreshKey] = useState(0);
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [isModalLogoutVisible, setIsModalLogoutVisible] = useState(false);
+
   const [isModalNotificacoesVisible, setIsModalNotificacoesVisible] = useState(false);
 
   const navigation = useNavigation<BottomTabNavigationProp<TabParamList>>();
   const goToProfile = () => { navigation.navigate("PerfilTab"); }
 
   const currentHour = new Date().getHours();
-  const greeting = currentHour < 12 ? t("home.welcome2") : currentHour < 18 ? t("home.welcome3") : t("home.welcome");
-
-  const handleConfirmLogout = () => {
-    setIsModalLogoutVisible(false);
-    logout();
-  };
+  const greeting = currentHour < 12 ? t("HOME.WELCOME2") : currentHour < 18 ? t("HOME.WELCOME3") : t("HOME.WELCOME");
 
   const handleRefresh = useCallback(async () => {
     setIsRefreshing(true);
@@ -98,7 +95,7 @@ function Home() {
             </TouchableOpacity>
 
             <TouchableOpacity
-              onPress={() => setIsModalLogoutVisible(true)}
+              onPress={() => logout()}
               className="bg-lightBgNonary dark:bg-darkBgNonary p-2.5 rounded-xl"
             >
               <Ionicons name="log-out-outline" size={24} color={mode === "dark" ? "#FFFFFF" : "#000000"} />
@@ -107,7 +104,7 @@ function Home() {
         </View>
 
         <Text className="text-lightText dark:text-darkText font-bold text-2xl pt-6 pb-4">
-          {t("home.title")}
+          {t("HOME.TITLE")}
         </Text>
 
         <View className="flex-row items-stretch justify-between gap-3">
@@ -136,12 +133,6 @@ function Home() {
         />
 
       </ScrollView>
-
-      <ModalLogout
-        visible={isModalLogoutVisible}
-        onCancel={() => setIsModalLogoutVisible(false)}
-        onConfirm={handleConfirmLogout}
-      />
 
       <ModalNotificacoes
         visible={isModalNotificacoesVisible}

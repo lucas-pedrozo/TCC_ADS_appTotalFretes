@@ -1,6 +1,7 @@
 import React from "react";
 import { Modal, Text, TouchableOpacity, View, FlatList, Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useTranslation } from "react-i18next";
 import { useThemeMode } from "@/src/context/ThemeContext";
 import animation from "@/src/utils/animation";
 
@@ -17,6 +18,7 @@ interface ModalNotificacoesProps {
 }
 
 const ModalNotificacoes = ({ visible, onClose, notifications }: ModalNotificacoesProps) => {
+  const { t } = useTranslation();
   const { mode } = useThemeMode();
 
   return (
@@ -29,13 +31,14 @@ const ModalNotificacoes = ({ visible, onClose, notifications }: ModalNotificacoe
       <Pressable
         onPress={onClose}
         className="flex-1 bg-black/50"
-      />
+      >
+      
       <animation.appleModal
         className="flex-1 justify-end"
       >
         <View className="bg-lightBg dark:bg-darkBg rounded-t-2xl p-4">
           <View className="flex-row justify-between items-center mb-4">
-            <Text className="text-lightText dark:text-darkText font-semibold text-lg">Notificações</Text>
+            <Text className="text-lightText dark:text-darkText font-semibold text-lg">{t("MODALNOTIFICACOES.TITLE")}</Text>
             <TouchableOpacity onPress={onClose}>
               <Ionicons name="close" size={24} color={mode === "dark" ? "#FFFFFF" : "#000000"} />
             </TouchableOpacity>
@@ -52,12 +55,13 @@ const ModalNotificacoes = ({ visible, onClose, notifications }: ModalNotificacoe
             )}
             ListEmptyComponent={
               <Text className="text-lightTextSecondary dark:text-darkTextSecondary text-center mt-4">
-                Nenhuma notificação disponível.
+                {t("MODALNOTIFICACOES.EMPTY")}
               </Text>
             }
           />
         </View>
       </animation.appleModal>
+      </Pressable>
     </Modal>
   );
 };

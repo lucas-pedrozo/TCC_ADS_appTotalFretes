@@ -32,23 +32,27 @@ export function useHookNewPassword() {
         return;
       }
       try {
-        await notify({ status: "loading", message: "Alterando senha..." });
+        await notify({
+          status: "loading",
+          message: i18n.t("NOTIFICATIONS.NEWPASSWORDLOADING"),
+        });
 
         await http.post("/auth/reset-password", {
           resetToken,
           password: data.password,
         });
 
-        await notify({ status: "success", message: "Senha alterada com sucesso!" });
+        await notify({
+          status: "success",
+          message: i18n.t("NOTIFICATIONS.NEWPASSWORDSUCCESS"),
+        });
         await new Promise((r) => setTimeout(r, 1200));
         navigation.navigate("Login");
       } catch (error) {
-        await notify({
-          status: "error",
-          message:
-            (error as AxiosError<{ message?: string }>).response?.data?.message ??
-            "Erro ao alterar senha. Tente novamente.",
-        });
+        const message = (error as AxiosError<{ message?: string }>).response?.data?.message ?? "";
+        if (message) {
+          await notify({ status: "error", message });
+        }
       }
     },
     [resetToken, notify, navigation]
@@ -57,10 +61,10 @@ export function useHookNewPassword() {
   const rules = {
     password: validationRules.password,
     confirmPassword: {
-      required: i18n.t("validation.requiredConfirmPassword"),
+      required: i18n.t("VALIDATION.REQUIREDCONFIRMPASSWORD"),
       validate: (value: string, formValues: NewPasswordForm) =>
         validatePasswordConfirmationMatch(value, formValues?.password ?? "") ||
-        i18n.t("validation.invalidConfirmPassword"),
+        i18n.t("VALIDATION.INVALIDCONFIRMPASSWORD"),
     },
   };
 

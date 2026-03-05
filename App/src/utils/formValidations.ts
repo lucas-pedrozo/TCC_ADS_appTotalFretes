@@ -136,60 +136,60 @@ export const validateDisability = (value: string) => {
  */
 export const validationRules = {
   cnhNumber: {
-    required: i18n.t("validation.requiredCnh"),
-    validate: (value: string) => validateCnhNumber(value) || i18n.t("validation.invalidCnh"),
+    required: i18n.t("VALIDATION.REQUIREDCNH"),
+    validate: (value: string) => validateCnhNumber(value) || i18n.t("VALIDATION.INVALIDCNH"),
   },
   name: {
-    required: i18n.t("validation.requiredName"), 
-    validate: (value: string) => validateName(value) || i18n.t("validation.invalidName"),
+    required: i18n.t("VALIDATION.REQUIREDNAME"),
+    validate: (value: string) => validateName(value) || i18n.t("VALIDATION.INVALIDNAME"),
   },
   email: {
-    required: i18n.t("validation.requiredEmail"),
-    validate: (value: string) => validateEmail(value) || i18n.t("validation.invalidEmail"),
+    required: i18n.t("VALIDATION.REQUIREDEMAIL"),
+    validate: (value: string) => validateEmail(value) || i18n.t("VALIDATION.INVALIDEMAIL"),
   },
   cpf: {
-    required: i18n.t("validation.requiredCpf"),
-    validate: (value: string) => validateCPF(value) || i18n.t("validation.invalidCpf"),
+    required: i18n.t("VALIDATION.REQUIREDCPF"),
+    validate: (value: string) => validateCPF(value) || i18n.t("VALIDATION.INVALIDCPF"),
   },
   cnpj: {
-    required: i18n.t("validation.requiredCnpj"),
-    validate: (value: string) => validateCNPJ(value) || i18n.t("validation.invalidCnpj"),
+    required: i18n.t("VALIDATION.REQUIREDCNPJ"),
+    validate: (value: string) => validateCNPJ(value) || i18n.t("VALIDATION.INVALIDCNPJ"),
   },
   phoneNumber: {
-    required: i18n.t("validation.requiredPhone"),
-    validate: (value: string) => validatePhone(value) || i18n.t("validation.invalidPhone"),
+    required: i18n.t("VALIDATION.REQUIREDPHONE"),
+    validate: (value: string) => validatePhone(value) || i18n.t("VALIDATION.INVALIDPHONE"),
   },
   birthDate: {
-    required: i18n.t("validation.requiredBirthDate"),
-    validate: (value: string) => validateBirthDate(value) || i18n.t("validation.invalidBirthDate"),
+    required: i18n.t("VALIDATION.REQUIREDBIRTHDATE"),
+    validate: (value: string) => validateBirthDate(value) || i18n.t("VALIDATION.INVALIDBIRTHDATE"),
   },
   cnhType_id: {
-    required: i18n.t("validation.requiredTypeCnh"),
-    validate: (value: string) => validateTypeCnh(value) || i18n.t("validation.invalidTypeCnh"),
+    required: i18n.t("VALIDATION.REQUIREDTYPECNH"),
+    validate: (value: string) => validateTypeCnh(value) || i18n.t("VALIDATION.INVALIDTYPECNH"),
   },
   useGlasses: {
-    required: i18n.t("validation.requiredUseGlasses"),
-    validate: (value: string) => validateUseGlasses(value) || i18n.t("validation.invalidUseGlasses"),
+    required: i18n.t("VALIDATION.REQUIREDUSEGLASSES"),
+    validate: (value: string) => validateUseGlasses(value) || i18n.t("VALIDATION.INVALIDUSEGLASSES"),
   },
   isDeficient: {
-    required: i18n.t("validation.requiredDisability"),
-    validate: (value: string) => validateDisability(value) || i18n.t("validation.invalidDisability"),
+    required: i18n.t("VALIDATION.REQUIREDDISABILITY"),
+    validate: (value: string) => validateDisability(value) || i18n.t("VALIDATION.INVALIDDISABILITY"),
   },
   issuingAgencyCnh: {
-    required: i18n.t("validation.requiredIssuingAgency"),
-    validate: (value: string) => validateIssuingAgencyCnh(value) || i18n.t("validation.invalidIssuingAgency"),
+    required: i18n.t("VALIDATION.REQUIREDISSUINGAGENCY"),
+    validate: (value: string) => validateIssuingAgencyCnh(value) || i18n.t("VALIDATION.INVALIDISSUINGAGENCY"),
   },
   password: {
-    required: i18n.t("validation.requiredPassword"),
-    validate: (value: string) => validatePasswordConfirmation(value) || i18n.t("validation.invalidPassword"),
+    required: i18n.t("VALIDATION.REQUIREDPASSWORD"),
+    validate: (value: string) => validatePasswordConfirmation(value) || i18n.t("VALIDATION.INVALIDPASSWORD"),
   },
-  sex:{
-    required: i18n.t("validation.requiredSex"),
-    validate: (value: string) => validateSex(value) || i18n.t("validation.invalidSex"),
+  sex: {
+    required: i18n.t("VALIDATION.REQUIREDSEX"),
+    validate: (value: string) => validateSex(value) || i18n.t("VALIDATION.INVALIDSEX"),
   },
   confirmPassword: {
-    required: i18n.t("validation.requiredConfirmPassword"),
+    required: i18n.t("VALIDATION.REQUIREDCONFIRMPASSWORD"),
     validate: (value: string, formValues: { password: string }) =>
-      validatePasswordConfirmationMatch(value, formValues.password) || i18n.t("validation.invalidConfirmPassword"),
+      validatePasswordConfirmationMatch(value, formValues.password) || i18n.t("VALIDATION.INVALIDCONFIRMPASSWORD"),
   },
 };

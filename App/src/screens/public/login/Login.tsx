@@ -33,8 +33,8 @@ const Login = () => {
       <View className="gap-4 flex-1">
         <InputDefault
           name="email"
-          label={t("login.emailLabel")}
-          placeholder={t("login.emailPlaceholder")}
+          label={t("LOGIN.EMAILLABEL")}
+          placeholder={t("LOGIN.EMAILPLACEHOLDER")}
           type="default"
           control={control}
           rules={rules.email}
@@ -42,8 +42,8 @@ const Login = () => {
 
         <InputDefault
           name="password"
-          label={t("login.passwordLabel")}
-          placeholder={t("login.passwordPlaceholder")}
+          label={t("LOGIN.PASSWORDLABEL")}
+          placeholder={t("LOGIN.PASSWORDPLACEHOLDER")}
           type="default"
           secureTextEntry
           control={control}
@@ -52,13 +52,13 @@ const Login = () => {
 
         <Pressable onPress={goForgotPassword} className="self-start">
           <Text className="text-lightText dark:text-darkText font-medium underline text-base pl-2.5 pt-2.5">
-            {t("login.forgotPassword")}
+            {t("LOGIN.FORGOTPASSWORD")}
           </Text>
         </Pressable>
 
         <View className="flex-1 justify-end pt-5">
           <ButtonDefault
-            title={t("login.submit")}
+            title={t("LOGIN.SUBMIT")}
             onPress={handleSubmit(handleLogin)}
             disabled={false}
             loading={false}

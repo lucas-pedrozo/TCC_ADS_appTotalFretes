@@ -36,10 +36,10 @@ const EditPerfil = () => {
 				<InputDefault
 					name="name"
 					control={control}
-					label={t("signUp.basic.fullNameLabel")}
+					label={t("SIGNUP.BASIC.FULLNAMELABEL")}
 					maxLength={100}
 
-					placeholder={t("signUp.basic.fullNamePlaceholder")}
+					placeholder={t("SIGNUP.BASIC.FULLNAMEPLACEHOLDER")}
 					rules={rules.name}
 				/>
 
@@ -47,8 +47,8 @@ const EditPerfil = () => {
 					name="email"
 					control={control}
 					desabled={true}
-					placeholder={t("signUp.basic.emailPlaceholder")}
-					label={t("signUp.basic.emailLabel")}
+					placeholder={t("SIGNUP.BASIC.EMAILPLACEHOLDER")}
+					label={t("SIGNUP.BASIC.EMAILLABEL")}
 					rules={rules.email}
 				/>
 
@@ -57,25 +57,25 @@ const EditPerfil = () => {
 					control={control}
 					maxLength={14}
 					desabled={true}
-					placeholder={t("signUp.basic.cpfPlaceholder")}
-					label={t("signUp.basic.cpfLabel")}
+					placeholder={t("SIGNUP.BASIC.CPFPLACEHOLDER")}
+					label={t("SIGNUP.BASIC.CPFLABEL")}
 					rules={rules.cpf}
 				/>
 
 				<InputPhone
 					name="phoneNumber"
 					control={control}
-					placeholder={t("signUp.basic.phonePlaceholder")}
+					placeholder={t("SIGNUP.BASIC.PHONEPLACEHOLDER")}
 					maxLength={15}
-					label={t("signUp.basic.phoneLabel")}
+					label={t("SIGNUP.BASIC.PHONELABEL")}
 					rules={rules.phoneNumber}
 				/>
 
 				<InputDate
 					name="birthDate"
 					control={control}
-					placeholder={t("signUp.basic.birthDatePlaceholder")}
-					label={t("signUp.basic.birthDateLabel")}
+					placeholder={t("SIGNUP.BASIC.BIRTHDATEPLACEHOLDER")}
+					label={t("SIGNUP.BASIC.BIRTHDATELABEL")}
 					maxLength={10}
 					rules={rules.birthDate}
 				/>
@@ -83,29 +83,29 @@ const EditPerfil = () => {
 				<InputGroup
 					name="sex"
 					control={control}
-					label={t("signUp.basic.genderLabel")}
+					label={t("SIGNUP.BASIC.GENDERLABEL")}
 					rules={rules.sex}
 					options={[
-						{ label: t("signUp.basic.genderMale"), value: "M" },
-						{ label: t("signUp.basic.genderFemale"), value: "F" },
-						{ label: t("signUp.basic.genderNotInform"), value: "N" },
+						{ label: t("SIGNUP.BASIC.GENDERMALE"), value: "M" },
+						{ label: t("SIGNUP.BASIC.GENDERFEMALE"), value: "F" },
+						{ label: t("SIGNUP.BASIC.GENDERNOTINFORM"), value: "N" },
 					]}
 				/>
 
 				<InputGroup
 					name="isDeficient"
 					control={control}
-					label={t("signUp.basic.disabilityLabel")}
+					label={t("SIGNUP.BASIC.DISABILITYLABEL")}
 					rules={rules.isDeficient}
 					options={[
-						{ label: t("signUp.basic.yes"), value: "true" },
-						{ label: t("signUp.basic.no"), value: "false" },
+						{ label: t("SIGNUP.BASIC.YES"), value: "true" },
+						{ label: t("SIGNUP.BASIC.NO"), value: "false" },
 					]}
 				/>
 
 				<View className="flex-1 justify-end pt-4">
 					<ButtonDefault
-						title={t("signUp.basic.next")}
+						title={t("SIGNUP.BASIC.NEXT")}
 						onPress={handleSubmit(handleEditPerfil)}
 					/>
 				</View>

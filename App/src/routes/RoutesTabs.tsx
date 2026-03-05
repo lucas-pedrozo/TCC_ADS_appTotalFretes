@@ -3,6 +3,7 @@ import { BackHandler, Platform, Text, ToastAndroid, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { useFocusEffect } from "@react-navigation/native";
+import { useAuth } from "@/src/context/AuthContext";
 
 import Freight from "../screens/private/freight/Freight";
 import Perfil  from "@/src/screens/private/perfil/Perfil";
@@ -35,6 +36,7 @@ const PropostaScreen = () => <PlaceholderScreen title="Proposta" />;
 const TAB_BAR_HEIGHT = 72;
 
 export default function RoutesTabs() {
+	const { logout } = useAuth();
 	const { mode } = useThemeMode();
 	const insets = useSafeAreaInsets();
 	const lastBackPress = useRef<number>(0);
@@ -57,7 +59,7 @@ export default function RoutesTabs() {
 
 				const now = Date.now();
 				if (now - lastBackPress.current < 2000) {
-					BackHandler.exitApp();
+					logout();
 					return true;
 				}
 

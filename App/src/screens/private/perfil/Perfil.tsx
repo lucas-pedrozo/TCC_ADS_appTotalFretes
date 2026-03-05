@@ -55,8 +55,8 @@ const Perfil = () => {
   }
 
   const idiomaOptions = [
-    { value: "pt", label: "PT-BR" },
-    { value: "en", label: "EN-US" },
+    { value: "pt", label: t("PERFIL.LANGPT") },
+    { value: "en", label: t("PERFIL.LANGEN") },
   ];
 
   const handleRefresh = useCallback(async () => {
@@ -87,34 +87,34 @@ const Perfil = () => {
         }
       >
         <HeaderPerfil
-          name={userData?.name || "Não informado"}
-          email={userData?.email || "Não informado"}
-          cpf={userData?.cpf || "Não informado"}
+          name={userData?.name || t("COMMON.NOTINFORMED")}
+          email={userData?.email || t("COMMON.NOTINFORMED")}
+          cpf={userData?.cpf || t("COMMON.NOTINFORMED")}
         />
 
         <View className="flex-col gap-2.5 mt-14">
-          <Text className="text-sm font-semibold pl-2.5 pb-1.5 text-lightTextSecondary dark:text-darkTextSecondary">Informações Pessoais</Text>
+          <Text className="text-sm font-semibold pl-2.5 pb-1.5 text-lightTextSecondary dark:text-darkTextSecondary">{t("PERFIL.PERSONALINFO")}</Text>
 
-          <Option title="Editar meus Dados" icon="pencil" onPress={goToEditPerfil} />
+          <Option title={t("PERFIL.EDITMYDATA")} icon="pencil" onPress={goToEditPerfil} />
           <View className="h-0.5 w-full bg-lightBgNonary dark:bg-darkBgNonary rounded-full" />
-          <Option title="Editar Dados da CNH" icon="pencil" onPress={goToEditCnh} />
+          <Option title={t("PERFIL.EDITCNHDATA")} icon="pencil" onPress={goToEditCnh} />
           <View className="h-0.5 w-full bg-lightBgNonary dark:bg-darkBgNonary rounded-full" />
 
           {!userData?.vehicleType_id ?
-            <Option title="Cadastrar Veículo" icon="car-outline" onPress={() => { }} />
+            <Option title={t("PERFIL.REGISTERVEHICLE")} icon="car-outline" onPress={() => { }} />
             :
-            <Option title="Editar Veículo" icon="car-outline" onPress={() => { }} />
+            <Option title={t("PERFIL.EDITVEHICLE")} icon="car-outline" onPress={() => { }} />
           }
 
           <View className="h-0.5 w-full bg-lightBgNonary dark:bg-darkBgNonary rounded-full" />
-          <Option title="Opções Avançadas" icon="settings-outline" onPress={goToAdvancedOptions} />
+          <Option title={t("PERFIL.ADVANCEDOPTIONS")} icon="settings-outline" onPress={goToAdvancedOptions} />
         </View>
 
         <View className="flex-col gap-2.5 mt-5">
-          <Text className="text-sm font-semibold pl-2.5 pb-1.5 text-lightTextSecondary dark:text-darkTextSecondary">Funcionamento do App</Text>
+          <Text className="text-sm font-semibold pl-2.5 pb-1.5 text-lightTextSecondary dark:text-darkTextSecondary">{t("PERFIL.APPBEHAVIOR")}</Text>
 
           <OptionSelect
-            title="Idioma"
+            title={t("PERFIL.LANGUAGE")}
             icon="language-outline"
             options={idiomaOptions}
             value={language}
@@ -122,7 +122,7 @@ const Perfil = () => {
           />
 
           <View className="h-0.5 w-full bg-lightBgNonary dark:bg-darkBgNonary rounded-full" />
-          <OptionKey title="Modo claro" icon="sunny-outline" value={mode === "light"} setValue={() => toggleMode()} />
+          <OptionKey title={t("PERFIL.LIGHTMODE")} icon="sunny-outline" value={mode === "light"} setValue={() => toggleMode()} />
           <View className="h-0.5 w-full bg-lightBgNonary dark:bg-darkBgNonary rounded-full" />
         </View>
       </ScrollView>

@@ -22,19 +22,19 @@ const ForgotPassword = () => {
 
 			<View className="gap-4 flex-1">
 				<Text className="text-lightText dark:text-darkText text-base">{
-					t("forgotPassword.description")}
+					t("FORGOTPASSWORD.DESCRIPTION")}
 				</Text>
 				<InputDefault
 					name="email"
 					control={control}
-					label={t("forgotPassword.emailLabel")}
-					placeholder={t("forgotPassword.emailPlaceholder")}
+					label={t("FORGOTPASSWORD.EMAILLABEL")}
+					placeholder={t("FORGOTPASSWORD.EMAILPLACEHOLDER")}
 					rules={rules.email}
 				/>
 			</View>
 			<View className="flex-1 justify-end pt-4">
 				<ButtonDefault
-					title={t("forgotPassword.submit")}
+					title={t("FORGOTPASSWORD.SUBMIT")}
 					onPress={handleSubmit(handleForgotPassword)}
 					disabled={false}
 					loading={false}

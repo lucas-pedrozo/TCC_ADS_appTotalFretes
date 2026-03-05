@@ -30,7 +30,7 @@ export function useHookSingUp() {
     try {
       await notify({
         status: "loading",
-        message: i18n.t("notifications.signUpLoading")
+        message: i18n.t("NOTIFICATIONS.SIGNUPLOADING")
       });
 
     const response =  await http.post("/user/end-account", {
@@ -51,7 +51,7 @@ export function useHookSingUp() {
 
       await notify({
         status: "success",
-        message: response.data.message ?? i18n.t("notifications.signUpSuccess"),
+        message: response.data.message ?? i18n.t("NOTIFICATIONS.SIGNUPSUCCESS"),
       });
 
       await new Promise(resolve => setTimeout(resolve, 1200));
@@ -59,10 +59,10 @@ export function useHookSingUp() {
       await navigation.navigate("Login");
       
     } catch (error) {
-      notify({
-        status: "error",
-        message: (error as AxiosError<{ message: string }>).response?.data.message ?? i18n.t("notifications.signUpError"),
-      });
+      const message = (error as AxiosError<{ message: string }>).response?.data?.message ?? "";
+      if (message) {
+        notify({ status: "error", message });
+      }
     }
   }
 

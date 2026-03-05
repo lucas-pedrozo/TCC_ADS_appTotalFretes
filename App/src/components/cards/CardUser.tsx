@@ -1,6 +1,7 @@
 import { Feather, Ionicons } from "@expo/vector-icons"
 import { useThemeMode } from "@/src/context/ThemeContext"
 import { Text, TouchableOpacity, View } from "react-native"
+import { formatNameSobrenome } from "@/src/utils/funcoes"
 
 type CardUserProps = {
   name?: string;
@@ -21,8 +22,8 @@ export const CardUser = ({ name, cnhType, navegation }: CardUserProps) => {
         <Feather name="arrow-up-right" size={24} color={mode === "dark" ? "#FFFFFF" : "#000000"} />
       </View>
 
-      <Text className="text-lightText dark:text-darkText text-sm mt-4" numberOfLines={1}>Nome: {name}</Text>
-      <Text className="text-lightText dark:text-darkText text-sm mt-1" numberOfLines={1}>Categoria: {cnhType}</Text>
+      <Text className="text-lightText dark:text-darkText text-sm mt-4">Nome: {formatNameSobrenome(name ?? "")}</Text>
+      <Text className="text-lightText dark:text-darkText text-sm mt-1" numberOfLines={1}>Categoria: {cnhType ?? "---"}</Text>
     </TouchableOpacity>
   )
 }

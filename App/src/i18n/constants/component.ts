@@ -1,0 +1,78 @@
+/**
+ * Traduções usadas por componentes (validação de formulários, idioma, etc.)
+ * Chaves em UPPERCASE: VALIDATION.REQUIREDCNH, LANGUAGE.PT
+ */
+
+export const componentPT = {
+  VALIDATION: {
+    REQUIREDCNH: "CNH é obrigatória",
+    INVALIDCNH: "CNH inválida",
+    REQUIREDNAME: "Nome é obrigatório",
+    INVALIDNAME: "Nome inválido",
+    REQUIREDEMAIL: "Email é obrigatório",
+    INVALIDEMAIL: "Email inválido",
+    REQUIREDCPF: "CPF é obrigatório",
+    INVALIDCPF: "CPF inválido",
+    REQUIREDCNPJ: "CNPJ é obrigatório",
+    INVALIDCNPJ: "CNPJ inválido",
+    REQUIREDPHONE: "Número de telefone é obrigatório",
+    INVALIDPHONE: "Número de telefone inválido",
+    REQUIREDBIRTHDATE: "Data de nascimento é obrigatória",
+    INVALIDBIRTHDATE: "Data de nascimento inválida",
+    REQUIREDTYPECNH: "Categoria de CNH é obrigatória",
+    INVALIDTYPECNH: "Categoria de CNH inválida",
+    REQUIREDUSEGLASSES: "Este campo é obrigatório",
+    INVALIDUSEGLASSES: "Valor inválido",
+    REQUIREDDISABILITY: "Este campo é obrigatório",
+    INVALIDDISABILITY: "Valor inválido",
+    REQUIREDISSUINGAGENCY: "Órgão emissor é obrigatório",
+    INVALIDISSUINGAGENCY: "Órgão emissor inválido",
+    REQUIREDPASSWORD: "Senha é obrigatória",
+    INVALIDPASSWORD: "A senha deve ter entre 8 e 16 caracteres",
+    REQUIREDSEX: "Sexo é obrigatório",
+    INVALIDSEX: "Sexo inválido",
+    REQUIREDCONFIRMPASSWORD: "Confirmação de senha é obrigatória",
+    INVALIDCONFIRMPASSWORD: "As senhas não conferem",
+  },
+  LANGUAGE: {
+    PT: "PT",
+    EN: "EN",
+  },
+} as const;
+
+export const componentEN = {
+  VALIDATION: {
+    REQUIREDCNH: "Driver license is required",
+    INVALIDCNH: "Invalid driver license",
+    REQUIREDNAME: "Name is required",
+    INVALIDNAME: "Invalid name",
+    REQUIREDEMAIL: "Email is required",
+    INVALIDEMAIL: "Invalid email",
+    REQUIREDCPF: "CPF is required",
+    INVALIDCPF: "Invalid CPF",
+    REQUIREDCNPJ: "CNPJ is required",
+    INVALIDCNPJ: "Invalid CNPJ",
+    REQUIREDPHONE: "Phone number is required",
+    INVALIDPHONE: "Invalid phone number",
+    REQUIREDBIRTHDATE: "Birth date is required",
+    INVALIDBIRTHDATE: "Invalid birth date",
+    REQUIREDTYPECNH: "License category is required",
+    INVALIDTYPECNH: "Invalid license category",
+    REQUIREDUSEGLASSES: "This field is required",
+    INVALIDUSEGLASSES: "Invalid value",
+    REQUIREDDISABILITY: "This field is required",
+    INVALIDDISABILITY: "Invalid value",
+    REQUIREDISSUINGAGENCY: "Issuing agency is required",
+    INVALIDISSUINGAGENCY: "Invalid issuing agency",
+    REQUIREDPASSWORD: "Password is required",
+    INVALIDPASSWORD: "Password must be between 8 and 16 characters",
+    REQUIREDSEX: "Gender is required",
+    INVALIDSEX: "Invalid gender",
+    REQUIREDCONFIRMPASSWORD: "Password confirmation is required",
+    INVALIDCONFIRMPASSWORD: "Passwords do not match",
+  },
+  LANGUAGE: {
+    PT: "PT",
+    EN: "EN",
+  },
+} as const;

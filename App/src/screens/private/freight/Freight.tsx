@@ -1,15 +1,16 @@
 import { useCallback, useState } from "react";
 import { useForm } from "react-hook-form";
-import { useThemeMode } from "@/src/context/ThemeContext"
-import { SafeAreaView } from "react-native-safe-area-context"
-import { FlatList, RefreshControl, Text, View, } from "react-native"
+import { useThemeMode } from "@/src/context/ThemeContext";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { FlatList, RefreshControl, Text, View } from "react-native";
+import { useTranslation } from "react-i18next";
 import { InputSearch } from "@/src/components/fom/inputs/InputSearch";
 import { ButtonFilter } from "@/src/components/fom/buttons/ButtonFilter";
 import ModalFilter, { FreightFilterState } from "@/src/components/modal/ModalFilter";
 import { CardFreight } from "@/src/components/cards/CardFreight";
 
 const Freight = () => {
-
+  const { t } = useTranslation();
   const { control } = useForm();
   const { mode } = useThemeMode();
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -41,15 +42,15 @@ const Freight = () => {
     <SafeAreaView style={{ flex: 1, paddingHorizontal: 16 }} className="bg-lightBg dark:bg-darkBg">
 
       <Text className="text-lightText dark:text-darkText text-2xl text-center font-semibold">
-        Fretes Disponiveis
+        {t("FREIGHT.TITLE")}
       </Text>
 
       <View className="flex-row items-center gap-2.5 justify-between mt-4 mb-2">
         <InputSearch
           control={control}
           name="search"
-          placeholder="Buscar frete"
-          rules={{ required: 'dsda' }}
+          placeholder={t("FREIGHT.SEARCHPLACEHOLDER")}
+          rules={{ required: "dsda" }}
         />
         <ButtonFilter onPress={handleOpenFilter} />
       </View>
@@ -63,12 +64,12 @@ const Freight = () => {
         contentContainerStyle={{ paddingBottom: 120, paddingTop: 20 }}
         renderItem={({ item }) => (
           <CardFreight
-            name={item.name || "Não informado"}
-            origin={item.origin || "Não informado"}
-            destination={item.destination || "Não informado"}
-            cargoType={item.cargoType || "Nenhum"}
-            cargoWeight={item.cargoWeight || "N/A"}
-            freightValue={item.freightValue || "N/A"}
+            name={item.name || t("COMMON.NOTINFORMED")}
+            origin={item.origin || t("COMMON.NOTINFORMED")}
+            destination={item.destination || t("COMMON.NOTINFORMED")}
+            cargoType={item.cargoType || t("COMMON.NONE")}
+            cargoWeight={item.cargoWeight || t("COMMON.N_A")}
+            freightValue={item.freightValue || t("COMMON.N_A")}
           />
         )}
         refreshControl={
@@ -80,7 +81,7 @@ const Freight = () => {
         }
         ListEmptyComponent={
           <Text className="text-lightTextSecondary dark:text-darkTextSecondary text-center mt-10 text-base">
-            Nenhum frete encontrado.
+            {t("FREIGHT.EMPTYLIST")}
           </Text>
         }
       />

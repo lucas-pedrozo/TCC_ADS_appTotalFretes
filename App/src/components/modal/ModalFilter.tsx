@@ -1,6 +1,7 @@
 import React from "react";
 import { Modal, Pressable, Text, TouchableOpacity, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import animation from "@/src/utils/animation";
 
 export type FreightFilterState = {
   order: "proximo" | "longe";
@@ -52,10 +53,10 @@ const ModalFilter = ({
     <Modal
       visible={visible}
       transparent
-      animationType="fade"
+      animationType="none"
       onRequestClose={onClose}
     >
-      <View className="flex-1 bg-black/50 justify-start px-4 pt-28">
+      <animation.FadeDown className="flex-1 bg-black/30 justify-start px-4 pt-28">
         <Pressable className="absolute inset-0" onPress={onClose} />
 
         <View className="w-full p-2.5 rounded-2xl bg-darkBgSecondary border border-darkBgTertiary">
@@ -135,7 +136,7 @@ const ModalFilter = ({
             </View>
           </View>
         </View>
-      </View>
+      </animation.FadeDown>
     </Modal>
   );
 };

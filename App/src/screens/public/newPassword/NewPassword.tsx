@@ -20,8 +20,8 @@ const NewPassword = () => {
 				<InputDefault
 					name="password"
 					control={control}
-					placeholder={t("signUp.password.passwordPlaceholder")}
-					label={t("signUp.password.passwordLabel")}
+					placeholder={t("SIGNUP.PASSWORD.PASSWORDPLACEHOLDER")}
+					label={t("SIGNUP.PASSWORD.PASSWORDLABEL")}
 					secureTextEntry
 					rules={rules.password}
 				/>
@@ -29,15 +29,15 @@ const NewPassword = () => {
 				<InputDefault
 					name="confirmPassword"
 					control={control}
-					placeholder={t("signUp.password.confirmPasswordPlaceholder")}
-					label={t("signUp.password.confirmPasswordLabel")}
+					placeholder={t("SIGNUP.PASSWORD.CONFIRMPASSWORDPLACEHOLDER")}
+					label={t("SIGNUP.PASSWORD.CONFIRMPASSWORDLABEL")}
 					secureTextEntry
 					rules={rules.confirmPassword}
 				/>
 
 				<View className="flex-1 justify-end py-4">
 					<ButtonDefault
-						title={t("signUp.password.finish")}
+						title={t("SIGNUP.PASSWORD.FINISH")}
 						onPress={handleSubmit(handleResetPassword)}
 						disabled={false}
 						loading={false}

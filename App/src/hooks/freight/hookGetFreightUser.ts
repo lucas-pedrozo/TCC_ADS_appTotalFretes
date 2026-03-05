@@ -33,10 +33,10 @@ export function useHookGetFreightUser() {
       // const response = await http.get<FreightUserMap>(`/freight/${idUser}`);
       await new Promise(resolve => setTimeout(resolve, 1200));
     } catch (error) {
-      notify({
-        status: "error",
-        message: (error as AxiosError<{ message: string }>).response?.data.message ?? "Erro ao buscar fretes do usuário",
-      });
+      const message = (error as AxiosError<{ message: string }>).response?.data?.message ?? "";
+      if (message) {
+        notify({ status: "error", message });
+      }
     } finally {
       setIsLoading(false);
     }

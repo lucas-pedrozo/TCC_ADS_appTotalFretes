@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { View, Text, TouchableOpacity, Modal, Pressable } from "react-native";
 import { useThemeMode } from "@/src/context/ThemeContext";
+import animation from "@/src/utils/animation";
 
 export type OptionSelectOption = {
   value: string;
@@ -25,7 +26,7 @@ export const OptionSelect = (props: OptionSelectProps) => {
 
   return (
     <>
-      <TouchableOpacity onPress={() => setModalVisible(true)} className="flex-row items-center justify-between">
+      <View className="flex-row items-center justify-between">
         <View className="flex-row items-center justify-center gap-2.5">
           <View className="w-12 h-12 rounded-xl bg-lightBgNonary dark:bg-darkBgNonary items-center justify-center">
             <Ionicons name={props.icon} size={26} color={mode === "dark" ? "#FFFFFF" : "#000000"} />
@@ -33,13 +34,13 @@ export const OptionSelect = (props: OptionSelectProps) => {
           <Text className="text-lightText dark:text-darkText font-semibold text-base">{props.title}</Text>
         </View>
 
-        <View className="flex-row items-center gap-1.5">
+        <TouchableOpacity  onPress={() => setModalVisible(true)} className="flex-row items-center gap-1.5">
           <Text className="text-lightTextSecondary dark:text-darkTextSecondary font-medium text-sm">
             {selectedOption.label}
           </Text>
           <Ionicons name="chevron-down" size={20} color={mode === "dark" ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.5)"} />
-        </View>
-      </TouchableOpacity>
+        </TouchableOpacity>
+      </View>
 
       <Modal
         visible={modalVisible}
@@ -51,7 +52,7 @@ export const OptionSelect = (props: OptionSelectProps) => {
           style={{ flex: 1, justifyContent: "center", backgroundColor: "rgba(0,0,0,0.5)" }}
           onPress={() => setModalVisible(false)}
         >
-          <View
+          <animation.FadeDown
             className="mx-4 rounded-2xl overflow-hidden bg-lightBgSecondary dark:bg-darkBgSecondary"
             onStartShouldSetResponder={() => true}
           >
@@ -76,7 +77,7 @@ export const OptionSelect = (props: OptionSelectProps) => {
                 </Pressable>
               ))}
             </View>
-          </View>
+          </animation.FadeDown>
         </Pressable>
       </Modal>
     </>

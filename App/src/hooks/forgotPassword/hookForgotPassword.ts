@@ -3,6 +3,7 @@ import { useCallback } from "react";
 import http from "@/src/service/http";
 import { useForm } from "react-hook-form";
 import { validationRules } from "@/src/utils/formValidations";
+import i18n from "@/src/i18n";
 
 import { RootStackParamList } from "@/src/routes/Routes";
 import { useAlertDefault } from "@/src/context/AlertDefaultContext";
@@ -23,25 +24,27 @@ export function useHookForgotPassword() {
 
   const handleForgotPassword = useCallback(async (data: ForgotPasswordForm) => {
     try {
-      await notify({ status: "loading", message: "Enviando codigo de verificador" });
+      await notify({
+        status: "loading",
+        message: i18n.t("NOTIFICATIONS.FORGOTPASSWORDLOADING"),
+      });
 
       const response = await http.post("/auth/forgot-password", { email: data.email });
 
       await notify({
         status: "success",
-        message: response.data.message ?? "Se o email estiver cadastrado, você receberá o código.",
+        message: response.data.message ?? i18n.t("NOTIFICATIONS.FORGOTPASSWORDSUCCESS"),
       });
 
       await new Promise((resolve) => setTimeout(resolve, 1200));
 
       navigation.navigate("VerificationCode", { email: data.email.trim() });
     } catch (error) {
-      console.log(error)
-
-      await notify({
-        status: "error",
-        message: (error as AxiosError<{ message: string }>).response?.data.message ?? "Erro ao solicitar redefinição. Tente novamente.",
-      })
+      console.log(error);
+      const message = (error as AxiosError<{ message: string }>).response?.data?.message ?? "";
+      if (message) {
+        await notify({ status: "error", message });
+      }
     }
   }, [notify, navigation])
 

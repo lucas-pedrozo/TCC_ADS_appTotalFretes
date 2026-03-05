@@ -25,10 +25,13 @@ export function useHookGetVehicle() {
       setVehicleData(response.data);
 
     } catch (error) {
-      notify({
-        status: "alert",
-        message: (error as AxiosError<{ message: string }>).response?.data.message || "Erro ao obter dados do veículo",
-      });
+      const message = (error as AxiosError<{ message: string }>).response?.data?.message ?? "";
+      if (message) {
+        notify({
+          status: "alert",
+          message,
+        });
+      }
     } finally {
       setIsLoading(false);
     }

@@ -43,8 +43,8 @@ const SingUpCNH = () => {
 				<InputDefault
 					name="cnhNumber"
 					control={control}
-					placeholder={t("signUp.cnh.cnhPlaceholder")}
-					label={t("signUp.cnh.cnhLabel")}
+					placeholder={t("SIGNUP.CNH.CNHPLACEHOLDER")}
+					label={t("SIGNUP.CNH.CNHLABEL")}
 					maxLength={11}
 					rules={rules.cnhNumber}
 				/>
@@ -52,8 +52,8 @@ const SingUpCNH = () => {
 				<InputDefault
 					name="issuingAgencyCnh"
 					control={control}
-					placeholder={t("signUp.cnh.issuingAgencyPlaceholder")}
-					label={t("signUp.cnh.issuingAgencyLabel")}
+					placeholder={t("SIGNUP.CNH.ISSUINGAGENCYPLACEHOLDER")}
+					label={t("SIGNUP.CNH.ISSUINGAGENCYLABEL")}
 					maxLength={2}
 					rules={rules.issuingAgencyCnh}
 				/>
@@ -61,7 +61,7 @@ const SingUpCNH = () => {
 				<InputGroup
 					name="cnhType_id"
 					control={control}
-					label={t("signUp.cnh.categoryLabel")}
+					label={t("SIGNUP.CNH.CATEGORYLABEL")}
 					rules={rules.cnhType_id}
 					options={[
 						{ label: "A", value: "1" },
@@ -75,17 +75,17 @@ const SingUpCNH = () => {
 				<InputGroup
 					name="useGlasses"
 					control={control}
-					label={t("signUp.cnh.useGlassesLabel")}
+					label={t("SIGNUP.CNH.USEGLASSESLABEL")}
 					rules={rules.useGlasses}
 					options={[
-						{ label: t("signUp.cnh.yes"), value: "true" },
-						{ label: t("signUp.cnh.no"), value: "false" },
+						{ label: t("SIGNUP.CNH.YES"), value: "true" },
+						{ label: t("SIGNUP.CNH.NO"), value: "false" },
 					]}
 				/>
 
 				<View className="flex-1 justify-end py-4">
 					<ButtonDefault
-						title={t("signUp.cnh.next")}
+						title={t("SIGNUP.CNH.NEXT")}
 						onPress={handleNext}
 					/>
 				</View>

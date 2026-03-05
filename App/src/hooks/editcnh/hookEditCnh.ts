@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form";
 import { useAuth } from "@/src/context/AuthContext";
 import { validationRules } from "@/src/utils/formValidations";
 import { useAlertDefault } from "@/src/context/AlertDefaultContext";
+import i18n from "@/src/i18n";
 
 import { RootStackParamList } from "@/src/routes/Routes";
 import { RouteProp, useRoute } from "@react-navigation/native";
@@ -36,21 +37,21 @@ export function useHookEditCnh() {
 		try {
 			await notify({
 				status: "loading",
-				message: "Editando CNH...",
+				message: i18n.t("NOTIFICATIONS.EDITCNHLOADING"),
 			});
 
 			await http.patch<EditCnhMap>(`/user/${id}`, data);
 
 			await notify({
 				status: "success",
-				message: "CNH editada com sucesso!",
+				message: i18n.t("NOTIFICATIONS.EDITCNHSUCCESS"),
 			});
 
 		} catch (error) {
-			notify({
-				status: "error",
-				message: (error as AxiosError<{ message: string }>).response?.data.message ?? "Erro ao editar CNH",
-			});
+			const message = (error as AxiosError<{ message: string }>).response?.data?.message ?? "";
+			if (message) {
+				notify({ status: "error", message });
+			}
 		}
 	}, [notify, id])
 
