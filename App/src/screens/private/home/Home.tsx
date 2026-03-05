@@ -12,6 +12,7 @@ import { useWeather } from "@/src/hooks/weather/useWeather";
 import { CardClime } from "@/src/components/cards/CardClime";
 import { useHookGetUser } from "@/src/hooks/user/hookGetUser";
 import ModalNotificacoes from "@/src/components/modal/ModalNotificacoes";
+import DetalhesFreteModal from "@/src/components/mapbox/MapBox";
 
 import { TabParamList } from "@/src/routes/RoutesTabs";
 import { useNavigation } from "@react-navigation/native";
@@ -32,6 +33,7 @@ function Home() {
   const [refreshKey, setRefreshKey] = useState(0);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isModalNotificacoesVisible, setIsModalNotificacoesVisible] = useState(false);
+  const [isModalRotaTesteVisible, setIsModalRotaTesteVisible] = useState(false);
 
   const greeting = currentHour < 12 ? t("HOME.WELCOME2") : currentHour < 18 ? t("HOME.WELCOME3") : t("HOME.WELCOME");
 
@@ -133,12 +135,33 @@ function Home() {
           key={`card-vehicle-${refreshKey}`}
           vehicleId={userData?.vehicleType_id}
         />
+
+        <TouchableOpacity
+          onPress={() => setIsModalRotaTesteVisible(true)}
+          className="mt-4 flex-row items-center justify-center gap-2 bg-lightBgTertiary dark:bg-darkBgTertiary py-3 px-4 rounded-xl border border-lightBgNonary dark:border-darkBgNonary"
+          activeOpacity={0.8}
+        >
+          <Ionicons name="map-outline" size={22} color={mode === "dark" ? "#74AEF1" : "#3498db"} />
+          <Text className="text-base font-semibold text-lightText dark:text-darkText">
+            Testar rota Mapbox: Curitiba → São Paulo
+          </Text>
+        </TouchableOpacity>
       </ScrollView>
 
       <ModalNotificacoes
         visible={isModalNotificacoesVisible}
         onClose={() => setIsModalNotificacoesVisible(false)}
         notifications={[]}
+      />
+
+      <DetalhesFreteModal
+        visible={isModalRotaTesteVisible}
+        onClose={() => setIsModalRotaTesteVisible(false)}
+        enderecoCarga="Rua das Flores, 123, Curitiba', PR, Brasil"
+        enderecoDestino="Avenida Amazonas, 648, Boa Esperança, PR, Brasil"
+        nomeEmpresa="Teste"
+        rotaSimples
+        prazo="—"
       />
     </SafeAreaView>
   );

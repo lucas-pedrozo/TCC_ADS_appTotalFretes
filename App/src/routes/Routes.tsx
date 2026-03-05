@@ -12,18 +12,19 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
 import Start from "../screens/public/Start";
 import Login from "../screens/public/login/Login";
+import EditCnh from "../screens/private/editcnh/EditCnh";
 import SingUp from "../screens/public/singUp/SingUpBasic";
 import SingUpCNH from "../screens/public/singUp/SingUpCNH";
+import EditPerfil from "../screens/private/editPerfil/EditPerfil";
+import NewPassword from "../screens/public/newPassword/NewPassword";
 import SingUpPassword from "../screens/public/singUp/SingUpPassword";
 import ForgotPassword from "../screens/public/newPassword/ForgotPassword";
+import CancelAccount from "../screens/private/cancelAccount/CancelAccount";
 import VerificationCode from "../screens/public/newPassword/VerificationCode";
-import NewPassword from "../screens/public/newPassword/NewPassword";
-import EditPerfil from "../screens/private/editPerfil/EditPerfil";
-import EditCnh from "../screens/private/editcnh/EditCnh";
+import AdvancedOptions from "../screens/private/advancedOptions/AdvancedOptions";
 
 import { EditPerfilMap } from "../hooks/editPerfil/hookEditPerfil";
 import { EditCnhMap } from "../hooks/editcnh/hookEditCnh";
-import AdvancedOptions from "../screens/private/advancedOptions/AdvancedOptions";
 
 interface EditPerfilRouteParams {
   editPerfilData: EditPerfilMap;
@@ -46,6 +47,7 @@ export type RootStackParamList = {
   EditCnh: EditCnhRouteParams;
   AdvancedOptions: undefined;
   NewPassword: { email: string; resetToken: string };
+  CancelAccount: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -78,6 +80,7 @@ export default function Routes() {
         <Stack.Screen name="EditPerfil" component={() => <PrivateRoute><EditPerfil /></PrivateRoute>} options={{ title: t("ROUTES.EDITPERFIL") }} />
         <Stack.Screen name="EditCnh" component={() => <PrivateRoute><EditCnh /></PrivateRoute>} options={{ title: t("ROUTES.EDITCNH") }} />
         <Stack.Screen name="AdvancedOptions" component={() => <PrivateRoute><AdvancedOptions /></PrivateRoute>} options={{ title: t("ROUTES.ADVANCEDOPTIONS") }} />
+        <Stack.Screen name="CancelAccount" component={() => <PrivateRoute><CancelAccount /></PrivateRoute>} options={{ title: t("ROUTES.CANCELACCOUNT") }} />
 
         <Stack.Screen name="Start" component={Start} options={{ headerShown: false }} />
         <Stack.Screen name="Login" component={Login} options={{ title: t("ROUTES.LOGIN") }} />
@@ -86,7 +89,7 @@ export default function Routes() {
         <Stack.Screen name="NewPassword" component={NewPassword} options={{ title: t("ROUTES.NEWPASSWORD") }} />
         <Stack.Screen name="SingUpPassword" component={SingUpPassword} options={{ title: t("ROUTES.SIGNUPPASSWORD") }} />
         <Stack.Screen name="ForgotPassword" component={ForgotPassword} options={{ title: t("ROUTES.FORGOTPASSWORD") }} />
-        <Stack.Screen name="VerificationCode" component={VerificationCode} options={{ title: t("ROUTES.VERIFICATIONCODE") }} />
+        <Stack.Screen name="VerificationCode" component={VerificationCode} options={{ title: t("ROUTES.VERIFICATIO  NCODE") }} />
 
       </Stack.Navigator>
     </NavigationContainer>

@@ -16,10 +16,13 @@ import { useLanguage } from "@/src/context/LanguageContext";
 import { useNavigation } from "@react-navigation/native";
 import { RootStackParamList } from "@/src/routes/Routes";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { ButtonCancel } from "@/src/components/fom/buttons/ButtonDefauilt";
+import { useAuth } from "@/src/context/AuthContext";
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
 const Perfil = () => {
+  const { logout } = useAuth()
   const { t } = useTranslation();
   const { mode, toggleMode } = useThemeMode();
   const { language, changeLanguage } = useLanguage();
@@ -94,7 +97,6 @@ const Perfil = () => {
 
         <View className="flex-col gap-2.5 mt-14">
           <Text className="text-sm font-semibold pl-2.5 pb-1.5 text-lightTextSecondary dark:text-darkTextSecondary">{t("PERFIL.PERSONALINFO")}</Text>
-
           <Option title={t("PERFIL.EDITMYDATA")} icon="pencil" onPress={goToEditPerfil} />
           <View className="h-0.5 w-full bg-lightBgNonary dark:bg-darkBgNonary rounded-full" />
           <Option title={t("PERFIL.EDITCNHDATA")} icon="pencil" onPress={goToEditCnh} />
@@ -109,10 +111,8 @@ const Perfil = () => {
           <View className="h-0.5 w-full bg-lightBgNonary dark:bg-darkBgNonary rounded-full" />
           <Option title={t("PERFIL.ADVANCEDOPTIONS")} icon="settings-outline" onPress={goToAdvancedOptions} />
         </View>
-
         <View className="flex-col gap-2.5 mt-5">
           <Text className="text-sm font-semibold pl-2.5 pb-1.5 text-lightTextSecondary dark:text-darkTextSecondary">{t("PERFIL.APPBEHAVIOR")}</Text>
-
           <OptionSelect
             title={t("PERFIL.LANGUAGE")}
             icon="language-outline"
@@ -120,11 +120,14 @@ const Perfil = () => {
             value={language}
             onValueChange={(value) => changeLanguage(value as AppLanguage)}
           />
-
           <View className="h-0.5 w-full bg-lightBgNonary dark:bg-darkBgNonary rounded-full" />
           <OptionKey title={t("PERFIL.LIGHTMODE")} icon="sunny-outline" value={mode === "light"} setValue={() => toggleMode()} />
           <View className="h-0.5 w-full bg-lightBgNonary dark:bg-darkBgNonary rounded-full" />
         </View>
+
+          <View className="w-5/12 self-end pt-8 ">
+            <ButtonCancel title={t("PERFIL.LOGOUT")} onPress={logout}  />
+          </View>
       </ScrollView>
     </SafeAreaView>
   )

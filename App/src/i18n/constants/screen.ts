@@ -34,6 +34,7 @@ export const screenPT = {
     EDITPERFIL: "Editar Dados",
     EDITCNH: "Editar CNH",
     ADVANCEDOPTIONS: "Opções Avançadas",
+    CANCELACCOUNT: "Cancelar Conta"
   },
   FORGOTPASSWORD: {
     TITLE: "Solicitação de nova senha",
@@ -101,6 +102,7 @@ export const screenPT = {
     LIGHTMODE: "Modo claro",
     LANGPT: "PT-BR",
     LANGEN: "EN-US",
+    LOGOUT: "Sair da conta",
   },
   FREIGHT: {
     TITLE: "Fretes Disponiveis",
@@ -163,6 +165,7 @@ export const screenEN = {
     EDITPERFIL: "Edit Data",
     EDITCNH: "Edit Driver License",
     ADVANCEDOPTIONS: "Advanced Options",
+    CANCELACCOUNT: "Cancel Account"
   },
   FORGOTPASSWORD: {
     TITLE: "Forgot Password Request",
@@ -230,6 +233,7 @@ export const screenEN = {
     LIGHTMODE: "Light mode",
     LANGPT: "PT-BR",
     LANGEN: "EN-US",
+    LOGOUT: "Sign out",
   },
   FREIGHT: {
     TITLE: "Available Freights",
