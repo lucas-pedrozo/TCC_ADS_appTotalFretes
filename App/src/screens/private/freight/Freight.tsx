@@ -1,13 +1,14 @@
 import { useCallback, useState } from "react";
-import { useForm } from "react-hook-form";
-import { useThemeMode } from "@/src/context/ThemeContext";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { FlatList, RefreshControl, Text, View } from "react-native";
+
+import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
+import { useThemeMode } from "@/src/context/ThemeContext";
+import { CardFreight } from "@/src/components/cards/CardFreight";
 import { InputSearch } from "@/src/components/fom/inputs/InputSearch";
 import { ButtonFilter } from "@/src/components/fom/buttons/ButtonFilter";
 import ModalFilter, { FreightFilterState } from "@/src/components/modal/ModalFilter";
-import { CardFreight } from "@/src/components/cards/CardFreight";
 
 const Freight = () => {
   const { t } = useTranslation();

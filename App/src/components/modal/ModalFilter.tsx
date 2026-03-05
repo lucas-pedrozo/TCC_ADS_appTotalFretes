@@ -27,15 +27,9 @@ type FilterChipProps = {
 const FilterChip = ({ label, active, onPress }: FilterChipProps) => (
   <TouchableOpacity
     onPress={onPress}
-    className={`px-3 py-1.5 rounded-xl ${active
-      ? "bg-lightBgQuaternary "
-      : "bg-lightBgSecondary"
-      }`}
+    className={`px-3 py-1.5 rounded-xl ${active ? "bg-lightBgQuaternary" : "bg-lightBgSecondary"}`}
   >
-    <Text className={`font-medium ${active
-      ? "text-lightTextTertiary"
-      : "text-lightText"
-      }`}>
+    <Text className={`font-medium ${active ? "text-lightTextTertiary" : "text-lightText"}`}>
       {label}
     </Text>
   </TouchableOpacity>

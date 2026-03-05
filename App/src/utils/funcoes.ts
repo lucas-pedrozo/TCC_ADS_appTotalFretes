@@ -28,3 +28,14 @@ export function formatNameSobrenome(nome: string): string {
 
   return `${partes[0]} ${partes[partes.length - 1]}`;
 }
+
+/**
+ * @description Retorna a primeira parte de um texto antes do separador (ex.: endereço antes da vírgula).
+ * @param texto Texto completo
+ * @param separador Caractere separador (padrão: vírgula)
+ * @returns Exemplo: "Rua X, Bairro" => "Rua X", "Sem vírgula" => "Sem vírgula"
+ */
+export function primeiraParte(texto: string, separador = ","): string {
+  const parte = texto.trim().split(separador)[0];
+  return parte?.trim() ?? texto.trim();
+}

@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { Text, TouchableOpacity, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useThemeMode } from "@/src/context/ThemeContext";
@@ -10,8 +11,9 @@ type CardVehicleProps = {
 }
 
 export const CardVehicle = ({ vehicleId }: CardVehicleProps) => {
+  
+  const { t } = useTranslation();
   const { mode } = useThemeMode();
-
   const { handleGetVehicle, vehicleData } = useHookGetVehicle();
 
   useEffect(() => {
@@ -23,7 +25,7 @@ export const CardVehicle = ({ vehicleId }: CardVehicleProps) => {
   return (
     <>
       <View className="flex-row justify-between items-center pt-6 pb-2.5 px-0.5">
-        <Text className="text-lightText dark:text-darkText font-semibold text-lg">Meu Veículo</Text>
+        <Text className="text-lightText dark:text-darkText font-semibold text-lg">{t("CARD.VEHICLE.MY_VEHICLE")}</Text>
 
         <TouchableOpacity className="w-10 h-10 rounded-lg bg-lightBgNonary dark:bg-darkBgNonary items-center justify-center">
           <Ionicons name="chevron-forward-outline" size={22} color={mode === "dark" ? "#FFFFFF" : "#000000"} />
@@ -38,14 +40,14 @@ export const CardVehicle = ({ vehicleId }: CardVehicleProps) => {
 
         <View className="flex-row justify-between">
           <View className="flex-col flex-1">
-            <Text className="text-lightText dark:text-darkText text-sm">Modelo: {vehicleData?.model || "N/A"}</Text>
-            <Text className="text-lightText dark:text-darkText text-sm">Placa: {vehicleData?.plate || "N/A"}</Text>
-            <Text className="text-lightText dark:text-darkText text-sm">Marca: {vehicleData?.brand || "N/A"}</Text>
+            <Text className="text-lightText dark:text-darkText text-sm">{t("CARD.VEHICLE.MODEL")}: {vehicleData?.model || "N/A"}</Text>
+            <Text className="text-lightText dark:text-darkText text-sm">{t("CARD.VEHICLE.PLATE")}: {vehicleData?.plate || "N/A"}</Text>
+            <Text className="text-lightText dark:text-darkText text-sm">{t("CARD.VEHICLE.BRAND")}: {vehicleData?.brand || "N/A"}</Text>
           </View>
           <View className="flex-col items-end flex-1">
-            <Text className="text-lightText dark:text-darkText text-sm text-end">Eixos: {vehicleData?.axle || "N/A"}</Text>
-            <Text className="text-lightText dark:text-darkText text-sm text-end">Comprimento: {vehicleData?.size || "N/A"}</Text>
-            <Text className="text-lightText dark:text-darkText text-sm text-end">Peso: {vehicleData?.weight != null ? `${vehicleData.weight}${typeof vehicleData.weight === "number" ? "T" : ""}` : "N/A"}</Text>
+            <Text className="text-lightText dark:text-darkText text-sm text-end">{t("CARD.VEHICLE.AXLES")}: {vehicleData?.axle || "N/A"}</Text>
+            <Text className="text-lightText dark:text-darkText text-sm text-end">{t("CARD.VEHICLE.LENGTH")}: {vehicleData?.size || "N/A"}</Text>
+            <Text className="text-lightText dark:text-darkText text-sm text-end">{t("CARD.VEHICLE.WEIGHT")}: {vehicleData?.weight != null ? `${vehicleData.weight}${typeof vehicleData.weight === "number" ? "T" : ""}` : "N/A"}</Text>
           </View>
         </View>
 
