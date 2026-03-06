@@ -70,7 +70,7 @@ export default function RoutesTabs() {
 
 			const subscription = BackHandler.addEventListener("hardwareBackPress", onBackPress);
 			return () => subscription.remove();
-		}, [])
+		}, [ logout ])
 	);
 
 	return (

@@ -1,7 +1,7 @@
 import { createContext, useState, ReactNode, useContext, useEffect } from "react";
 import * as SecureStore from "expo-secure-store";
 import { jwtDecode } from "jwt-decode";
-import { clearAuthToken, setAuthToken } from "@/src/service/http";
+import { clearAuthToken, setAuthToken } from "@/src/services/http";
 
 /**
  * @description Interface de token decodificado

@@ -38,6 +38,12 @@ export const componentPT = {
     PT: "PT",
     EN: "EN",
   },
+  ALERT: {
+    SUCCESS_TITLE: "Tudo certo!",
+    ERROR_TITLE: "Algo deu errado!",
+    LOADING_TITLE: "Carregando...",
+    NOTIFICATION_TITLE: "Notificação",
+  },
 } as const;
 
 export const componentEN = {
@@ -74,5 +80,11 @@ export const componentEN = {
   LANGUAGE: {
     PT: "PT",
     EN: "EN",
+  },
+  ALERT: {
+    SUCCESS_TITLE: "All good!",
+    ERROR_TITLE: "Something went wrong!",
+    LOADING_TITLE: "Loading...",
+    NOTIFICATION_TITLE: "Notification",
   },
 } as const;

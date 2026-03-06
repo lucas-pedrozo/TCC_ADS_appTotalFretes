@@ -34,6 +34,7 @@ export const screenPT = {
     EDITPERFIL: "Editar Dados",
     EDITCNH: "Editar CNH",
     ADVANCEDOPTIONS: "Opções Avançadas",
+    CANCELACCOUNT: "Cancelar Conta"
   },
   FORGOTPASSWORD: {
     TITLE: "Solicitação de nova senha",
@@ -101,6 +102,7 @@ export const screenPT = {
     LIGHTMODE: "Modo claro",
     LANGPT: "PT-BR",
     LANGEN: "EN-US",
+    LOGOUT: "Sair da conta",
   },
   FREIGHT: {
     TITLE: "Fretes Disponiveis",
@@ -112,6 +114,11 @@ export const screenPT = {
     CANCELACCOUNT: "Cancelar Minha Conta",
     FREIGHTHISTORY: "Histórico de Fretes Aceitos",
     TERMS: "Termos de compromisso",
+  },
+  CANCELACCOUNT: {
+    TITLE: "Cancelar Minha Conta",
+    DESCRIPTION: "Tem certeza que deseja cancelar sua conta? Esta ação é irreversível.",
+    CONFIRM: "Confirmar",
   },
   MODALLOGOUT: {
     MESSAGE: "Deseja sair da conta?",
@@ -163,6 +170,7 @@ export const screenEN = {
     EDITPERFIL: "Edit Data",
     EDITCNH: "Edit Driver License",
     ADVANCEDOPTIONS: "Advanced Options",
+    CANCELACCOUNT: "Cancel Account"
   },
   FORGOTPASSWORD: {
     TITLE: "Forgot Password Request",
@@ -230,6 +238,7 @@ export const screenEN = {
     LIGHTMODE: "Light mode",
     LANGPT: "PT-BR",
     LANGEN: "EN-US",
+    LOGOUT: "Sign out",
   },
   FREIGHT: {
     TITLE: "Available Freights",
@@ -241,6 +250,11 @@ export const screenEN = {
     CANCELACCOUNT: "Cancel My Account",
     FREIGHTHISTORY: "Accepted Freights History",
     TERMS: "Terms of commitment",
+  },
+  CANCELACCOUNT: {
+    TITLE: "Cancel My Account",
+    DESCRIPTION: "Are you sure you want to cancel your account? This action is irreversible.",
+    CONFIRM: "Confirm",
   },
   MODALLOGOUT: {
     MESSAGE: "Do you want to sign out?",

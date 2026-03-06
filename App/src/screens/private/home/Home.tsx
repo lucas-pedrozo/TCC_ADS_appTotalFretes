@@ -1,45 +1,41 @@
 import { useCallback, useEffect, useState } from "react";
-
-import { Ionicons } from "@expo/vector-icons";
-import { useTranslation } from "react-i18next";
-import { useNavigation } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
-import { Image, RefreshControl, ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { RefreshControl, ScrollView, Text, TouchableOpacity, View } from "react-native";
 
+import { useTranslation } from "react-i18next";
 import { useAuth } from "@/src/context/AuthContext";
 import { useThemeMode } from "@/src/context/ThemeContext";
-import { useWeather } from "@/src/hooks/weather/useWeather";
-import { useHookGetUser } from "@/src/hooks/user/hookGetUser";
-
 import { CardUser } from "@/src/components/cards/CardUser";
+import { useWeather } from "@/src/hooks/weather/useWeather";
 import { CardClime } from "@/src/components/cards/CardClime";
-import { CardVehicle } from "@/src/components/cards/CardVehicle";
-
+import { useGetUser } from "@/src/hooks/user/useGetUser";
+import { HeaderHome } from "@/src/components/header/HeaderHome";
 import ModalNotificacoes from "@/src/components/modal/ModalNotificacoes";
-import { CardActivityHome } from "@/src/components/cards/CardActivityHome";
 
 import { TabParamList } from "@/src/routes/RoutesTabs";
-import { formatName } from "@/src/utils/funcoes";
+import { useNavigation } from "@react-navigation/native";
+import { CardVehicle } from "@/src/components/cards/CardVehicle";
+import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
+import { CardActivityHome } from "@/src/components/cards/CardActivityHome";
 
 function Home() {
 
   const { logout } = useAuth();
   const { t } = useTranslation();
   const { mode } = useThemeMode();
-  const { userData, handleGetUser } = useHookGetUser();
-  const { weatherData, loading: loadingWeather, refetch: refetchWeather } = useWeather();
-
-  const [refreshKey, setRefreshKey] = useState(0);
-  const [isRefreshing, setIsRefreshing] = useState(false);
-
-  const [isModalNotificacoesVisible, setIsModalNotificacoesVisible] = useState(false);
-
+  const { userData, handleGetUser } = useGetUser();
   const navigation = useNavigation<BottomTabNavigationProp<TabParamList>>();
-  const goToProfile = () => { navigation.navigate("PerfilTab"); }
+  const { weatherData, loading: weatherLoading, refetch: refetchWeather } = useWeather();
 
   const currentHour = new Date().getHours();
+  const [refreshKey, setRefreshKey] = useState(0);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [isModalNotificacoesVisible, setIsModalNotificacoesVisible] = useState(false);
+
   const greeting = currentHour < 12 ? t("HOME.WELCOME2") : currentHour < 18 ? t("HOME.WELCOME3") : t("HOME.WELCOME");
+
+  const goToProfile = () => { navigation.navigate("PerfilTab"); };
+  const goToAndamento = () => { navigation.navigate("AndamentoTab"); };
 
   const handleRefresh = useCallback(async () => {
     setIsRefreshing(true);
@@ -69,43 +65,16 @@ function Home() {
           />
         }
       >
+        <HeaderHome
+          userData={userData}
+          greeting={greeting}
+          onProfilePress={goToProfile}
+          notInformedLabel={t("COMMON.NOTINFORMED")}
+          onNotificationsPress={() => setIsModalNotificacoesVisible(true)}
+          onLogout={logout}
+        />
 
-        <View className="flex-row items-center justify-between w-full">
-          <View className="flex-row items-center gap-3">
-            <TouchableOpacity onPress={goToProfile} activeOpacity={0.7}>
-              {userData?.userImage_id ?
-                <Image source={require('@/src/assets/usuario.jpg')} className="w-14 h-14 rounded-xl" /> :
-                <View className="w-14 h-14 rounded-xl bg-lightBgNonary dark:bg-darkBgNonary items-center justify-center">
-                  <Text className="text-lightText dark:text-darkText">{userData?.name ? userData.name[0] + userData.name[1] : "??"}</Text>
-                </View>
-              }
-            </TouchableOpacity>
-            <View className="flex-col">
-              <Text className="text-lightTextSecondary dark:text-darkTextSecondary font-medium text-sm">{greeting}</Text>
-              <Text className="text-lightText dark:text-darkText font-semibold text-base">{formatName(userData?.name ?? "-----")}</Text>
-            </View>
-          </View>
-
-          <View className="flex-row items-center gap-2.5">
-            <TouchableOpacity
-              onPress={() => setIsModalNotificacoesVisible(true)}
-              className="bg-lightBgNonary dark:bg-darkBgNonary p-2.5 rounded-xl"
-            >
-              <Ionicons name="notifications-outline" size={24} color={mode === "dark" ? "#FFFFFF" : "#000000"} />
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={() => logout()}
-              className="bg-lightBgNonary dark:bg-darkBgNonary p-2.5 rounded-xl"
-            >
-              <Ionicons name="log-out-outline" size={24} color={mode === "dark" ? "#FFFFFF" : "#000000"} />
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        <Text className="text-lightText dark:text-darkText font-bold text-2xl pt-6 pb-4">
-          {t("HOME.TITLE")}
-        </Text>
+        <Text className="text-lightText dark:text-darkText font-bold text-2xl pt-6 pb-4"> {t("HOME.TITLE")} </Text>
 
         <View className="flex-row items-stretch justify-between gap-3">
           <CardUser
@@ -115,23 +84,22 @@ function Home() {
           />
 
           <CardClime
-            loading={loadingWeather}
             clima={weatherData?.descricao}
             cidade={weatherData?.cidade}
             temp={weatherData?.temperatura}
+            loading={weatherLoading}
             weatherCode={weatherData?.weatherCode}
           />
         </View>
-
+        
         <CardActivityHome
           key={`card-activity-${refreshKey}`}
+          navegation={goToAndamento}
         />
-
         <CardVehicle
           key={`card-vehicle-${refreshKey}`}
           vehicleId={userData?.vehicleType_id}
         />
-
       </ScrollView>
 
       <ModalNotificacoes
@@ -139,6 +107,7 @@ function Home() {
         onClose={() => setIsModalNotificacoesVisible(false)}
         notifications={[]}
       />
+
     </SafeAreaView>
   );
 }

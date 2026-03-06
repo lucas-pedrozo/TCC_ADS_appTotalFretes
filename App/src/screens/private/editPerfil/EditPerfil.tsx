@@ -1,19 +1,28 @@
 import { useTranslation } from "react-i18next";
-import { Image, Text, TouchableOpacity, View } from "react-native";
+import { useThemeMode } from "@/src/context/ThemeContext";
+import { Image, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 
-import { InputGroup } from "@/src/components/fom/inputs/InputGroup";
-import { useHookEditPerfil } from "@/src/hooks/editPerfil/hookEditPerfil";
-import { useHookImagePicker } from "@/src/hooks/editPerfil/imagePicker";
-import { ButtonDefault } from "@/src/components/fom/buttons/ButtonDefauilt";
-import { InputCpf, InputDate, InputDefault, InputPhone } from "@/src/components/fom/inputs/InputDefault";
+import { Ionicons } from "@expo/vector-icons";
+import {
+  ButtonDefault,
+  ButtonOutline,
+  InputCpf,
+  InputDate,
+  InputDefault,
+  InputGroup,
+  InputPhone,
+} from "@/src/components/form";
+import { useEditPerfil } from "@/src/hooks/editPerfil/useEditPerfil";
+import { useImagePicker } from "@/src/hooks/editPerfil/useImagePicker";
 
 const EditPerfil = () => {
 	const { t } = useTranslation();
+	const { mode } = useThemeMode();
 	const insets = useSafeAreaInsets();
-	const { control, handleSubmit, handleEditPerfil, rules } = useHookEditPerfil();
-	const { imageUri, handlePickFromGallery, handleTakePhoto } = useHookImagePicker();
+	const { control, handleSubmit, handleEditPerfil, rules } = useEditPerfil();
+	const { imageUri, handlePickFromGallery, handleTakePhoto } = useImagePicker();
 
 	return (
 		<KeyboardAwareScrollView
@@ -22,13 +31,21 @@ const EditPerfil = () => {
 			keyboardShouldPersistTaps="handled"
 		>
 			<View className="flex-1 items-center gap-5 mb-8">
-				<Image
-					source={imageUri ? { uri: imageUri } : require('../../../assets/usuario.jpg')}
-					style={{ width: 80, height: 80, borderRadius: 50 }}
-				/>
+				{
+					imageUri ? (
+						<Image
+							source={{ uri: imageUri }}
+							style={{ width: 80, height: 80, borderRadius: 50 }}
+						/>
+					) : (
+						<TouchableOpacity onPress={handleTakePhoto} className="w-24 h-24 bg-lightBgSecondary dark:bg-darkBgSecondary rounded-full items-center justify-center">
+							<Ionicons name="camera" size={24} color={mode === "dark" ? "white" : "black"} />
+						</TouchableOpacity>
+					)
+				}
 				<View className="flex-row gap-3">
-					<TesteButton title="Tirar" onPress={handleTakePhoto} />
-					<TesteButton title="Buscar" onPress={handlePickFromGallery} />
+					<ButtonOutline title="Tirar" onPress={handleTakePhoto} />
+					<ButtonOutline title="Buscar" onPress={handlePickFromGallery} />
 				</View>
 			</View>
 
@@ -115,13 +132,3 @@ const EditPerfil = () => {
 }
 
 export default EditPerfil;
-
-const TesteButton = ({ title, onPress }: { title: string, onPress: () => void }) => {
-	return (
-		<TouchableOpacity
-			onPress={onPress}
-			className="w-24 bg-lightBgNonary dark:bg-darkBgNonary p-2 rounded-xl border border-lightBgTertiary dark:border-darkBgTertiary">
-			<Text className="text-lightText dark:text-darkText text-center text-sm">{title}</Text>
-		</TouchableOpacity>
-	)
-}

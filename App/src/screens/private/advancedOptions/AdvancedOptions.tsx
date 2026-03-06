@@ -1,6 +1,6 @@
 import { View } from "react-native";
 import { useTranslation } from "react-i18next";
-import { Option } from "@/src/components/perfil/Option";
+import { Option } from "@/src/components/form";
 
 const AdvancedOptions = () => {
   const { t } = useTranslation();

@@ -2,34 +2,38 @@ import { useCallback, useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context"
 import { RefreshControl, ScrollView, Text, View } from "react-native"
 
-import { Option } from "@/src/components/perfil/Option";
-import { useHookGetUser } from "@/src/hooks/user/hookGetUser";
-import { OptionKey } from "@/src/components/perfil/OptionKey";
-import { HeaderPerfil } from "@/src/components/perfil/HeaderPerfil";
-import { OptionSelect } from "@/src/components/perfil/OptionSelect";
-
+import { baseURL } from "@/src/services/http";
+import { useGetUser } from "@/src/hooks/user/useGetUser";
 import { useTranslation } from "react-i18next";
 import type { AppLanguage } from "@/src/i18n/resources";
 import { useThemeMode } from "@/src/context/ThemeContext";
 import { useLanguage } from "@/src/context/LanguageContext";
 
+import { useAuth } from "@/src/context/AuthContext";
 import { useNavigation } from "@react-navigation/native";
 import { RootStackParamList } from "@/src/routes/Routes";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
+import { Option, OptionKey, OptionSelect } from "@/src/components/form";
+import { HeaderPerfil } from "@/src/components/header/HeaderPerfil";
+import { ButtonCancel } from "@/src/components/form";
+
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
 const Perfil = () => {
+  const BASE_URL = baseURL;
+  const { logout } = useAuth()
   const { t } = useTranslation();
   const { mode, toggleMode } = useThemeMode();
   const { language, changeLanguage } = useLanguage();
   const navigation = useNavigation<NavigationProp>();
-  const { userData, handleGetUser } = useHookGetUser();
+  const { userData, handleGetUser } = useGetUser();
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const goToAdvancedOptions = () => { navigation.navigate("AdvancedOptions"); }
 
   const goToEditPerfil = () => {
+    const validSex = userData?.sex && ["M", "F", "N"].includes(userData.sex) ? userData.sex : "";
     navigation.navigate("EditPerfil", {
       editPerfilData: {
         name: userData?.name ?? "",
@@ -38,7 +42,7 @@ const Perfil = () => {
         phoneNumber: userData?.phoneNumber ?? "",
         cpf: userData?.cpf ?? "",
         isDeficient: userData?.isDeficient ?? false,
-        sex: userData?.sex ?? "",
+        sex: validSex,
       }
     })
   }
@@ -87,14 +91,13 @@ const Perfil = () => {
         }
       >
         <HeaderPerfil
-          name={userData?.name || t("COMMON.NOTINFORMED")}
+          image={userData?.userImage_id ? `${BASE_URL}/api/user/image/${userData.userImage_id}` : undefined}
           email={userData?.email || t("COMMON.NOTINFORMED")}
           cpf={userData?.cpf || t("COMMON.NOTINFORMED")}
         />
 
         <View className="flex-col gap-2.5 mt-14">
           <Text className="text-sm font-semibold pl-2.5 pb-1.5 text-lightTextSecondary dark:text-darkTextSecondary">{t("PERFIL.PERSONALINFO")}</Text>
-
           <Option title={t("PERFIL.EDITMYDATA")} icon="pencil" onPress={goToEditPerfil} />
           <View className="h-0.5 w-full bg-lightBgNonary dark:bg-darkBgNonary rounded-full" />
           <Option title={t("PERFIL.EDITCNHDATA")} icon="pencil" onPress={goToEditCnh} />
@@ -109,10 +112,8 @@ const Perfil = () => {
           <View className="h-0.5 w-full bg-lightBgNonary dark:bg-darkBgNonary rounded-full" />
           <Option title={t("PERFIL.ADVANCEDOPTIONS")} icon="settings-outline" onPress={goToAdvancedOptions} />
         </View>
-
         <View className="flex-col gap-2.5 mt-5">
           <Text className="text-sm font-semibold pl-2.5 pb-1.5 text-lightTextSecondary dark:text-darkTextSecondary">{t("PERFIL.APPBEHAVIOR")}</Text>
-
           <OptionSelect
             title={t("PERFIL.LANGUAGE")}
             icon="language-outline"
@@ -120,11 +121,14 @@ const Perfil = () => {
             value={language}
             onValueChange={(value) => changeLanguage(value as AppLanguage)}
           />
-
           <View className="h-0.5 w-full bg-lightBgNonary dark:bg-darkBgNonary rounded-full" />
           <OptionKey title={t("PERFIL.LIGHTMODE")} icon="sunny-outline" value={mode === "light"} setValue={() => toggleMode()} />
           <View className="h-0.5 w-full bg-lightBgNonary dark:bg-darkBgNonary rounded-full" />
         </View>
+
+          <View className="w-5/12 self-end pt-8 ">
+            <ButtonCancel title={t("PERFIL.LOGOUT")} onPress={logout}  />
+          </View>
       </ScrollView>
     </SafeAreaView>
   )

@@ -3,21 +3,21 @@ import { useTranslation } from "react-i18next";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 
-import { OtpInput } from "@/src/components/otpInput/OtpInput";
-import { ButtonDefault } from "@/src/components/fom/buttons/ButtonDefauilt";
-import { useHookPasswordValidate } from "@/src/hooks/forgotPassword/hookPasswordValidate";
+import { OtpInput } from "@/src/components/form";
+import { ButtonDefault } from "@/src/components/form";
+import { usePasswordValidate } from "@/src/hooks/forgotPassword/usePasswordValidate";
 import React, { useState, useEffect } from "react";
-import { useHookResendCode } from "@/src/hooks/forgotPassword/hookResindCode";
+import { useResendCode } from "@/src/hooks/forgotPassword/useResendCode";
 
 const VerificationCode = () => {
 	const { t } = useTranslation();
 	const insets = useSafeAreaInsets();
-	const { control, handleSubmit, rules, handleValidateCode, email } = useHookPasswordValidate();
+	const { control, handleSubmit, rules, handleValidateCode, email } = usePasswordValidate();
 
 	
 	const [timer, setTimer] = useState(60);
 	const [canResend, setCanResend] = useState(false);
-	const { handleResendCode } = useHookResendCode(email);
+	const { handleResendCode } = useResendCode(email);
 
 	useEffect(() => {
 		if (timer > 0) {

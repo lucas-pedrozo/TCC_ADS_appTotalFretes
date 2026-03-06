@@ -1,15 +1,20 @@
 import { View } from "react-native";
 
-import { ButtonDefault } from "@/src/components/fom/buttons/ButtonDefauilt";
+import {
+  ButtonDefault,
+  InputDefault,
+  InputCpf,
+  InputPhone,
+  InputDate,
+  InputGroup,
+} from "@/src/components/form";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
-import { InputDefault, InputCpf, InputPhone, InputDate } from "@/src/components/fom/inputs/InputDefault";
 
 import { useTranslation } from "react-i18next";
 import { useNavigation } from "@react-navigation/native";
 import { RootStackParamList } from "@/src/routes/Routes";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useHookDataBasic } from "@/src/hooks/singUp/hookDataBasic";
-import { InputGroup } from "@/src/components/fom/inputs/InputGroup";
+import { useSignUpDataBasic } from "@/src/hooks/singUp/useSignUpDataBasic";
 import { StepIndicator } from "@/src/components/header/StepIndicator";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
@@ -20,7 +25,7 @@ const SingUp = () => {
   const insets = useSafeAreaInsets();
 
   const navigation = useNavigation<NavigationProp>();
-  const { control, rules, handleNext } = useHookDataBasic({
+  const { control, rules, handleNext } = useSignUpDataBasic({
     onNext: () => navigation.navigate("SingUpCNH"),
   });
 
