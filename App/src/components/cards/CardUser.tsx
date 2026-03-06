@@ -2,7 +2,7 @@ import { Feather, Ionicons } from "@expo/vector-icons"
 import { useTranslation } from "react-i18next"
 import { useThemeMode } from "@/src/context/ThemeContext"
 import { Text, TouchableOpacity, View } from "react-native"
-import { formatNameSobrenome } from "@/src/utils/funcoes"
+import { formatNameSobrenome } from "@/src/utils/format"
 
 type CardUserProps = {
   name?: string;

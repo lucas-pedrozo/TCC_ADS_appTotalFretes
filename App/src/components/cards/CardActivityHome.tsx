@@ -5,7 +5,7 @@ import { useAuth } from "@/src/context/AuthContext";
 import { useThemeMode } from "@/src/context/ThemeContext";
 import { Text, TouchableOpacity, View } from "react-native"
 import { ProgressBarWithPins } from "./ProgressBarWithPins";
-import { useHookGetFreightUser } from "@/src/hooks/freight/hookGetFreightUser"; 
+import { useGetFreightUser } from "@/src/hooks/freight/useGetFreightUser";
 
 type CardActivityHomeProps = {
   navegation: () => void;
@@ -15,14 +15,14 @@ export const CardActivityHome = ({ navegation }: CardActivityHomeProps) => {
   const { id } = useAuth()
   const { t } = useTranslation();
   const { mode } = useThemeMode();
-  const { freightUser, handleGetFreightUser } = useHookGetFreightUser();
+  const { freightUser, handleGetFreightUser } = useGetFreightUser();
 
   useEffect(() => {
     if (id) {
       handleGetFreightUser(String(id));
     }
   }, [id, handleGetFreightUser]);
-    
+
   return (
     <>
       <View className="flex-row justify-between items-center pt-6 pb-2.5 px-0.5">
@@ -34,7 +34,7 @@ export const CardActivityHome = ({ navegation }: CardActivityHomeProps) => {
       </View>
 
       <TouchableOpacity onPress={navegation} className="p-4 bg-lightBgNonary dark:bg-darkBgNonary rounded-2xl w-full border border-lightBgTertiary dark:border-darkBgTertiary">
-       
+
         <View className="flex-row items-center gap-3">
           <View className="w-12 h-12 rounded-xl bg-lightBgNonary dark:bg-darkBgNonary items-center justify-center">
             <Ionicons name="cube-outline" size={26} color={mode === "dark" ? "#FFFFFF" : "#000000"} />

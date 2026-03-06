@@ -2,8 +2,8 @@ import { useCallback, useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context"
 import { RefreshControl, ScrollView, Text, View } from "react-native"
 
-import { baseURL } from "@/src/service/http";
-import { useHookGetUser } from "@/src/hooks/user/hookGetUser";
+import { baseURL } from "@/src/services/http";
+import { useGetUser } from "@/src/hooks/user/useGetUser";
 import { useTranslation } from "react-i18next";
 import type { AppLanguage } from "@/src/i18n/resources";
 import { useThemeMode } from "@/src/context/ThemeContext";
@@ -14,11 +14,9 @@ import { useNavigation } from "@react-navigation/native";
 import { RootStackParamList } from "@/src/routes/Routes";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
-import { Option } from "@/src/components/perfil/Option";
-import { OptionKey } from "@/src/components/perfil/OptionKey";
+import { Option, OptionKey, OptionSelect } from "@/src/components/form";
 import { HeaderPerfil } from "@/src/components/header/HeaderPerfil";
-import { OptionSelect } from "@/src/components/perfil/OptionSelect";
-import { ButtonCancel } from "@/src/components/fom/buttons/ButtonDefauilt";
+import { ButtonCancel } from "@/src/components/form";
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
@@ -29,7 +27,7 @@ const Perfil = () => {
   const { mode, toggleMode } = useThemeMode();
   const { language, changeLanguage } = useLanguage();
   const navigation = useNavigation<NavigationProp>();
-  const { userData, handleGetUser } = useHookGetUser();
+  const { userData, handleGetUser } = useGetUser();
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const goToAdvancedOptions = () => { navigation.navigate("AdvancedOptions"); }

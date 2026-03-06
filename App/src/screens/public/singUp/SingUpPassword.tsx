@@ -1,9 +1,8 @@
 import { View } from "react-native";
 
-import { InputDefault } from "@/src/components/fom/inputs/InputDefault";
-import { ButtonDefault } from "@/src/components/fom/buttons/ButtonDefauilt";
+import { InputDefault, ButtonDefault } from "@/src/components/form";
 
-import { useHookPassword } from "@/src/hooks/singUp/hookPassword";
+import { useSignUpPassword } from "@/src/hooks/singUp/useSignUpPassword";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { StepIndicator } from "../../../components/header/StepIndicator";
 import { useTranslation } from "react-i18next";
@@ -14,7 +13,7 @@ import { useTranslation } from "react-i18next";
  */
 const SingUpPassword = () => {
 	const { t } = useTranslation();
-	const { control, rules, handleFinish } = useHookPassword();
+	const { control, rules, handleFinish } = useSignUpPassword();
 
 	return (
 		<KeyboardAwareScrollView

@@ -2,10 +2,10 @@ import React, { useEffect, useMemo } from "react";
 import { View, Text, Modal, TouchableOpacity } from "react-native";
 
 import animation from "@/src/utils/animation";
-import { primeiraParte } from "@/src/utils/funcoes";
+import { primeiraParte } from "@/src/utils/format";
 import { useThemeMode } from "@/src/context/ThemeContext";
 import { getCameraFromGeometry } from "@/src/utils/mapboxUtils";
-import { useHookGetMapBox } from "@/src/hooks/mapBox/hookGetMapBox";
+import { useGetMapBox } from "@/src/hooks/mapBox/useGetMapBox";
 import { MapRouteView } from "./MapRouteView";
 
 interface DetalhesFreteModalProps {
@@ -47,7 +47,7 @@ export default function DetalhesFreteModal({
   prazo = "10/09/2025",
 }: DetalhesFreteModalProps) {
   const { mode } = useThemeMode();
-  const { rotaData, handleGetMapBox } = useHookGetMapBox();
+  const { rotaData, handleGetMapBox } = useGetMapBox();
 
   const { center: cameraCenter, zoom: cameraZoom } = useMemo(
     () => getCameraFromGeometry(rotaData?.geometria),

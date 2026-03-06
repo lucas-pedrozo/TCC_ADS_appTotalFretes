@@ -1,20 +1,19 @@
 import { useEffect } from "react";
-import { useTranslation } from "react-i18next";
 import { Text, TouchableOpacity, View } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import { useThemeMode } from "@/src/context/ThemeContext";
-import { useHookGetVehicle } from "@/src/hooks/vehicle/hookGetVehicle";
 
+import { Ionicons } from "@expo/vector-icons";
+import { useTranslation } from "react-i18next";
+import { useThemeMode } from "@/src/context/ThemeContext";
+import { useGetVehicle } from "@/src/hooks/vehicle/useGetVehicle";
 
 type CardVehicleProps = {
   vehicleId?: number | null;
 }
 
 export const CardVehicle = ({ vehicleId }: CardVehicleProps) => {
-  
   const { t } = useTranslation();
   const { mode } = useThemeMode();
-  const { handleGetVehicle, vehicleData } = useHookGetVehicle();
+  const { handleGetVehicle, vehicleData } = useGetVehicle();
 
   useEffect(() => {
     if (vehicleId) {

@@ -3,16 +3,14 @@ import { useTranslation } from "react-i18next";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 
-import { InputGroup } from "@/src/components/fom/inputs/InputGroup";
-import { InputDefault } from "@/src/components/fom/inputs/InputDefault";
-import { ButtonDefault } from "@/src/components/fom/buttons/ButtonDefauilt";
-import { useHookEditCnh } from "@/src/hooks/editcnh/hookEditCnh";
+import { InputGroup, InputDefault, ButtonDefault } from "@/src/components/form";
+import { useEditCnh } from "@/src/hooks/editCnh/useEditCnh";
 
 const EditCnh = () => {
 
 	const insets = useSafeAreaInsets();
 	const { t } = useTranslation();
-	const { control, rules, handleEditCnh, handleSubmit } = useHookEditCnh();
+	const { control, rules, handleEditCnh, handleSubmit } = useEditCnh();
 
 	return (
 		<KeyboardAwareScrollView

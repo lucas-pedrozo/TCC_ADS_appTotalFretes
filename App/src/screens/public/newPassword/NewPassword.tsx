@@ -2,13 +2,12 @@ import { View } from "react-native";
 import { useTranslation } from "react-i18next";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 
-import { InputDefault } from "@/src/components/fom/inputs/InputDefault";
-import { ButtonDefault } from "@/src/components/fom/buttons/ButtonDefauilt";
-import { useHookNewPassword } from "@/src/hooks/forgotPassword/hookNewPassword";
+import { InputDefault, ButtonDefault } from "@/src/components/form";
+import { useNewPassword } from "@/src/hooks/forgotPassword/useNewPassword";
 
 const NewPassword = () => {
 	const { t } = useTranslation();
-	const { control, rules, handleSubmit, handleResetPassword } = useHookNewPassword();
+	const { control, rules, handleSubmit, handleResetPassword } = useNewPassword();
 
 	return (
 		<KeyboardAwareScrollView

@@ -3,15 +3,14 @@ import { useTranslation } from "react-i18next";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 
-import { InputDefault } from "@/src/components/fom/inputs/InputDefault";
-import { ButtonDefault } from "@/src/components/fom/buttons/ButtonDefauilt";
-import { useHookForgotPassword } from "@/src/hooks/forgotPassword/hookForgotPassword";
+import { InputDefault, ButtonDefault } from "@/src/components/form";
+import { useForgotPassword } from "@/src/hooks/forgotPassword/useForgotPassword";
 
 const ForgotPassword = () => {
 	const insets = useSafeAreaInsets();
 	const { t } = useTranslation();
 
-	const { control, rules, handleForgotPassword, handleSubmit} = useHookForgotPassword();
+	const { control, rules, handleForgotPassword, handleSubmit } = useForgotPassword();
 
 	return (
 		<KeyboardAwareScrollView

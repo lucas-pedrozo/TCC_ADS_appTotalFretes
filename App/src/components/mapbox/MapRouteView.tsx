@@ -9,13 +9,13 @@ import {
   ROTA_LINE_STYLE,
   THEME_COLORS,
   getMapStyleURL,
-} from "@/src/utils/mapboxConfig";
-import type { mapRotaResponse } from "@/src/hooks/mapBox/hookGetMapBox";
+} from "@/src/config/mapbox";
+import type { MapRotaResponse } from "@/src/interfaces/mapbox";
 
 type CameraRef = React.ComponentRef<typeof Mapbox.Camera>;
 
 interface MapRouteViewProps {
-  rotaData: mapRotaResponse | null;
+  rotaData: MapRotaResponse | null;
   cameraCenter: [number, number];
   cameraZoom: number;
   darkMode: boolean;

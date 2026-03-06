@@ -10,7 +10,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
-import Start from "../screens/public/Start";
+import Start from "../screens/public/start/Start";
 import Login from "../screens/public/login/Login";
 import EditCnh from "../screens/private/editcnh/EditCnh";
 import SingUp from "../screens/public/singUp/SingUpBasic";
@@ -23,8 +23,7 @@ import CancelAccount from "../screens/private/cancelAccount/CancelAccount";
 import VerificationCode from "../screens/public/newPassword/VerificationCode";
 import AdvancedOptions from "../screens/private/advancedOptions/AdvancedOptions";
 
-import { EditPerfilMap } from "../hooks/editPerfil/hookEditPerfil";
-import { EditCnhMap } from "../hooks/editcnh/hookEditCnh";
+import type { EditPerfilMap, EditCnhMap } from "@/src/interfaces/profile";
 
 interface EditPerfilRouteParams {
   editPerfilData: EditPerfilMap;

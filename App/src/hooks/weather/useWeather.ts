@@ -2,8 +2,8 @@ import { useCallback, useEffect, useState } from "react";
 import {
   getCurrentCoordinates,
   getCityFromCoordinates,
-} from "@/src/service/location";
-import { fetchWeatherByCoordinates, WeatherData } from "@/src/service/weather";
+} from "@/src/services/location";
+import { fetchWeatherByCoordinates, WeatherData } from "@/src/services/weather";
 import { useAlertDefault } from "@/src/context/AlertDefaultContext";
 
 export interface WeatherDisplayData extends WeatherData {

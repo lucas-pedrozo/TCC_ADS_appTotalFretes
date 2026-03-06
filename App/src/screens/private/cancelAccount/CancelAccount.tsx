@@ -1,11 +1,11 @@
 import { View, Text } from "react-native";
 import { useTranslation } from "react-i18next";
-import { useHookDeleteUser } from "@/src/hooks/user/hookDeletUser";
-import { ButtonCancel } from "@/src/components/fom/buttons/ButtonDefauilt";
+import { useDeleteUser } from "@/src/hooks/user/useDeleteUser";
+import { ButtonCancel } from "@/src/components/form";
 
 const CancelAccount = () => {
   const { t } = useTranslation();
-  const { handleDeleteUser, isdisabled } = useHookDeleteUser();
+  const { handleDeleteUser, isdisabled } = useDeleteUser();
 
   return (
     <View style={{ paddingHorizontal: 16, paddingTop: 10, paddingBottom: 30 }} className="bg-lightBg dark:bg-darkBg">

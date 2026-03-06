@@ -1,5 +1,5 @@
 import { Image, Text, View } from "react-native";
-import { maskCpfUltimosCinco } from "@/src/utils/funcoes";
+import { maskCpfUltimosCinco } from "@/src/utils/format";
 import { useThemeMode } from "@/src/context/ThemeContext";
 import { Ionicons } from "@expo/vector-icons";
 

@@ -8,7 +8,7 @@ import { useThemeMode } from "@/src/context/ThemeContext";
 import { CardUser } from "@/src/components/cards/CardUser";
 import { useWeather } from "@/src/hooks/weather/useWeather";
 import { CardClime } from "@/src/components/cards/CardClime";
-import { useHookGetUser } from "@/src/hooks/user/hookGetUser";
+import { useGetUser } from "@/src/hooks/user/useGetUser";
 import { HeaderHome } from "@/src/components/header/HeaderHome";
 import ModalNotificacoes from "@/src/components/modal/ModalNotificacoes";
 
@@ -23,7 +23,7 @@ function Home() {
   const { logout } = useAuth();
   const { t } = useTranslation();
   const { mode } = useThemeMode();
-  const { userData, handleGetUser } = useHookGetUser();
+  const { userData, handleGetUser } = useGetUser();
   const navigation = useNavigation<BottomTabNavigationProp<TabParamList>>();
   const { weatherData, loading: weatherLoading, refetch: refetchWeather } = useWeather();
 

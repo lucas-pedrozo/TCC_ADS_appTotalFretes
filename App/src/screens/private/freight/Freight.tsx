@@ -6,8 +6,7 @@ import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { useThemeMode } from "@/src/context/ThemeContext";
 import { CardFreight } from "@/src/components/cards/CardFreight";
-import { InputSearch } from "@/src/components/fom/inputs/InputSearch";
-import { ButtonFilter } from "@/src/components/fom/buttons/ButtonFilter";
+import { InputSearch, ButtonFilter } from "@/src/components/form";
 import ModalFilter, { FreightFilterState } from "@/src/components/modal/ModalFilter";
 
 const normalizeForSearch = (text: string) =>(text ?? "").toLowerCase().normalize("NFD").replace(/\p{Diacritic}/gu, "");

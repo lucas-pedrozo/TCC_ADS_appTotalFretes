@@ -1,11 +1,12 @@
 import { Image, Text, TouchableOpacity, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
-import { formatName } from "@/src/utils/funcoes";
+import { formatName } from "@/src/utils/format";
 import { useThemeMode } from "@/src/context/ThemeContext";
+import type { MapUser } from "@/src/interfaces/user";
 
 export type HeaderHomeProps = {
-  userData?: { name?: string; userImage_id?: string | number | null } | null;
+  userData?: MapUser | null;
   greeting: string;
   notInformedLabel: string;
   onProfilePress: () => void;

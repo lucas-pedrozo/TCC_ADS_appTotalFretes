@@ -1,10 +1,8 @@
 import { View } from "react-native";
 
-import { useHookCnh } from "@/src/hooks/singUp/hookCNH";
+import { useSignUpCnh } from "@/src/hooks/singUp/useSignUpCnh";
 import { StepIndicator } from "@/src/components/header/StepIndicator";
-import { InputDefault } from "@/src/components/fom/inputs/InputDefault";
-import { ButtonDefault } from "@/src/components/fom/buttons/ButtonDefauilt";
-import { InputGroup } from "@/src/components/fom/inputs/InputGroup";
+import { InputDefault, ButtonDefault, InputGroup } from "@/src/components/form";
 
 import { useNavigation } from "@react-navigation/native";
 import { RootStackParamList } from "@/src/routes/Routes";
@@ -23,7 +21,7 @@ const SingUpCNH = () => {
   const { t } = useTranslation();
 
 	const navigation = useNavigation<NavigationProp>();
-	const { control, rules, handleNext } = useHookCnh({
+	const { control, rules, handleNext } = useSignUpCnh({
 		onNext: () => navigation.navigate("SingUpPassword"),
 	});
 

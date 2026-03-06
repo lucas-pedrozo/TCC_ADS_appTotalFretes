@@ -1,11 +1,10 @@
-import useHookLogin from "@/src/hooks/login/hookLogin";
+import { useLogin } from "@/src/hooks/login/useLogin";
 
 import { Pressable, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 
-import { InputDefault } from "@/src/components/fom/inputs/InputDefault";
-import { ButtonDefault } from "@/src/components/fom/buttons/ButtonDefauilt";
+import { InputDefault, ButtonDefault } from "@/src/components/form";
 
 import { RootStackParamList } from "@/src/routes/Routes";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
@@ -17,7 +16,7 @@ import { useTranslation } from "react-i18next";
  * @returns Componente de login
  */
 const Login = () => {
-  const { control, rules, handleSubmit, handleLogin } = useHookLogin();
+  const { control, rules, handleSubmit, handleLogin } = useLogin();
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const { t } = useTranslation();
   const insets = useSafeAreaInsets();
