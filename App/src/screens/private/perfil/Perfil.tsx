@@ -2,26 +2,28 @@ import { useCallback, useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context"
 import { RefreshControl, ScrollView, Text, View } from "react-native"
 
-import { Option } from "@/src/components/perfil/Option";
+import { baseURL } from "@/src/service/http";
 import { useHookGetUser } from "@/src/hooks/user/hookGetUser";
-import { OptionKey } from "@/src/components/perfil/OptionKey";
-import { HeaderPerfil } from "@/src/components/perfil/HeaderPerfil";
-import { OptionSelect } from "@/src/components/perfil/OptionSelect";
-
 import { useTranslation } from "react-i18next";
 import type { AppLanguage } from "@/src/i18n/resources";
 import { useThemeMode } from "@/src/context/ThemeContext";
 import { useLanguage } from "@/src/context/LanguageContext";
 
+import { useAuth } from "@/src/context/AuthContext";
 import { useNavigation } from "@react-navigation/native";
 import { RootStackParamList } from "@/src/routes/Routes";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+
+import { Option } from "@/src/components/perfil/Option";
+import { OptionKey } from "@/src/components/perfil/OptionKey";
+import { HeaderPerfil } from "@/src/components/header/HeaderPerfil";
+import { OptionSelect } from "@/src/components/perfil/OptionSelect";
 import { ButtonCancel } from "@/src/components/fom/buttons/ButtonDefauilt";
-import { useAuth } from "@/src/context/AuthContext";
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
 const Perfil = () => {
+  const BASE_URL = baseURL;
   const { logout } = useAuth()
   const { t } = useTranslation();
   const { mode, toggleMode } = useThemeMode();
@@ -33,6 +35,7 @@ const Perfil = () => {
   const goToAdvancedOptions = () => { navigation.navigate("AdvancedOptions"); }
 
   const goToEditPerfil = () => {
+    const validSex = userData?.sex && ["M", "F", "N"].includes(userData.sex) ? userData.sex : "";
     navigation.navigate("EditPerfil", {
       editPerfilData: {
         name: userData?.name ?? "",
@@ -41,7 +44,7 @@ const Perfil = () => {
         phoneNumber: userData?.phoneNumber ?? "",
         cpf: userData?.cpf ?? "",
         isDeficient: userData?.isDeficient ?? false,
-        sex: userData?.sex ?? "",
+        sex: validSex,
       }
     })
   }
@@ -90,7 +93,7 @@ const Perfil = () => {
         }
       >
         <HeaderPerfil
-          name={userData?.name || t("COMMON.NOTINFORMED")}
+          image={userData?.userImage_id ? `${BASE_URL}/api/user/image/${userData.userImage_id}` : undefined}
           email={userData?.email || t("COMMON.NOTINFORMED")}
           cpf={userData?.cpf || t("COMMON.NOTINFORMED")}
         />

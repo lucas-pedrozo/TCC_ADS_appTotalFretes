@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { FlatList, RefreshControl, Text, View } from "react-native";
 
@@ -10,14 +10,44 @@ import { InputSearch } from "@/src/components/fom/inputs/InputSearch";
 import { ButtonFilter } from "@/src/components/fom/buttons/ButtonFilter";
 import ModalFilter, { FreightFilterState } from "@/src/components/modal/ModalFilter";
 
+const normalizeForSearch = (text: string) =>(text ?? "").toLowerCase().normalize("NFD").replace(/\p{Diacritic}/gu, "");
+
+type FreightItem = {
+  id: string;
+  name?: string;
+  origin?: string;
+  destination?: string;
+  cargoType?: string;
+  cargoWeight?: string;
+  freightValue?: string;
+};
+
 const Freight = () => {
   const { t } = useTranslation();
-  const { control } = useForm();
   const { mode } = useThemeMode();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [showFilterModal, setShowFilterModal] = useState(false);
+  const { control, watch } = useForm<{ search: string }>({ defaultValues: { search: "" } });
 
-  const [filters, setFilters] = useState<FreightFilterState>({ order: "proximo", distance: "50km", value: "todos", });
+  const searchTerm = watch("search");
+  const [filters, setFilters] = useState<FreightFilterState>({ order: "proximo", value: "todos" });
+
+  const filteredFreights = useMemo(() => {
+    const term = normalizeForSearch(searchTerm ?? "").trim();
+    if (!term) return freights;
+    return freights.filter((item: FreightItem) => {
+      const cargoType = normalizeForSearch(item.cargoType ?? "");
+      const value = normalizeForSearch(item.freightValue ?? "");
+      const origin = normalizeForSearch(item.origin ?? "");
+      const destination = normalizeForSearch(item.destination ?? "");
+      return (
+        cargoType.includes(term) ||
+        value.includes(term) ||
+        origin.includes(term) ||
+        destination.includes(term)
+      );
+    });
+  }, [searchTerm]);
 
   const handleRefresh = useCallback(async () => {
     setIsRefreshing(true);
@@ -51,14 +81,13 @@ const Freight = () => {
           control={control}
           name="search"
           placeholder={t("FREIGHT.SEARCHPLACEHOLDER")}
-          rules={{ required: "dsda" }}
         />
         <ButtonFilter onPress={handleOpenFilter} />
       </View>
 
 
       <FlatList
-        data={freights}
+        data={filteredFreights}
         keyExtractor={(item) => item.id}
         showsVerticalScrollIndicator={false}
         ItemSeparatorComponent={() => <View style={{ height: 16 }} />}

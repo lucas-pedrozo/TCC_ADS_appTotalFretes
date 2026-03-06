@@ -1,7 +1,3 @@
-/**
- * Utilitários para cálculo de câmera e geometria no Mapbox.
- */
-
 export type GeometriaRota = { coordinates?: [number, number][] };
 
 export interface CameraBounds {
@@ -13,7 +9,7 @@ const FALLBACK_CENTER: [number, number] = [-52.3833, -24.0458];
 const FALLBACK_ZOOM = 8;
 
 /**
- * Calcula o centro e o zoom ideais para enquadrar a rota (bbox da geometria).
+ * @description Calcula o centro e o zoom ideais para enquadrar a rota (bbox da geometria).
  * @param geometria Geometria da rota (coordinates)
  * @returns center e zoom para Mapbox.Camera
  */

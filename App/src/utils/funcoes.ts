@@ -39,3 +39,19 @@ export function primeiraParte(texto: string, separador = ","): string {
   const parte = texto.trim().split(separador)[0];
   return parte?.trim() ?? texto.trim();
 }
+
+/**
+ * @description Mascara os últimos 5 dígitos do CPF para exibição (privacidade).
+ * @param cpf CPF completo (com ou sem formatação: 12345678901 ou 123.456.789-01)
+ * @returns CPF com últimos 5 dígitos substituídos por * — ex.: "123.456.***-**"
+ */
+export function maskCpfUltimosCinco(cpf: string): string {
+  const apenasDigitos = cpf.replace(/\D/g, "");
+  
+  if (apenasDigitos.length !== 11) {
+    return cpf;
+  }
+
+  // Captura os primeiros 3 dígitos ($1), os próximos 3 ($2) e substitui o resto.
+  return apenasDigitos.replace(/^(\d{3})(\d{3})\d{5}$/, "$1.$2.***-**");
+}

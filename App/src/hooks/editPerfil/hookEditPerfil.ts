@@ -11,6 +11,8 @@ import { validationRules } from "@/src/utils/formValidations";
 import { RouteProp, useRoute } from "@react-navigation/native";
 import { useAuth } from "@/src/context/AuthContext";
 
+const SEX_VALUES = ["M", "F", "N"] as const;
+
 export interface EditPerfilMap {
   name: string;
   email: string;
@@ -27,6 +29,11 @@ export function useHookEditPerfil() {
   const route = useRoute<RouteProp<RootStackParamList, "EditPerfil">>();
   const editPerfilData = route.params?.editPerfilData;
 
+  const normalizedSex =
+    editPerfilData?.sex && SEX_VALUES.includes(editPerfilData.sex as (typeof SEX_VALUES)[number])
+      ? editPerfilData.sex
+      : "";
+
   const { control, handleSubmit, formState: { errors } } = useForm<EditPerfilMap>({
     defaultValues: {
       name: editPerfilData?.name ?? "",
@@ -35,7 +42,7 @@ export function useHookEditPerfil() {
       phoneNumber: editPerfilData?.phoneNumber ?? "",
       cpf: editPerfilData?.cpf ?? "",
       isDeficient: editPerfilData?.isDeficient ?? false,
-      sex: editPerfilData?.sex ?? ""
+      sex: normalizedSex,
     },
     mode: "onSubmit",
   });
@@ -46,8 +53,13 @@ export function useHookEditPerfil() {
         status: "loading",
         message: i18n.t("NOTIFICATIONS.EDITPERFILLOADING"),
       });
-
-      await http.patch<EditPerfilMap>(`/user/${id}`, data);
+      const isDeficientValue =
+        data.isDeficient === true || String(data.isDeficient) === "true";
+      const payload = {
+        ...data,
+        isDeficient: isDeficientValue,
+      };
+      await http.patch<EditPerfilMap>(`/user/${id}`, payload);
 
       await notify({
         status: "success",

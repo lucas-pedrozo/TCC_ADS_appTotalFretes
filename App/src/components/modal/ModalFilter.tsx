@@ -5,8 +5,7 @@ import animation from "@/src/utils/animation";
 
 export type FreightFilterState = {
   order: "proximo" | "longe";
-  distance: "50km" | "100km" | "200km";
-  value: "todos" | "100" | "200";
+  value: "todos" | "menores" | "maiores";
 };
 
 interface ModalFilterProps {
@@ -35,29 +34,22 @@ const FilterChip = ({ label, active, onPress }: FilterChipProps) => (
   </TouchableOpacity>
 );
 
-const ModalFilter = ({
-  visible,
-  onClose,
-  onApply,
-  currentCity,
-  filters,
-  onChangeFilters,
-}: ModalFilterProps) => {
+const ModalFilter = (props: ModalFilterProps) => {
   return (
     <Modal
-      visible={visible}
+      visible={props.visible}
       transparent
       animationType="none"
-      onRequestClose={onClose}
+      onRequestClose={props.onClose}
     >
       <animation.FadeDown className="flex-1 bg-black/30 justify-start px-4 pt-28">
-        <Pressable className="absolute inset-0" onPress={onClose} />
+        <Pressable className="absolute inset-0" onPress={props.onClose} />
 
         <View className="w-full p-2.5 rounded-2xl bg-darkBgSecondary border border-darkBgTertiary">
           
           <View className="flex-row justify-between items-center mb-4">
             <Text className="text-darkText font-semibold text-base">Filtro de Fretes</Text>
-            <TouchableOpacity onPress={onClose} className="bg-darkBgTertiary rounded-md p-1.5">
+            <TouchableOpacity onPress={props.onClose} className="bg-darkBgTertiary rounded-md p-1.5">
               <Ionicons name="close" size={20} color="#ff0000" />
             </TouchableOpacity>
           </View>
@@ -67,60 +59,41 @@ const ModalFilter = ({
               <Text className="text-darkTextSecondary font-semibold text-base">Ordem:</Text>
               <FilterChip
                 label="Proximo"
-                active={filters.order === "proximo"}
-                onPress={() => onChangeFilters({ ...filters, order: "proximo" })}
+                active={props.filters.order === "proximo"}
+                onPress={() => props.onChangeFilters({ ...props.filters, order: "proximo" })}
               />
               <FilterChip
                 label="Longe"
-                active={filters.order === "longe"}
-                onPress={() => onChangeFilters({ ...filters, order: "longe" })}
-              />
-            </View>
-
-            <View className="flex-row items-center gap-2 flex-wrap">
-              <Text className="text-darkTextSecondary font-semibold text-base">Distancia:</Text>
-              <FilterChip
-                label="50km"
-                active={filters.distance === "50km"}
-                onPress={() => onChangeFilters({ ...filters, distance: "50km" })}
-              />
-              <FilterChip
-                label="100km"
-                active={filters.distance === "100km"}
-                onPress={() => onChangeFilters({ ...filters, distance: "100km" })}
-              />
-              <FilterChip
-                label="200km"
-                active={filters.distance === "200km"}
-                onPress={() => onChangeFilters({ ...filters, distance: "200km" })}
+                active={props.filters.order === "longe"}
+                onPress={() => props.onChangeFilters({ ...props.filters, order: "longe" })}
               />
             </View>
 
             <View className="flex-row items-center gap-2 flex-wrap">
               <Text className="text-darkTextSecondary font-semibold text-base">Valor:</Text>
-              <FilterChip
+              <FilterChip 
                 label="Todos"
-                active={filters.value === "todos"}
-                onPress={() => onChangeFilters({ ...filters, value: "todos" })}
+                active={props.filters.value === "todos"}
+                onPress={() => props.onChangeFilters({ ...props.filters, value: "todos" })}
               />
               <FilterChip
-                label="100km"
-                active={filters.value === "100"}
-                onPress={() => onChangeFilters({ ...filters, value: "100" })}
+                label="Menores"
+                active={props.filters.value === "menores"}
+                onPress={() => props.onChangeFilters({ ...props.filters, value: "menores" })}
               />
               <FilterChip
-                label="200km"
-                active={filters.value === "200"}
-                onPress={() => onChangeFilters({ ...filters, value: "200" })}
+                label="Maiores"
+                active={props.filters.value === "maiores"}
+                onPress={() => props.onChangeFilters({ ...props.filters, value: "maiores" })}
               />
             </View>
 
             <View className="flex-row items-center justify-between mt-2">
               <Text className="text-darkTextSecondary font-semibold text-base">
-                Cidade Atual: {currentCity}
+                Cidade Atual: {props.currentCity}
               </Text>
               <TouchableOpacity
-                onPress={onApply}
+                onPress={props.onApply}
                 className="bg-lightBgPrimary dark:bg-darkBgPrimary rounded-xl px-4 py-2"
               >
                 <Text className="text-lightText bg-[#74AEF1] rounded-lg px-2 py-1 font-semibold text-base">
