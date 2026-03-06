@@ -55,9 +55,9 @@ function DetailRow({
 export default function DetalhesFreteModal({
   visible,
   onClose,
-  enderecoCarga = 'Rua São Paulo 4512, Campo Mourão',
-  enderecoDestino = 'Juranda',
-  nomeEmpresa = 'Coamo',
+  enderecoCarga = 'Rua São Paulo 4512, Campo Mourão, PR, Brasil',
+  enderecoDestino = 'Juranda, PR, Brasil',
+  nomeEmpresa = 'Coamo, PR, Brasil',
   rotaSimples = false,
   prazo = '10/09/2025',
 }: DetalhesFreteModalProps) {
@@ -88,6 +88,8 @@ export default function DetalhesFreteModal({
 
   const corTema = mode === 'dark' ? '#74AEF1' : '#3498db';
 
+  const mapStyleURL = mode === 'dark' ? Mapbox.StyleURL.Dark : Mapbox.StyleURL.Street;
+
   return (
     <Modal
       animationType="none"
@@ -113,8 +115,8 @@ export default function DetalhesFreteModal({
             </TouchableOpacity>
           </View>
 
-          <View className="h-[250px] w-full relative">
-            <Mapbox.MapView style={{ flex: 1 }} styleURL={Mapbox.StyleURL.SatelliteStreet}>
+          <View className="h-[250px] w-full relative bg-black">
+            <Mapbox.MapView style={{ flex: 1 }} styleURL={mapStyleURL}>
               <Mapbox.Camera
                 ref={cameraRef}
                 zoomLevel={cameraZoom}

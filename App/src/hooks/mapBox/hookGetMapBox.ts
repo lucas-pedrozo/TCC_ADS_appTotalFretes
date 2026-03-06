@@ -35,18 +35,16 @@ export function useHookGetMapBox() {
           moradaDestino,
         };
 
-        if (!rotaSimples) {
-          const coords = await getCurrentCoordinates();
-          if (!coords) {
-            notify({
-              status: "error",
-              message:
-                "Permissão de localização negada. O aplicativo precisa do GPS para traçar a rota.",
-            });
-            return;
-          }
-          params.coordenadasMotorista = `${coords.longitude},${coords.latitude}`;
+        const coords = await getCurrentCoordinates();
+        if (!coords) {
+          notify({
+            status: "error",
+            message:
+              "Permissão de localização negada. O aplicativo precisa do GPS para traçar a rota.",
+          });
+          return;
         }
+        params.coordenadasMotorista = `${coords.longitude},${coords.latitude}`;
 
         const response = await http.get<mapRotaResponse>(`mapbox/rota-frete`, {
           params,
@@ -54,6 +52,7 @@ export function useHookGetMapBox() {
 
         setRotaData(response.data);
       } catch (error) {
+        console.log(error);
         const err = error as AxiosError<{ error?: string; erro?: string }>;
         const msg =
           err.response?.data?.error ??

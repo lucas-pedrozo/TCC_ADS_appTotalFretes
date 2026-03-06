@@ -115,6 +115,11 @@ export const screenPT = {
     FREIGHTHISTORY: "Histórico de Fretes Aceitos",
     TERMS: "Termos de compromisso",
   },
+  CANCELACCOUNT: {
+    TITLE: "Cancelar Minha Conta",
+    DESCRIPTION: "Tem certeza que deseja cancelar sua conta? Esta ação é irreversível.",
+    CONFIRM: "Confirmar",
+  },
   MODALLOGOUT: {
     MESSAGE: "Deseja sair da conta?",
     NO: "Não",
@@ -245,6 +250,11 @@ export const screenEN = {
     CANCELACCOUNT: "Cancel My Account",
     FREIGHTHISTORY: "Accepted Freights History",
     TERMS: "Terms of commitment",
+  },
+  CANCELACCOUNT: {
+    TITLE: "Cancel My Account",
+    DESCRIPTION: "Are you sure you want to cancel your account? This action is irreversible.",
+    CONFIRM: "Confirm",
   },
   MODALLOGOUT: {
     MESSAGE: "Do you want to sign out?",
