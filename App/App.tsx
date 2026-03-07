@@ -29,7 +29,7 @@ const AlertNotificationGlobal = () => {
 function App() {
   return (
     <SafeAreaProvider>
-      <ThemeProvider key={colorScheme.get()}>
+      <ThemeProvider>
         <LanguageProvider>
           <AuthProvider>
             <AlertDefaultProvider>

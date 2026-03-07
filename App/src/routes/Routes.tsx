@@ -39,7 +39,10 @@ interface EditCnhRouteParams {
 
 export type RootStackParamList = {
   Home: undefined;
-  Login: undefined;
+  Login: {
+    startMode?: "saved" | "full";
+    focusPassword?: boolean;
+  } | undefined;
   Start: undefined;
   SingUp: undefined;
   SingUpCNH: undefined;

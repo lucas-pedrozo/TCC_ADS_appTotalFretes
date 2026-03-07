@@ -13,6 +13,7 @@ export function InputDefault({
   placeholder,
   type,
   secureTextEntry,
+  autoFocus = false,
   maxLength,
   disabled = false,
 }: InputBaseProps) {
@@ -35,6 +36,7 @@ export function InputDefault({
           <TextInput
             id={id}
             onBlur={onBlur}
+            autoFocus={autoFocus}
             keyboardType={type}
             maxLength={maxLength}
             value={String(value ?? "")}

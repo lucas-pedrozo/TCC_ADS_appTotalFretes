@@ -21,6 +21,9 @@ export const screenPT = {
     PASSWORDPLACEHOLDER: "Digite sua senha",
     FORGOTPASSWORD: "Esqueci minha senha",
     SUBMIT: "Login",
+    SAVEDACCOUNT: "Conta salva",
+    SWITCHACCOUNT: "Trocar conta",
+    USESAVEDACCOUNT: "Usar conta salva",
   },
   ROUTES: {
     LOGIN: "Login",
@@ -160,6 +163,9 @@ export const screenEN = {
     PASSWORDPLACEHOLDER: "Enter your password",
     FORGOTPASSWORD: "Forgot my password",
     SUBMIT: "Login",
+    SAVEDACCOUNT: "Saved account",
+    SWITCHACCOUNT: "Switch account",
+    USESAVEDACCOUNT: "Use saved account",
   },
   ROUTES: {
     LOGIN: "Login",
