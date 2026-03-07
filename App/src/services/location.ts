@@ -6,17 +6,9 @@ export interface Coordinates {
   longitude: number;
 }
 
-let cachedPermission: 'granted' | 'denied' | null = null;
-
 export async function requestLocationPermission(): Promise<'granted' | 'denied'> {
-  if (cachedPermission !== null) return cachedPermission;
   const { status } = await Location.requestForegroundPermissionsAsync();
-  cachedPermission = status === 'granted' ? 'granted' : 'denied';
-  return cachedPermission;
-}
-
-export function clearLocationPermissionCache(): void {
-  cachedPermission = null;
+  return status === 'granted' ? 'granted' : 'denied';
 }
 
 const COORDS_CACHE_TTL_MS = 45_000;

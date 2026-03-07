@@ -68,6 +68,7 @@ http.interceptors.response.use(
     }
 
     if (error.response?.status === 401) {
+      await clearAuthToken();
     }
     return Promise.reject(error);
   }

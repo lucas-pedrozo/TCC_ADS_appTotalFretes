@@ -9,7 +9,7 @@ import i18n from '@/src/i18n';
  * @returns true se o valor for valido, false caso contrario
  */
 export const validateName = (value: string) => {
-  return validator.isLength(value, { min: 2, max: 100 }) && validator.matches(value, /^[a-zA-Z\s]+$/);
+  return validator.isLength(value, { min: 2, max: 100 }) && /^[\p{L}\s]+$/u.test(value);
 };
 
 /**
@@ -132,9 +132,10 @@ export const validateDisability = (value: string) => {
 };
 
 /**
- * @description Objeto com todas as regras de validacao do react-hook-form
+ * @description Getter que retorna regras de validação com traduções avaliadas no momento de uso,
+ * garantindo que a troca de idioma atualize as mensagens corretamente.
  */
-export const validationRules = {
+export const getValidationRules = () => ({
   cnhNumber: {
     required: i18n.t("VALIDATION.REQUIREDCNH"),
     validate: (value: string) => validateCnhNumber(value) || i18n.t("VALIDATION.INVALIDCNH"),
@@ -192,4 +193,4 @@ export const validationRules = {
     validate: (value: string, formValues: { password: string }) =>
       validatePasswordConfirmationMatch(value, formValues.password) || i18n.t("VALIDATION.INVALIDCONFIRMPASSWORD"),
   },
-};
+});

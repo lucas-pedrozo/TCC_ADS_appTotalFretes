@@ -3,13 +3,16 @@ import { useCallback, useState } from "react";
 import http from "@/src/services/http";
 import { useAlertDefault } from "@/src/context/AlertDefaultContext";
 import type { FreightUserMap } from "@/src/interfaces/freight";
+import { useAuth } from "@/src/context/AuthContext";
 
 export function useGetFreightUser() {
-  const { notify } = useAlertDefault();
-  const [freightUser, setFreightUser] = useState<FreightUserMap | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
 
-  const handleGetFreightUser = useCallback(async (idUser: string) => {
+  const { id } = useAuth();
+  const { notify } = useAlertDefault();
+  const [isLoading, setIsLoading] = useState(false);
+  const [freightUser, setFreightUser] = useState<FreightUserMap | null>(null);
+
+  const handleGetFreightUser = useCallback(async () => {
     try {
       setIsLoading(true);
       await new Promise(resolve => setTimeout(resolve, 1200));
@@ -24,8 +27,8 @@ export function useGetFreightUser() {
   }, [notify]);
 
   return {
-    handleGetFreightUser,
     freightUser,
+    handleGetFreightUser,
     isLoading,
   };
 }

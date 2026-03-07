@@ -33,8 +33,9 @@ export const screenPT = {
     VERIFICATIONCODE: "Código de verificação",
     EDITPERFIL: "Editar Dados",
     EDITCNH: "Editar CNH",
-    ADVANCEDOPTIONS: "Opções Avançadas",
-    CANCELACCOUNT: "Cancelar Conta"
+    ADVANCEDOPTIONS: "Opções Avançadas",  
+    CANCELACCOUNT: "Cancelar Conta",
+    RENEWPASSWORD: "Renovar Senha"
   },
   FORGOTPASSWORD: {
     TITLE: "Solicitação de nova senha",
@@ -82,13 +83,15 @@ export const screenPT = {
       CONFIRMPASSWORDLABEL: "Confirmar Senha",
       CONFIRMPASSWORDPLACEHOLDER: "Confirmar Senha",
       FINISH: "Finalizar",
+      OLDPWPASSWORDLABEL: "Senha Atual",
+      OLDPPASSWORDPLACEHOLDER: "Senha Atual",
     },
   },
   HOME: {
     WELCOME: "Boa noite",
     WELCOME2: "Bom Dia",
     WELCOME3: "Boa Tarde",
-    TITLE: "Minha Dashboard",
+    TITLE: "Dashboard",
   },
   PERFIL: {
     PERSONALINFO: "Informações Pessoais",
@@ -170,7 +173,8 @@ export const screenEN = {
     EDITPERFIL: "Edit Data",
     EDITCNH: "Edit Driver License",
     ADVANCEDOPTIONS: "Advanced Options",
-    CANCELACCOUNT: "Cancel Account"
+    CANCELACCOUNT: "Cancel Account",
+    RENEWPASSWORD: "Renew Password"
   },
   FORGOTPASSWORD: {
     TITLE: "Forgot Password Request",
@@ -218,13 +222,15 @@ export const screenEN = {
       CONFIRMPASSWORDLABEL: "Confirm Password",
       CONFIRMPASSWORDPLACEHOLDER: "Confirm Password",
       FINISH: "Finish",
+      OLDPWPASSWORDLABEL: "Current Password",
+      OLDPPASSWORDPLACEHOLDER: "Current Password",
     },
   },
   HOME: {
     WELCOME: "Good evening",
     WELCOME2: "Good morning",
     WELCOME3: "Good afternoon",
-    TITLE: "My Dashboard",
+    TITLE: "Dashboard",
   },
   PERFIL: {
     PERSONALINFO: "Personal Information",

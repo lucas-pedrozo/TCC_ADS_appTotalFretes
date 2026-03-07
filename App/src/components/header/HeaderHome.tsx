@@ -2,7 +2,8 @@ import { Image, Text, TouchableOpacity, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
 import { formatName } from "@/src/utils/format";
-import { useThemeMode } from "@/src/context/ThemeContext";
+import { baseURL } from "@/src/services/http";
+import { useIconColor } from "@/src/context/ThemeContext";
 import type { MapUser } from "@/src/interfaces/user";
 
 export type HeaderHomeProps = {
@@ -22,17 +23,17 @@ export function HeaderHome({
   onNotificationsPress,
   onLogout,
 }: HeaderHomeProps) {
-  const { mode } = useThemeMode();
+  const iconColor = useIconColor();
 
   return (
     <View className="flex-row items-center justify-between w-full">
       <View className="flex-row items-center gap-3">
         <TouchableOpacity onPress={onProfilePress} activeOpacity={0.7}>
           {userData?.userImage_id ? (
-            <Image source={require("@/src/assets/usuario.jpg")} className="w-14 h-14 rounded-xl" />
+            <Image source={{ uri: `${baseURL}/user/image/${userData.userImage_id}` }} className="w-14 h-14 rounded-xl" />
           ) : (
             <View className="w-14 h-14 rounded-xl bg-lightBgNonary dark:bg-darkBgNonary items-center justify-center">
-              <Ionicons name="person-outline" size={24} color={mode === "dark" ? "white" : "black"} />
+              <Ionicons name="person-outline" size={24} color={iconColor} />
             </View>
           )}
         </TouchableOpacity>
@@ -52,7 +53,7 @@ export function HeaderHome({
           onPress={onNotificationsPress}
           className="bg-lightBgNonary dark:bg-darkBgNonary p-2.5 rounded-xl"
         >
-          <Ionicons name="notifications-outline" size={24} color={mode === "dark" ? "#FFFFFF" : "#000000"} />
+          <Ionicons name="notifications-outline" size={24} color={iconColor} />
         </TouchableOpacity>
 
         <TouchableOpacity

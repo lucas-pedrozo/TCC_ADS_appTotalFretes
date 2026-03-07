@@ -1,6 +1,7 @@
 import React, { useRef } from "react";
 import { View, Text, TextInput } from "react-native";
 import { Controller } from "react-hook-form";
+import { onlyDigits } from "./inputs/inputShared";
 
 type OtpInputProps = {
   control: any;
@@ -8,8 +9,6 @@ type OtpInputProps = {
   rules?: object;
   length?: number;
 };
-
-const onlyDigits = (text: string) => text.replace(/\D/g, "");
 
 export function OtpInput({
   control,

@@ -5,8 +5,9 @@ import animation from "@/src/utils/animation";
 import { primeiraParte } from "@/src/utils/format";
 import { useThemeMode } from "@/src/context/ThemeContext";
 import { getCameraFromGeometry } from "@/src/utils/mapboxUtils";
-import { useGetMapBox } from "@/src/hooks/mapBox/useGetMapBox";
+import { useGetMapBox } from "@/src/hooks/freight/useGetMapBox";
 import { MapRouteView } from "./MapRouteView";
+import { DetailRow } from "../info/DetailRow";
 
 interface DetalhesFreteModalProps {
   visible: boolean;
@@ -18,56 +19,22 @@ interface DetalhesFreteModalProps {
   prazo?: string;
 }
 
-const DetailRow = React.memo(function DetailRow({
-  label,
-  value,
-}: {
-  label: string;
-  value: string;
-}) {
-  return (
-    <View className="flex-row justify-between mb-2.5">
-      <Text className="text-lightTextSecondary dark:text-darkTextSecondary">
-        {label}
-      </Text>
-      <Text className="font-medium text-lightText dark:text-darkText">
-        {value}
-      </Text>
-    </View>
-  );
-});
-
 export default function DetalhesFreteModal({
   visible,
   onClose,
-  enderecoCarga = "Rua São Paulo 4512, Campo Mourão, PR, Brasil",
-  enderecoDestino = "Juranda, PR, Brasil",
-  nomeEmpresa = "Coamo, PR, Brasil",
+  enderecoCarga = "",
+  enderecoDestino = "",
+  nomeEmpresa = "",
   rotaSimples = false,
   prazo = "10/09/2025",
 }: DetalhesFreteModalProps) {
+
   const { mode } = useThemeMode();
   const { rotaData, handleGetMapBox } = useGetMapBox();
 
-  const { center: cameraCenter, zoom: cameraZoom } = useMemo(
-    () => getCameraFromGeometry(rotaData?.geometria),
-    [rotaData?.geometria]
-  );
-
-  useEffect(() => {
-    if (!visible) return;
-    const destino = rotaSimples
-      ? enderecoDestino
-      : `${nomeEmpresa}, ${enderecoDestino}`;
-    handleGetMapBox(enderecoCarga, destino, { rotaSimples });
-  }, [
-    visible,
-    enderecoCarga,
-    enderecoDestino,
-    nomeEmpresa,
-    rotaSimples,
-    handleGetMapBox,
-  ]);
+  const { center: cameraCenter, zoom: cameraZoom } = useMemo(() => {
+    return getCameraFromGeometry(rotaData?.geometria);
+  }, [rotaData?.geometria]);
 
   return (
     <Modal

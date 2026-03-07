@@ -66,7 +66,7 @@ export const MapRouteView = React.memo(function MapRouteView({
             coordinate={coordinates[0]}
             title="Você está aqui"
           >
-            <Ionicons name="location-outline" size={24} color={themeColor} />
+            <Ionicons name="person" size={24} color={themeColor} />
           </Mapbox.PointAnnotation>
         )}
 
@@ -76,7 +76,7 @@ export const MapRouteView = React.memo(function MapRouteView({
             coordinate={rotaData.coords_carga}
             title="Carga"
           >
-            <Ionicons name="location-outline" size={24} color={themeColor} />
+            <Ionicons name="cube" size={24} color={themeColor} />
           </Mapbox.PointAnnotation>
         )}
 
@@ -86,7 +86,7 @@ export const MapRouteView = React.memo(function MapRouteView({
             coordinate={rotaData.coords_destino}
             title="Destino"
           >
-            <Ionicons name="location-outline" size={24} color={themeColor} />
+            <Ionicons name="flag" size={24} color={themeColor} />
           </Mapbox.PointAnnotation>
         )}
       </Mapbox.MapView>

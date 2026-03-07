@@ -92,3 +92,8 @@ export const useThemeMode = () => {
   }
   return context;
 };
+
+export function useIconColor() {
+  const { mode } = useThemeMode();
+  return mode === "dark" ? "#FFFFFF" : "#000000";
+}

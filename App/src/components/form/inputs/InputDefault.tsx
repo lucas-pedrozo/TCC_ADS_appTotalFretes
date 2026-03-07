@@ -14,7 +14,7 @@ export function InputDefault({
   type,
   secureTextEntry,
   maxLength,
-  desabled = false,
+  disabled = false,
 }: InputBaseProps) {
   return (
     <Controller
@@ -26,7 +26,7 @@ export function InputDefault({
           {label ? (
             <Text
               className={
-                error ? INPUT_STYLES.error.label : desabled ? INPUT_STYLES.desabled.label : INPUT_STYLES.default.label
+                error ? INPUT_STYLES.error.label : disabled ? INPUT_STYLES.disabled.label : INPUT_STYLES.default.label
               }
             >
               {label}
@@ -41,9 +41,9 @@ export function InputDefault({
             onChangeText={onChange}
             placeholder={placeholder}
             secureTextEntry={secureTextEntry}
-            editable={!desabled}
+            editable={!disabled}
             className={
-              error ? INPUT_STYLES.error.input : desabled ? INPUT_STYLES.desabled.input : INPUT_STYLES.default.input
+              error ? INPUT_STYLES.error.input : disabled ? INPUT_STYLES.disabled.input : INPUT_STYLES.default.input
             }
           />
           {error ? <Text className="text-red-500 text-sm pl-2.5 pt-1">{error.message}</Text> : null}

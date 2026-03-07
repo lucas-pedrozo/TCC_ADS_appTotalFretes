@@ -2,6 +2,7 @@
   "expo": {
     "name": "Total Fretes",
     "slug": "App",
+    "icon": "./src/assets/logo.jpeg",
     "version": "1.0.0",
     "orientation": "portrait",
     "scheme": "app",

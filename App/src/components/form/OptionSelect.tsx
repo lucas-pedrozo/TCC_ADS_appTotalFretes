@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import { View, Text, TouchableOpacity, Modal, Pressable } from "react-native";
-import { useThemeMode } from "@/src/context/ThemeContext";
+import { useIconColor } from "@/src/context/ThemeContext";
+import { IconBox } from "@/src/components/ui/IconBox";
 import animation from "@/src/utils/animation";
 
 export type OptionSelectOption = {
@@ -17,28 +18,25 @@ type OptionSelectProps = {
   onValueChange: (value: string) => void;
 };
 
-export function OptionSelect(props: OptionSelectProps) {
-  const { mode } = useThemeMode();
+export function OptionSelect({ title, icon, options, value, onValueChange }: OptionSelectProps) {
+  const iconColor = useIconColor();
   const [modalVisible, setModalVisible] = useState(false);
 
-  const selectedOption =
-    props.options.find((o) => o.value === props.value) ?? props.options[0];
+  const selectedOption = options.find((o) => o.value === value) ?? options[0];
 
   return (
     <>
       <View className="flex-row items-center justify-between">
         <View className="flex-row items-center justify-center gap-2.5">
-          <View className="w-12 h-12 rounded-xl bg-lightBgNonary dark:bg-darkBgNonary items-center justify-center">
-            <Ionicons name={props.icon} size={26} color={mode === "dark" ? "#FFFFFF" : "#000000"} />
-          </View>
-          <Text className="text-lightText dark:text-darkText font-semibold text-base">{props.title}</Text>
+          {icon && <IconBox name={icon} />}
+          <Text className="text-lightText dark:text-darkText font-semibold text-base">{title}</Text>
         </View>
 
         <TouchableOpacity onPress={() => setModalVisible(true)} className="flex-row items-center gap-1.5">
           <Text className="text-lightTextSecondary dark:text-darkTextSecondary font-medium text-sm">
             {selectedOption.label}
           </Text>
-          <Ionicons name="chevron-down" size={20} color={mode === "dark" ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.5)"} />
+          <Ionicons name="chevron-down" size={20} color={iconColor} />
         </TouchableOpacity>
       </View>
 
@@ -57,17 +55,17 @@ export function OptionSelect(props: OptionSelectProps) {
             onStartShouldSetResponder={() => true}
           >
             <View className="max-h-80 py-2">
-              {props.options.map((opt) => (
+              {options.map((opt) => (
                 <Pressable
                   key={opt.value}
                   onPress={() => {
-                    props.onValueChange(opt.value);
+                    onValueChange(opt.value);
                     setModalVisible(false);
                   }}
                   className="py-3.5 px-4 active:opacity-70"
                 >
                   <Text
-                    className={`text-base font-medium ${opt.value === props.value
+                    className={`text-base font-medium ${opt.value === value
                       ? "text-darkBgOctonary dark:text-lightBgOctonary"
                       : "text-lightText dark:text-darkText"
                     }`}

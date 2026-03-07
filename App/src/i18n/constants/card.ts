@@ -30,6 +30,8 @@ export const cardPT = {
       STATUS: "Status",
       DEADLINE: "Prazo",
       NONE_NA: "Nenhum / N/A",
+      NONE: "Nenhum",
+      N_A: "N/A",
     },
     FREIGHT: {
       ORIGIN: "Origem",
@@ -67,6 +69,8 @@ export const cardEN = {
       STATUS: "Status",
       DEADLINE: "Deadline",
       NONE_NA: "None / N/A",
+      NONE: "None",
+      N_A: "N/A",
     },
     FREIGHT: {
       ORIGIN: "Origin",

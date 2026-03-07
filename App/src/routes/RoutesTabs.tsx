@@ -1,16 +1,17 @@
 import { useCallback, useRef } from "react";
 import { BackHandler, Platform, Text, ToastAndroid, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { useAuth } from "@/src/context/AuthContext";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { useFocusEffect } from "@react-navigation/native";
-import { useAuth } from "@/src/context/AuthContext";
 
-import Freight from "../screens/private/freight/Freight";
-import Perfil  from "@/src/screens/private/perfil/Perfil";
-import Home from "@/src/screens/private/home/Home";
+import Freight from "../screens/freight/Freight";
+import Perfil from "../screens/user/Perfil";
+import Home from "../screens/home/Home";
 
 import { useThemeMode } from "@/src/context/ThemeContext";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import OngoingFreights from "../screens/freight/OngoingFreights";
 
 export type TabParamList = {
 	HomeTab: undefined;
@@ -30,14 +31,14 @@ function PlaceholderScreen({ title }: { title: string }) {
 	);
 }
 
-const AndamentoScreen = () => <PlaceholderScreen title="Andamento" />;
+
 const PropostaScreen = () => <PlaceholderScreen title="Proposta" />;
 
 const TAB_BAR_HEIGHT = 72;
 
 export default function RoutesTabs() {
-	const { logout } = useAuth();
 	const { mode } = useThemeMode();
+	const { logout } = useAuth();
 	const insets = useSafeAreaInsets();
 	const lastBackPress = useRef<number>(0);
 	const currentTab = useRef<keyof TabParamList>("HomeTab");
@@ -70,7 +71,7 @@ export default function RoutesTabs() {
 
 			const subscription = BackHandler.addEventListener("hardwareBackPress", onBackPress);
 			return () => subscription.remove();
-		}, [ logout ])
+		}, [])
 	);
 
 	return (
@@ -135,7 +136,7 @@ export default function RoutesTabs() {
 			/>
 			<Tab.Screen
 				name="AndamentoTab"
-				component={AndamentoScreen}
+				component={OngoingFreights}
 				options={{ tabBarLabel: "Andamento" }}
 				listeners={{ focus: () => { currentTab.current = "AndamentoTab"; } }}
 			/>

@@ -107,6 +107,6 @@ export const AlertDefaultProvider: React.FC<{ children: React.ReactNode }> = ({ 
  */
 export const useAlertDefault = () => {
   const ctx = useContext(AlertDefaultContext);
-  if (!ctx) throw new Error("useAlertDefault must be used within useAlertDefault");
+  if (!ctx) throw new Error("useAlertDefault must be used within AlertDefaultProvider");
   return ctx;
 };

@@ -71,7 +71,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 	const [id, setId] = useState<number | null>(null);
 	const [token, setToken] = useState<string | null>(null);
 	const [accessLevel, setAccessLevel] = useState<string | null>(null);
-	const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+	const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
 	useEffect(() => {
 		const loadStoredToken = async () => {

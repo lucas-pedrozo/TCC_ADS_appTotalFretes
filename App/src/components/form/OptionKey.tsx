@@ -1,6 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { View, Text, Switch } from "react-native";
 import { useThemeMode } from "@/src/context/ThemeContext";
+import { IconBox } from "@/src/components/ui/IconBox";
 
 type OptionKeyProps = {
   title?: string;
@@ -10,23 +11,21 @@ type OptionKeyProps = {
   setValue?: (value: boolean) => void;
 };
 
-export function OptionKey(props: OptionKeyProps) {
+export function OptionKey({ title, icon, value, setValue }: OptionKeyProps) {
   const { mode } = useThemeMode();
 
   return (
     <View className="flex-row items-center justify-between">
       <View className="flex-row items-center justify-center gap-2.5">
-        <View className="w-12 h-12 rounded-xl bg-lightBgNonary dark:bg-darkBgNonary items-center justify-center">
-          <Ionicons name={props.icon} size={26} color={mode === "dark" ? "#FFFFFF" : "#000000"} />
-        </View>
-        <Text className="text-lightText dark:text-darkText font-semibold text-base">{props.title}</Text>
+        {icon && <IconBox name={icon} />}
+        <Text className="text-lightText dark:text-darkText font-semibold text-base">{title}</Text>
       </View>
 
       <Switch
-        value={props.value}
-        onValueChange={(val) => { if (props.setValue) props.setValue(val); }}
+        value={value}
+        onValueChange={(val) => { if (setValue) setValue(val); }}
         trackColor={{ false: "#767577", true: "#00FF44" }}
-        thumbColor={mode === "dark" ? "#f4f3f4" : "#f4f3f4"}
+        thumbColor="#f4f3f4"
         ios_backgroundColor="#3e3e3e"
         style={{ transform: [{ scaleX: 1 }, { scaleY: 1 }] }}
       />
