@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { Text, TouchableOpacity, View } from "react-native";
-import { useIconColor } from "@/src/context/ThemeContext";
+import { useIconColor, useThemeColors } from "@/src/context/ThemeContext";
 import { IconBox } from "@/src/components/ui/IconBox";
 
 type OptionProps = {
@@ -10,13 +10,14 @@ type OptionProps = {
 };
 
 export function Option({ title, icon, onPress }: OptionProps) {
+  const colors = useThemeColors();
   const iconColor = useIconColor();
 
   return (
     <TouchableOpacity onPress={onPress} className="flex-row items-center justify-between">
       <View className="flex-row items-center justify-center gap-2.5">
         {icon && <IconBox name={icon} />}
-        <Text className="text-lightText dark:text-darkText font-semibold text-base">{title}</Text>
+        <Text className="font-semibold text-base" style={{ color: colors.text }}>{title}</Text>
       </View>
 
       <Ionicons name="chevron-forward-outline" size={22} color={iconColor} />

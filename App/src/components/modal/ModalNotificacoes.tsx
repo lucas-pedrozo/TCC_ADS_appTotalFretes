@@ -2,7 +2,7 @@ import React from "react";
 import { Modal, Text, TouchableOpacity, View, FlatList, Pressable } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
-import { useThemeMode } from "@/src/context/ThemeContext";
+import { useThemeColors, useThemeMode } from "@/src/context/ThemeContext";
 import animation from "@/src/utils/animation";
 
 interface Notification {
@@ -18,6 +18,7 @@ interface ModalNotificacoesProps {
 }
 
 const ModalNotificacoes = ({ visible, onClose, notifications }: ModalNotificacoesProps) => {
+  const colors = useThemeColors();
   const { t } = useTranslation();
   const { mode } = useThemeMode();
 
@@ -36,9 +37,9 @@ const ModalNotificacoes = ({ visible, onClose, notifications }: ModalNotificacoe
       <animation.appleModal
         className="flex-1 justify-end"
       >
-        <View className="bg-lightBg dark:bg-darkBg rounded-t-2xl p-4">
+        <View className="rounded-t-2xl p-4" style={{ backgroundColor: colors.bg }}>
           <View className="flex-row justify-between items-center mb-4">
-            <Text className="text-lightText dark:text-darkText font-semibold text-lg">{t("MODALNOTIFICACOES.TITLE")}</Text>
+            <Text className="font-semibold text-lg" style={{ color: colors.text }}>{t("MODALNOTIFICACOES.TITLE")}</Text>
             <TouchableOpacity onPress={onClose}>
               <Ionicons name="close" size={24} color={mode === "dark" ? "#FFFFFF" : "#000000"} />
             </TouchableOpacity>
@@ -48,13 +49,13 @@ const ModalNotificacoes = ({ visible, onClose, notifications }: ModalNotificacoe
             data={notifications}
             keyExtractor={(item) => item.id.toString()}
             renderItem={({ item }) => (
-              <View className="mb-4 p-3 bg-lightBgSecondary dark:bg-darkBgSecondary rounded-xl">
-                <Text className="text-lightText dark:text-darkText font-medium text-base">{item.title}</Text>
-                <Text className="text-lightTextSecondary dark:text-darkTextSecondary text-sm mt-1">{item.message}</Text>
+              <View className="mb-4 p-3 rounded-xl" style={{ backgroundColor: colors.bgSecondary }}>
+                <Text className="font-medium text-base" style={{ color: colors.text }}>{item.title}</Text>
+                <Text className="text-sm mt-1" style={{ color: colors.textSecondary }}>{item.message}</Text>
               </View>
             )}
             ListEmptyComponent={
-              <Text className="text-lightTextSecondary dark:text-darkTextSecondary text-center mt-4">
+              <Text className="text-center mt-4" style={{ color: colors.textSecondary }}>
                 {t("MODALNOTIFICACOES.EMPTY")}
               </Text>
             }

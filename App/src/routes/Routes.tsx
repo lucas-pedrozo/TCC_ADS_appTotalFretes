@@ -113,8 +113,8 @@ export default function Routes() {
         }}
       >
         <Stack.Screen name="Home" component={PrivateHome} options={{ headerShown: false }} />
-        <Stack.Screen name="EditPerfil" component={PrivateEditPerfil} options={{ title: t("ROUTES.EDITPERFIL") }} />
         <Stack.Screen name="EditCnh" component={PrivateEditCnh} options={{ title: t("ROUTES.EDITCNH") }} />
+        <Stack.Screen name="EditPerfil" component={PrivateEditPerfil} options={{ title: t("ROUTES.EDITPERFIL") }} />
         <Stack.Screen name="AdvancedOptions" component={PrivateAdvancedOptions} options={{ title: t("ROUTES.ADVANCEDOPTIONS") }} />
         <Stack.Screen name="CancelAccount" component={PrivateCancelAccount} options={{ title: t("ROUTES.CANCELACCOUNT") }} />
         <Stack.Screen name="RenewPassword" component={PrivateRenewPassword} options={{ title: t("ROUTES.RENEWPASSWORD") }} />

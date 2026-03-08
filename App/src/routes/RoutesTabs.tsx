@@ -9,7 +9,7 @@ import Freight from "../screens/freight/Freight";
 import Perfil from "../screens/user/Perfil";
 import Home from "../screens/home/Home";
 
-import { useThemeMode } from "@/src/context/ThemeContext";
+import { useThemeColors, useThemeMode } from "@/src/context/ThemeContext";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import OngoingFreights from "../screens/freight/OngoingFreights";
 
@@ -24,9 +24,10 @@ export type TabParamList = {
 const Tab = createBottomTabNavigator<TabParamList>();
 
 function PlaceholderScreen({ title }: { title: string }) {
+	const colors = useThemeColors();
 	return (
-		<View className="flex-1 items-center justify-center bg-lightBg dark:bg-darkBg">
-			<Text className="text-lightText dark:text-darkText font-semibold text-lg">{title}</Text>
+		<View className="flex-1 items-center justify-center" style={{ backgroundColor: colors.bg }}>
+			<Text className="font-semibold text-lg" style={{ color: colors.text }}>{title}</Text>
 		</View>
 	);
 }

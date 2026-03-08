@@ -1,20 +1,22 @@
+import React, { useState, useEffect } from "react";
 import { Text, View, TouchableOpacity } from "react-native";
-import { useTranslation } from "react-i18next";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 
+import { useTranslation } from "react-i18next";
 import { OtpInput } from "@/src/components/form";
 import { ButtonDefault } from "@/src/components/form";
-import { usePasswordValidate } from "@/src/hooks/auth/usePasswordValidate";
-import React, { useState, useEffect } from "react";
+import { useThemeColors } from "@/src/context/ThemeContext";
 import { useResendCode } from "@/src/hooks/auth/useResendCode";
+import { usePasswordValidate } from "@/src/hooks/auth/usePasswordValidate";
 
 const VerificationCode = () => {
+	const colors = useThemeColors();
 	const { t } = useTranslation();
 	const insets = useSafeAreaInsets();
 	const { control, handleSubmit, rules, handleValidateCode, email } = usePasswordValidate();
 
-	
+
 	const [timer, setTimer] = useState(60);
 	const [canResend, setCanResend] = useState(false);
 	const { handleResendCode } = useResendCode(email);
@@ -48,12 +50,12 @@ const VerificationCode = () => {
 			}}
 			keyboardShouldPersistTaps="handled"
 		>
-			<Text className="text-lightText dark:text-darkText text-base">
+			<Text className="text-base" style={{ color: colors.text }}>
 				{t("FORGOTPASSWORD.DESCRIPTION")} Informe o código para: {email || "—"}
 			</Text>
 
 			<View className="flex-1 pt-8">
-				<Text className="text-lightText dark:text-darkText text-3xl font-semibold text-center pb-5">
+				<Text className="text-3xl font-semibold text-center pb-5" style={{ color: colors.text }}>
 					{t("FORGOTPASSWORDCODE.TITLE")}
 				</Text>
 

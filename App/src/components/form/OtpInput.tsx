@@ -1,6 +1,7 @@
 import React, { useRef } from "react";
 import { View, Text, TextInput } from "react-native";
 import { Controller } from "react-hook-form";
+import { useThemeColors } from "@/src/context/ThemeContext";
 import { onlyDigits } from "./inputs/inputShared";
 
 type OtpInputProps = {
@@ -16,6 +17,7 @@ export function OtpInput({
   rules,
   length = 6,
 }: OtpInputProps) {
+  const colors = useThemeColors();
   const inputRefs = useRef<(TextInput | null)[]>([]);
 
   return (
@@ -64,11 +66,11 @@ export function OtpInput({
                   maxLength={1}
                   onChangeText={(text: string) => handleChange(text, index)}
                   onKeyPress={({ nativeEvent }: { nativeEvent: { key: string } }) => handleKeyPress(nativeEvent.key, index)}
-                  className={`w-12 h-12 rounded border text-center text-xl font-semibold ${
-                    error
-                      ? "border-red-500 text-red-500"
-                      : "border-lightTextSecondary dark:border-darkTextSecondary text-lightText dark:text-darkText"
-                  }`}
+                  className="w-12 h-12 rounded border text-center text-xl font-semibold"
+                  style={{
+                    borderColor: error ? "#ef4444" : colors.textSecondary,
+                    color: error ? "#ef4444" : colors.text,
+                  }}
                 />
               ))}
             </View>

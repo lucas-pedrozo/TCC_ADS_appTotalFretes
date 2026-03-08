@@ -2,7 +2,7 @@ import React from "react";
 import { Modal, Pressable, Text, TouchableOpacity, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
-import { useIconColor } from "@/src/context/ThemeContext";
+import { useIconColor, useThemeColors } from "@/src/context/ThemeContext";
 import animation from "@/src/utils/animation";
 
 export type FreightFilterState = {
@@ -25,18 +25,20 @@ type FilterChipProps = {
   onPress: () => void;
 };
 
-const FilterChip = ({ label, active, onPress }: FilterChipProps) => (
+const FilterChip = ({ label, active, onPress, colors }: FilterChipProps & { colors: ReturnType<typeof useThemeColors> }) => (
   <TouchableOpacity
     onPress={onPress}
-    className={`px-3 py-1.5 rounded-xl ${active ? "bg-lightBgQuaternary dark:bg-darkBgQuaternary" : "bg-lightBgSecondary dark:bg-darkBgSecondary"}`}
+    className="px-3 py-1.5 rounded-xl"
+    style={{ backgroundColor: active ? colors.bgQuaternary : colors.bgSecondary }}
   >
-    <Text className={`font-medium ${active ? "text-lightTextTertiary dark:text-darkTextTertiary" : "text-lightText dark:text-darkText"}`}>
+    <Text className="font-medium" style={{ color: active ? colors.textTertiary : colors.text }}>
       {label}
     </Text>
   </TouchableOpacity>
 );
 
 const ModalFilter = ({ visible, onClose, onApply, currentCity, filters, onChangeFilters }: ModalFilterProps) => {
+  const colors = useThemeColors();
   const { t } = useTranslation();
   const iconColor = useIconColor();
 
@@ -50,63 +52,69 @@ const ModalFilter = ({ visible, onClose, onApply, currentCity, filters, onChange
       <animation.FadeDown className="flex-1 bg-black/30 justify-start px-4 pt-28">
         <Pressable className="absolute inset-0" onPress={onClose} />
 
-        <View className="w-full p-2.5 rounded-2xl bg-lightBgSecondary dark:bg-darkBgSecondary border border-lightBgTertiary dark:border-darkBgTertiary">
+        <View className="w-full p-2.5 rounded-2xl" style={{ backgroundColor: colors.bgSecondary, borderColor: colors.bgTertiary, borderWidth: 1 }}>
           <View className="flex-row justify-between items-center mb-4">
-            <Text className="text-lightText dark:text-darkText font-semibold text-base">
+            <Text className="font-semibold text-base" style={{ color: colors.text }}>
               {t("MODALFILTER.TITLE")}
             </Text>
-            <TouchableOpacity onPress={onClose} className="bg-lightBgNonary dark:bg-darkBgTertiary rounded-md p-1.5">
+            <TouchableOpacity onPress={onClose} className="rounded-md p-1.5" style={{ backgroundColor: colors.bgTertiary }}>
               <Ionicons name="close" size={20} color="#ff0000" />
             </TouchableOpacity>
           </View>
 
           <View className="gap-4">
             <View className="flex-row items-center gap-2 flex-wrap">
-              <Text className="text-lightTextSecondary dark:text-darkTextSecondary font-semibold text-base">
+              <Text className="font-semibold text-base" style={{ color: colors.textSecondary }}>
                 {t("MODALFILTER.ORDER")}:
               </Text>
               <FilterChip
                 label={t("MODALFILTER.NEARBY")}
                 active={filters.order === "proximo"}
                 onPress={() => onChangeFilters({ ...filters, order: "proximo" })}
+                colors={colors}
               />
               <FilterChip
                 label={t("MODALFILTER.FAR")}
                 active={filters.order === "longe"}
                 onPress={() => onChangeFilters({ ...filters, order: "longe" })}
+                colors={colors}
               />
             </View>
 
             <View className="flex-row items-center gap-2 flex-wrap">
-              <Text className="text-lightTextSecondary dark:text-darkTextSecondary font-semibold text-base">
+              <Text className="font-semibold text-base" style={{ color: colors.textSecondary }}>
                 {t("MODALFILTER.VALUE")}:
               </Text>
               <FilterChip
                 label={t("MODALFILTER.ALL")}
                 active={filters.value === "todos"}
                 onPress={() => onChangeFilters({ ...filters, value: "todos" })}
+                colors={colors}
               />
               <FilterChip
                 label={t("MODALFILTER.LOWER")}
                 active={filters.value === "menores"}
                 onPress={() => onChangeFilters({ ...filters, value: "menores" })}
+                colors={colors}
               />
               <FilterChip
                 label={t("MODALFILTER.HIGHER")}
                 active={filters.value === "maiores"}
                 onPress={() => onChangeFilters({ ...filters, value: "maiores" })}
+                colors={colors}
               />
             </View>
 
             <View className="flex-row items-center justify-between mt-2">
-              <Text className="text-lightTextSecondary dark:text-darkTextSecondary font-semibold text-base">
+              <Text className="font-semibold text-base" style={{ color: colors.textSecondary }}>
                 {t("MODALFILTER.CURRENTCITY")}: {currentCity}
               </Text>
               <TouchableOpacity
                 onPress={onApply}
-                className="bg-lightBgQuaternary dark:bg-darkBgQuaternary rounded-xl px-4 py-2"
+                className="rounded-xl px-4 py-2"
+                style={{ backgroundColor: colors.bgQuaternary }}
               >
-                <Text className="text-lightTextTertiary dark:text-darkTextTertiary font-semibold text-base">
+                <Text className="font-semibold text-base" style={{ color: colors.textTertiary }}>
                   {t("MODALFILTER.APPLY")}
                 </Text>
               </TouchableOpacity>

@@ -1,6 +1,7 @@
 import React from "react";
 import { Pressable, Text, View } from "react-native";
 import { Controller } from "react-hook-form";
+import { useThemeColors } from "@/src/context/ThemeContext";
 
 type InputOption = {
   label: string;
@@ -18,14 +19,9 @@ type InputButtonGroupProps = {
 
 const STYLES_INPUT = {
   default: {
-    label: "text-lightText dark:text-darkText font-semibold text-base pl-2.5",
+    label: "font-semibold text-base pl-2.5",
     buttonBase: "rounded-lg px-6 py-3 items-center",
-    buttonUnselected: "bg-lightBgSecondary dark:bg-darkBgSecondary",
-    text: "text-lightText dark:text-darkText font-semibold text-sm",
-  },
-  selected: {
-    button: "bg-green-500",
-    text: "text-white",
+    text: "font-semibold text-sm",
   },
   error: {
     label: "text-red-500 font-semibold text-base pl-2.5",
@@ -33,6 +29,8 @@ const STYLES_INPUT = {
 };
 
 export const InputGroup = ({ label, name, control, rules, options, wrap = true }: InputButtonGroupProps) => {
+  const colors = useThemeColors();
+
   return (
     <Controller
       name={name}
@@ -44,21 +42,27 @@ export const InputGroup = ({ label, name, control, rules, options, wrap = true }
 
         return (
           <View>
-            <Text className={error ? STYLES_INPUT.error.label : STYLES_INPUT.default.label}> {label}</Text>
+            <Text
+              className={error ? STYLES_INPUT.error.label : STYLES_INPUT.default.label}
+              style={error ? undefined : { color: colors.text }}
+            >
+              {label}
+            </Text>
             <View className={`flex-row gap-2.5 pt-3 ${wrap ? "flex-wrap" : ""}`}>
               {options.map((option) => {
                 const isSelected = selectedValue === option.value;
 
-                const buttonBg = isSelected
-                  ? STYLES_INPUT.selected.button
-                  : STYLES_INPUT.default.buttonUnselected;
                 return (
                   <Pressable
                     key={option.value}
-                    className={`${STYLES_INPUT.default.buttonBase} ${buttonBg}`}
+                    className={STYLES_INPUT.default.buttonBase}
+                    style={{ backgroundColor: isSelected ? "#22c55e" : colors.bgSecondary }}
                     onPress={() => { onChange(option.value); onBlur(); }}
                   >
-                    <Text className={isSelected ? STYLES_INPUT.selected.text : STYLES_INPUT.default.text}>
+                    <Text
+                      className={STYLES_INPUT.default.text}
+                      style={{ color: isSelected ? "#FFFFFF" : colors.text }}
+                    >
                       {option.label}
                     </Text>
                   </Pressable>

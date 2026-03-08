@@ -3,7 +3,7 @@ import { View, Text, Modal, TouchableOpacity } from "react-native";
 
 import animation from "@/src/utils/animation";
 import { primeiraParte } from "@/src/utils/format";
-import { useThemeMode } from "@/src/context/ThemeContext";
+import { useThemeColors, useThemeMode } from "@/src/context/ThemeContext";
 import { getCameraFromGeometry } from "@/src/utils/mapboxUtils";
 import { useGetMapBox } from "@/src/hooks/freight/useGetMapBox";
 import { MapRouteView } from "./MapRouteView";
@@ -28,7 +28,7 @@ export default function DetalhesFreteModal({
   rotaSimples = false,
   prazo = "10/09/2025",
 }: DetalhesFreteModalProps) {
-
+  const colors = useThemeColors();
   const { mode } = useThemeMode();
   const { rotaData, handleGetMapBox } = useGetMapBox();
 
@@ -44,18 +44,19 @@ export default function DetalhesFreteModal({
       onRequestClose={onClose}
     >
       <animation.FadeDown className="flex-1 justify-center items-center bg-black/50">
-        <View className="w-[90%] rounded-2xl overflow-hidden border border-lightBgTertiary dark:border-darkBgTertiary bg-lightBgSecondary dark:bg-darkBgSecondary">
-          <View className="flex-row justify-between items-center p-4 border-b border-lightBgNonary dark:border-darkBgNonary">
-            <Text className="text-lg font-bold text-lightText dark:text-darkText">
+        <View className="w-[90%] rounded-2xl overflow-hidden" style={{ borderColor: colors.bgTertiary, borderWidth: 1, backgroundColor: colors.bgSecondary }}>
+          <View className="flex-row justify-between items-center p-4 border-b" style={{ borderBottomColor: colors.bgNonary, borderBottomWidth: 1 }}>
+            <Text className="text-lg font-bold" style={{ color: colors.text }}>
               Rota
             </Text>
             <TouchableOpacity
               onPress={onClose}
-              className="bg-red-100 dark:bg-darkBgTertiary px-2.5 py-1.5 rounded-lg"
+              className="px-2.5 py-1.5 rounded-lg"
+              style={{ backgroundColor: colors.bgTertiary }}
               accessibilityRole="button"
               accessibilityLabel="Fechar modal"
             >
-              <Text className="text-red-600 dark:text-darkText font-bold">
+              <Text className="font-bold" style={{ color: colors.text }}>
                 X
               </Text>
             </TouchableOpacity>
@@ -69,7 +70,7 @@ export default function DetalhesFreteModal({
           />
 
           <View className="p-5">
-            <Text className="text-base font-bold mb-4 text-lightText dark:text-darkText">
+            <Text className="text-base font-bold mb-4" style={{ color: colors.text }}>
               Mais Detalhes
             </Text>
 

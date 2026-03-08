@@ -3,7 +3,7 @@ import { Ionicons } from "@expo/vector-icons";
 
 import { formatName } from "@/src/utils/format";
 import { baseURL } from "@/src/services/http";
-import { useIconColor } from "@/src/context/ThemeContext";
+import { useIconColor, useThemeColors } from "@/src/context/ThemeContext";
 import type { MapUser } from "@/src/interfaces/user";
 
 export type HeaderHomeProps = {
@@ -23,6 +23,7 @@ export function HeaderHome({
   onNotificationsPress,
   onLogout,
 }: HeaderHomeProps) {
+  const colors = useThemeColors();
   const iconColor = useIconColor();
 
   return (
@@ -32,17 +33,17 @@ export function HeaderHome({
           {userData?.userImage_id ? (
             <Image source={{ uri: `${baseURL}/user/image/${userData.userImage_id}` }} className="w-14 h-14 rounded-xl" />
           ) : (
-            <View className="w-14 h-14 rounded-xl bg-lightBgNonary dark:bg-darkBgNonary items-center justify-center">
+            <View className="w-14 h-14 rounded-xl items-center justify-center" style={{ backgroundColor: colors.bgNonary }}>
               <Ionicons name="person-outline" size={24} color={iconColor} />
             </View>
           )}
         </TouchableOpacity>
 
         <View className="flex-col">
-          <Text className="text-lightTextSecondary dark:text-darkTextSecondary font-medium text-sm">
+          <Text className="font-medium text-sm" style={{ color: colors.textSecondary }}>
             {greeting}
           </Text>
-          <Text className="text-lightText dark:text-darkText font-semibold text-base">
+          <Text className="font-semibold text-base" style={{ color: colors.text }}>
             {formatName(userData?.name ?? notInformedLabel)}
           </Text>
         </View>
@@ -51,14 +52,16 @@ export function HeaderHome({
       <View className="flex-row items-center gap-2.5">
         <TouchableOpacity
           onPress={onNotificationsPress}
-          className="bg-lightBgNonary dark:bg-darkBgNonary p-2.5 rounded-xl"
+          className="p-2.5 rounded-xl"
+          style={{ backgroundColor: colors.bgNonary }}
         >
           <Ionicons name="notifications-outline" size={24} color={iconColor} />
         </TouchableOpacity>
 
         <TouchableOpacity
           onPress={onLogout}
-          className="bg-lightBgNonary dark:bg-darkBgNonary p-2.5 rounded-xl"
+          className="p-2.5 rounded-xl"
+          style={{ backgroundColor: colors.bgNonary }}
         >
           <Ionicons name="log-out-outline" size={24} color="#FF0000" />
         </TouchableOpacity>

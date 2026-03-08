@@ -6,7 +6,7 @@ import { baseURL } from "@/src/services/http";
 import { useGetUser } from "@/src/hooks/user/useGetUser";
 import { useTranslation } from "react-i18next";
 import type { AppLanguage } from "@/src/i18n/resources";
-import { useThemeMode } from "@/src/context/ThemeContext";
+import { useThemeColors, useThemeMode } from "@/src/context/ThemeContext";
 import { useLanguage } from "@/src/context/LanguageContext";
 
 import { useAuth } from "@/src/context/AuthContext";
@@ -22,6 +22,7 @@ type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
 const Perfil = () => {
   const BASE_URL = baseURL;
+  const colors = useThemeColors();
   const { logout } = useAuth()
   const { t } = useTranslation();
   const { mode, toggleMode } = useThemeMode();
@@ -77,7 +78,7 @@ const Perfil = () => {
   }, [handleGetUser]);
 
   return (
-    <SafeAreaView style={{ flex: 1 }} className="bg-lightBg dark:bg-darkBg">
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.bg }}>
       <ScrollView
         contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 100, paddingTop: 10 }}
         showsVerticalScrollIndicator={false}
@@ -98,11 +99,11 @@ const Perfil = () => {
         />
 
         <View className="flex-col gap-2.5 mt-14">
-          <Text className="text-sm font-semibold pl-2.5 pb-1.5 text-lightTextSecondary dark:text-darkTextSecondary">{t("PERFIL.PERSONALINFO")}</Text>
+          <Text className="text-sm font-semibold pl-2.5 pb-1.5" style={{ color: colors.textSecondary }}>{t("PERFIL.PERSONALINFO")}</Text>
           <Option title={t("PERFIL.EDITMYDATA")} icon="pencil" onPress={goToEditPerfil} />
-          <View className="h-0.5 w-full bg-lightBgNonary dark:bg-darkBgNonary rounded-full" />
+          <View className="h-0.5 w-full rounded-full" style={{ backgroundColor: colors.bgNonary }} />
           <Option title={t("PERFIL.EDITCNHDATA")} icon="pencil" onPress={goToEditCnh} />
-          <View className="h-0.5 w-full bg-lightBgNonary dark:bg-darkBgNonary rounded-full" />
+          <View className="h-0.5 w-full rounded-full" style={{ backgroundColor: colors.bgNonary }} />
 
           {!userData?.vehicleType_id ?
             <Option title={t("PERFIL.REGISTERVEHICLE")} icon="car-outline" onPress={() => { }} />
@@ -110,11 +111,11 @@ const Perfil = () => {
             <Option title={t("PERFIL.EDITVEHICLE")} icon="car-outline" onPress={() => { }} />
           }
 
-          <View className="h-0.5 w-full bg-lightBgNonary dark:bg-darkBgNonary rounded-full" />
+          <View className="h-0.5 w-full rounded-full" style={{ backgroundColor: colors.bgNonary }} />
           <Option title={t("PERFIL.ADVANCEDOPTIONS")} icon="settings-outline" onPress={goToAdvancedOptions} />
         </View>
         <View className="flex-col gap-2.5 mt-5">
-          <Text className="text-sm font-semibold pl-2.5 pb-1.5 text-lightTextSecondary dark:text-darkTextSecondary">{t("PERFIL.APPBEHAVIOR")}</Text>
+          <Text className="text-sm font-semibold pl-2.5 pb-1.5" style={{ color: colors.textSecondary }}>{t("PERFIL.APPBEHAVIOR")}</Text>
           <OptionSelect
             title={t("PERFIL.LANGUAGE")}
             icon="language-outline"
@@ -122,9 +123,9 @@ const Perfil = () => {
             value={language}
             onValueChange={(value) => changeLanguage(value as AppLanguage)}
           />
-          <View className="h-0.5 w-full bg-lightBgNonary dark:bg-darkBgNonary rounded-full" />
-          <OptionKey title={t("PERFIL.LIGHTMODE")} icon="sunny-outline" value={mode === "light"} setValue={() => toggleMode()} />
-          <View className="h-0.5 w-full bg-lightBgNonary dark:bg-darkBgNonary rounded-full" />
+          <View className="h-0.5 w-full rounded-full" style={{ backgroundColor: colors.bgNonary }} />
+          <OptionKey title={t("PERFIL.DARKMODE")} icon="moon-outline" value={mode === "dark"} setValue={() => toggleMode()} />
+          <View className="h-0.5 w-full rounded-full" style={{ backgroundColor: colors.bgNonary }} />
         </View>
 
           <View className="w-5/12 self-end pt-8 ">

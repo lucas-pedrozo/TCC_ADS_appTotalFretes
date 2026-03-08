@@ -4,7 +4,7 @@ import { RefreshControl, ScrollView, Text, View } from "react-native";
 
 import { useTranslation } from "react-i18next";
 import { useAuth } from "@/src/context/AuthContext";
-import { useThemeMode } from "@/src/context/ThemeContext";
+import { useThemeColors, useThemeMode } from "@/src/context/ThemeContext";
 import { CardHistory } from "@/src/components/cards/CardHistory";
 import { CardIntention } from "@/src/components/cards/CardIntention";
 import { useWeather } from "@/src/hooks/weather/useWeather";
@@ -22,7 +22,7 @@ import { useGetFreightUser } from "@/src/hooks/freight/useGetFreightUser";
 import { useGetVehicle } from "@/src/hooks/vehicle/useGetVehicle";
 
 function Home() {
-
+	const colors = useThemeColors();
 	const { logout } = useAuth();
 	const { t } = useTranslation();
 	const { mode } = useThemeMode();
@@ -67,7 +67,7 @@ function Home() {
 	}, [userData?.vehicleType_id, handleGetVehicle]);
 
 	return (
-		<SafeAreaView style={{ flex: 1 }} className="bg-lightBg dark:bg-darkBg">
+		<SafeAreaView style={{ flex: 1, backgroundColor: colors.bg }}>
 			<ScrollView
 				contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 100, paddingTop: 10 }}
 				showsVerticalScrollIndicator={false}
@@ -89,7 +89,7 @@ function Home() {
 					onLogout={logout}
 				/>
 
-				<Text className="text-lightText dark:text-darkText font-bold text-2xl pt-6 "> {t("HOME.TITLE")} </Text>
+				<Text className="font-bold text-2xl pt-6" style={{ color: colors.text }}> {t("HOME.TITLE")} </Text>
 
 				<CardActivityHome
 					key={`card-activity-${refreshKey}`}

@@ -2,7 +2,7 @@ import React from "react";
 import { Controller } from "react-hook-form";
 import { View, TextInput } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useIconColor } from "@/src/context/ThemeContext";
+import { useIconColor, useThemeColors } from "@/src/context/ThemeContext";
 
 type InputProps = {
   label?: string;
@@ -14,6 +14,7 @@ type InputProps = {
 };
 
 export const InputSearch = ({ control, name, rules, id, placeholder }: InputProps) => {
+  const colors = useThemeColors();
   const iconColor = useIconColor();
 
   return (
@@ -22,7 +23,7 @@ export const InputSearch = ({ control, name, rules, id, placeholder }: InputProp
       name={name}
       rules={rules}
       render={({ field: { onChange, onBlur, value } }) => (
-        <View className="flex-1 flex-row items-center px-2.5 py-1 bg-lightBgSecondary dark:bg-darkBgSecondary rounded-xl">
+        <View className="flex-1 flex-row items-center px-2.5 py-1 rounded-xl" style={{ backgroundColor: colors.bgSecondary }}>
           <Ionicons name="search" size={20} color={iconColor} />
           <TextInput
             id={id}
@@ -31,7 +32,9 @@ export const InputSearch = ({ control, name, rules, id, placeholder }: InputProp
             keyboardType="web-search"
             onChangeText={onChange}
             placeholder={placeholder}
-            className="text-lightText dark:text-darkText placeholder:text-lightTextSecondary dark:placeholder:text-darkTextSecondary flex-1"
+            placeholderTextColor={colors.textSecondary}
+            style={{ color: colors.text, flex: 1 }}
+            className="flex-1"
           />
         </View>
       )}

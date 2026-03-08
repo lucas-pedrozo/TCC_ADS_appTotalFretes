@@ -1,6 +1,6 @@
 import { View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { useIconColor } from "@/src/context/ThemeContext";
+import { useIconColor, useThemeColors } from "@/src/context/ThemeContext";
 
 type IconBoxProps = {
   name: keyof typeof Ionicons.glyphMap;
@@ -8,10 +8,11 @@ type IconBoxProps = {
 };
 
 export function IconBox({ name, size = 26 }: IconBoxProps) {
+  const colors = useThemeColors();
   const iconColor = useIconColor();
 
   return (
-    <View className="w-12 h-12 rounded-xl bg-lightBgNonary dark:bg-darkBgNonary items-center justify-center">
+    <View className="w-12 h-12 rounded-xl items-center justify-center" style={{ backgroundColor: colors.bgNonary }}>
       <Ionicons name={name} size={size} color={iconColor} />
     </View>
   );

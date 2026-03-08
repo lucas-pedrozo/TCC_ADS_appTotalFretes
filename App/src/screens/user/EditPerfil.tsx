@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { useThemeMode } from "@/src/context/ThemeContext";
+import { useThemeColors, useThemeMode } from "@/src/context/ThemeContext";
 import { Image, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
@@ -18,6 +18,7 @@ import { useEditPerfil } from "@/src/hooks/user/useEditPerfil";
 import { useImagePicker } from "@/src/hooks/user/useImagePicker";
 
 const EditPerfil = () => {
+	const colors = useThemeColors();
 	const { t } = useTranslation();
 	const { mode } = useThemeMode();
 	const insets = useSafeAreaInsets();
@@ -38,7 +39,7 @@ const EditPerfil = () => {
 							style={{ width: 80, height: 80, borderRadius: 50 }}
 						/>
 					) : (
-						<TouchableOpacity onPress={handleTakePhoto} className="w-24 h-24 bg-lightBgSecondary dark:bg-darkBgSecondary rounded-full items-center justify-center">
+						<TouchableOpacity onPress={handleTakePhoto} className="w-24 h-24 rounded-full items-center justify-center" style={{ backgroundColor: colors.bgSecondary }}>
 							<Ionicons name="camera" size={24} color={mode === "dark" ? "white" : "black"} />
 						</TouchableOpacity>
 					)

@@ -1,4 +1,5 @@
 import { ActivityIndicator, TouchableOpacity, Text } from "react-native";
+import { useThemeColors } from "@/src/context/ThemeContext";
 
 export type ButtonProps = {
 	title: string;
@@ -8,16 +9,19 @@ export type ButtonProps = {
 };
 
 export const ButtonDefault = ({ title, onPress, disabled, loading }: ButtonProps) => {
+	const colors = useThemeColors();
+
 	return (
 		<TouchableOpacity
-			className="bg-lightBgQuaternary dark:bg-darkBgQuaternary py-3 w-full rounded-lg items-center"
+			className="py-3 w-full rounded-lg items-center"
+			style={{ backgroundColor: colors.bgQuaternary }}
 			onPress={onPress}
 			disabled={disabled || loading}
 		>
 			{loading ? (
-				<ActivityIndicator size="small" color="#FFFFFF" />
+				<ActivityIndicator size="small" color={colors.textTertiary} />
 			) : (
-				<Text className="text-lightTextTertiary dark:text-darkTextTertiary font-semibold text-base">
+				<Text className="font-semibold text-base" style={{ color: colors.textTertiary }}>
 					{title}
 				</Text>
 			)}

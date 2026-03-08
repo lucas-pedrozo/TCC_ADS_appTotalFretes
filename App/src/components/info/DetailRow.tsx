@@ -1,4 +1,5 @@
 import { Text, View } from "react-native";
+import { useThemeColors } from "@/src/context/ThemeContext";
 
 type DetailRowProps = {
     label: string;
@@ -6,12 +7,14 @@ type DetailRowProps = {
 }
 
 export const DetailRow = ({ label, value }: DetailRowProps) => {
+    const colors = useThemeColors();
+
     return (
       <View className="flex-row justify-between mb-2.5">
-        <Text className="text-lightTextSecondary dark:text-darkTextSecondary">
+        <Text style={{ color: colors.textSecondary }}>
           {label}
         </Text>
-        <Text className="font-medium text-lightText dark:text-darkText">
+        <Text className="font-medium" style={{ color: colors.text }}>
           {value}
         </Text>
       </View>

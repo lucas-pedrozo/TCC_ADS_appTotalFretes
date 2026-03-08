@@ -5,7 +5,7 @@ import { useGetUser } from "@/src/hooks/user/useGetUser";
 import { useGetFreightUser } from "@/src/hooks/freight/useGetFreightUser";
 
 import { Ionicons } from "@expo/vector-icons";
-import { useIconColor } from "@/src/context/ThemeContext";
+import { useIconColor, useThemeColors } from "@/src/context/ThemeContext";
 import { DetailRow } from "@/src/components/info/DetailRow";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { CardFreight } from "@/src/components/cards/CardFreight";
@@ -15,6 +15,7 @@ import DetalhesFreteModal from "@/src/components/mapbox/DetalhesFreteModal";
 
 
 function OngoingFreights() {
+    const colors = useThemeColors();
     const iconColor = useIconColor();
     const [refreshKey, setRefreshKey] = useState(0);
     const [isRefreshing, setIsRefreshing] = useState(false);
@@ -39,7 +40,7 @@ function OngoingFreights() {
     }, [handleGetUser, handleGetFreightUser]);
 
     return (
-        <SafeAreaView style={{ flex: 1 }} className="bg-lightBg dark:bg-darkBg">
+        <SafeAreaView style={{ flex: 1, backgroundColor: colors.bg }}>
             <ScrollView
                 contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 100, paddingTop: 10 }}
                 showsVerticalScrollIndicator={false}
@@ -73,14 +74,13 @@ function OngoingFreights() {
 
                 <View className="h-7"/>
 
-                <TouchableOpacity className="flex-1" onPress={() => setIsDetalhesFreteModalVisible(true)}>
-                    <Text className="text-lightText dark:text-darkText text-center font-semibold text-base bg-lightBgSecondary dark:bg-darkBgSecondary border border-lightBgTertiary dark:border-darkBgTertiary py-3 w-full rounded-lg items-center">
-                        <Ionicons name="map-outline" size={20} color={iconColor} />
-                        Ver mapa
+                <TouchableOpacity className="flex-1 py-3 w-full rounded-lg items-center" style={{ backgroundColor: colors.bgSecondary, borderColor: colors.bgTertiary, borderWidth: 1 }} onPress={() => setIsDetalhesFreteModalVisible(true)}>
+                    <Text className="text-center font-semibold text-base" style={{ color: colors.text }}>
+                        <Ionicons name="map-outline" size={20} color={iconColor} /> Ver mapa
                     </Text>
                 </TouchableOpacity>
 
-                <Text className="text-lightText dark:text-darkText font-semibold text-base pl-2.5 mb-4 mt-5">Mais detalhes</Text>
+                <Text className="font-semibold text-base pl-2.5 mb-4 mt-5" style={{ color: colors.text }}>Mais detalhes</Text>
                 <DetailRow label="Tipo" value="Cascalho" />
                 <DetailRow label="Categoria" value="Mineral" />
                 <DetailRow label="Peso da carga" value="20T" />

@@ -4,6 +4,7 @@ import { View, TouchableOpacity, Text } from "react-native";
 import Mapbox from "@rnmapbox/maps";
 import { Ionicons } from "@expo/vector-icons";
 
+import { useThemeColors } from "@/src/context/ThemeContext";
 import {
   CAMERA_ANIMATION_MS,
   ROTA_LINE_STYLE,
@@ -27,6 +28,7 @@ export const MapRouteView = React.memo(function MapRouteView({
   cameraZoom,
   darkMode,
 }: MapRouteViewProps) {
+  const colors = useThemeColors();
   const cameraRef = useRef<CameraRef>(null);
   const themeColor = darkMode ? THEME_COLORS.dark : THEME_COLORS.light;
   const styleURL = getMapStyleURL(darkMode);
@@ -92,14 +94,15 @@ export const MapRouteView = React.memo(function MapRouteView({
       </Mapbox.MapView>
 
       <TouchableOpacity
-        className="absolute top-2.5 right-2.5 flex-row items-center gap-1.5 bg-white dark:bg-darkBgTertiary py-2 px-3 rounded-xl border border-gray-200 dark:border-darkBgNonary shadow shadow-black/20"
+        className="absolute top-2.5 right-2.5 flex-row items-center gap-1.5 py-2 px-3 rounded-xl shadow shadow-black/20"
+        style={{ backgroundColor: colors.bgTertiary, borderColor: colors.bgNonary, borderWidth: 1 }}
         onPress={handleCentralizar}
         activeOpacity={0.8}
         accessibilityRole="button"
         accessibilityLabel="Centralizar mapa na rota"
       >
         <Ionicons name="locate" size={24} color={themeColor} />
-        <Text className="text-sm font-semibold text-lightText dark:text-darkText">
+        <Text className="text-sm font-semibold" style={{ color: colors.text }}>
           Centralizar
         </Text>
       </TouchableOpacity>

@@ -3,10 +3,12 @@ import { useTranslation } from "react-i18next";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 
+import { useThemeColors } from "@/src/context/ThemeContext";
 import { InputDefault, ButtonDefault } from "@/src/components/form";
 import { useForgotPassword } from "@/src/hooks/auth/useForgotPassword";
 
 const ForgotPassword = () => {
+	const colors = useThemeColors();
 	const insets = useSafeAreaInsets();
 	const { t } = useTranslation();
 
@@ -20,7 +22,7 @@ const ForgotPassword = () => {
 		>
 
 			<View className="gap-4 flex-1">
-				<Text className="text-lightText dark:text-darkText text-base">{
+				<Text className="text-base" style={{ color: colors.text }}>{
 					t("FORGOTPASSWORD.DESCRIPTION")}
 				</Text>
 				<InputDefault

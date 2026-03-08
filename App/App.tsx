@@ -10,7 +10,6 @@ import { SingUpProvider } from "./src/context/SingUpContext";
 import AlertNotification from "./src/components/alert/AlertDefault";
 import { useAlertDefault, AlertDefaultProvider } from "./src/context/AlertDefaultContext";
 import { LanguageProvider } from "./src/context/LanguageContext";
-import { colorScheme } from "nativewind";
 
 const AlertNotificationGlobal = () => {
   const { alert, hideAlert } = useAlertDefault();

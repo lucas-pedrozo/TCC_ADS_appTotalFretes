@@ -1,6 +1,6 @@
 import { Ionicons } from "@expo/vector-icons";
 import { View, Text, Switch } from "react-native";
-import { useThemeMode } from "@/src/context/ThemeContext";
+import { useThemeColors, useThemeMode } from "@/src/context/ThemeContext";
 import { IconBox } from "@/src/components/ui/IconBox";
 
 type OptionKeyProps = {
@@ -12,13 +12,14 @@ type OptionKeyProps = {
 };
 
 export function OptionKey({ title, icon, value, setValue }: OptionKeyProps) {
+  const colors = useThemeColors();
   const { mode } = useThemeMode();
 
   return (
     <View className="flex-row items-center justify-between">
       <View className="flex-row items-center justify-center gap-2.5">
         {icon && <IconBox name={icon} />}
-        <Text className="text-lightText dark:text-darkText font-semibold text-base">{title}</Text>
+        <Text className="font-semibold text-base" style={{ color: colors.text }}>{title}</Text>
       </View>
 
       <Switch

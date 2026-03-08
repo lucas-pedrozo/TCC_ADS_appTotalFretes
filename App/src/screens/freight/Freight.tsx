@@ -4,7 +4,7 @@ import { FlatList, RefreshControl, Text, View } from "react-native";
 
 import { useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
-import { useThemeMode } from "@/src/context/ThemeContext";
+import { useThemeColors, useThemeMode } from "@/src/context/ThemeContext";
 import { CardFreight } from "@/src/components/cards/CardFreight";
 import { InputSearch, ButtonFilter } from "@/src/components/form";
 import ModalFilter, { FreightFilterState } from "@/src/components/modal/ModalFilter";
@@ -22,6 +22,7 @@ type FreightItem = {
 };
 
 const Freight = () => {
+  const colors = useThemeColors();
   const { t } = useTranslation();
   const { mode } = useThemeMode();
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -77,9 +78,9 @@ const Freight = () => {
   }, []);
 
   return (
-    <SafeAreaView style={{ flex: 1, paddingHorizontal: 16 }} className="bg-lightBg dark:bg-darkBg">
+    <SafeAreaView style={{ flex: 1, paddingHorizontal: 16, backgroundColor: colors.bg }}>
 
-      <Text className="text-lightText dark:text-darkText text-2xl text-center font-semibold">
+      <Text className="text-2xl text-center font-semibold" style={{ color: colors.text }}>
         {t("FREIGHT.TITLE")}
       </Text>
 
@@ -112,7 +113,7 @@ const Freight = () => {
           />
         }
         ListEmptyComponent={
-          <Text className="text-lightTextSecondary dark:text-darkTextSecondary text-center mt-10 text-base">
+          <Text className="text-center mt-10 text-base" style={{ color: colors.textSecondary }}>
             {t("FREIGHT.EMPTYLIST")}
           </Text>
         }
