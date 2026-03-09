@@ -3,13 +3,16 @@ import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 import { useAuth } from "@/src/context/AuthContext";
-import { getStoredAuthToken, getStoredAuthTokenSilent } from "@/src/services/http";
+import { useAlertDefault } from "@/src/context/AlertDefaultContext";
+import { getStoredAuthToken, getStoredAuthTokenSilent, validateAuthToken, clearAuthToken } from "@/src/services/http";
 import { RootStackParamList } from "@/src/routes/Routes";
+import i18n from "@/src/i18n";
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
 export function useStartScreen() {
 	const navigation = useNavigation<NavigationProp>();
+	const { notify } = useAlertDefault();
 	const { isAuthReady, lastUsedAccount, removeSavedAccount, login, biometricsEnabled } = useAuth();
 	const [hasStoredToken, setHasStoredToken] = useState<boolean | null>(null);
 
@@ -33,8 +36,15 @@ export function useStartScreen() {
 				navigation.navigate("Login", { startMode: "saved", focusPassword: true });
 				return;
 			}
-			const token = await getStoredAuthToken();
+			const token = await getStoredAuthToken({ useBiometrics: biometricsEnabled });
 			if (token) {
+				const isValid = await validateAuthToken({ token });
+				if (!isValid) {
+					await clearAuthToken();
+					notify({ status: "error", message: i18n.t("NOTIFICATIONS.TOKENINVALID") });
+					setHasStoredToken(false);
+					return;
+				}
 				await login(token);
 				setTimeout(() => {
 					navigation.reset({ index: 0, routes: [{ name: "Home" as never }] });
@@ -43,7 +53,7 @@ export function useStartScreen() {
 			}
 		}
 		navigation.navigate("Login", { startMode: "saved", focusPassword: true });
-	}, [navigation, login, biometricsEnabled]);
+	}, [navigation, login, biometricsEnabled, notify]);
 
 	const goToLoginWithPassword = useCallback(() => {
 		navigation.navigate("Login", { startMode: "saved", focusPassword: true });

@@ -3,7 +3,6 @@ import { SafeAreaView } from "react-native-safe-area-context"
 import { Platform, RefreshControl, ScrollView, Text, View } from "react-native"
 import * as LocalAuthentication from "expo-local-authentication";
 
-import { baseURL } from "@/src/services/http";
 import { useGetUser } from "@/src/hooks/user/useGetUser";
 import { useTranslation } from "react-i18next";
 import type { AppLanguage } from "@/src/i18n/resources";
@@ -22,7 +21,6 @@ type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 const isNative = Platform.OS === "ios" || Platform.OS === "android";
 
 const Perfil = () => {
-  const BASE_URL = baseURL;
   const colors = useThemeColors();
   const { logout, biometricsEnabled, setBiometricsEnabledAsync } = useAuth()
   const { t } = useTranslation();
@@ -81,7 +79,11 @@ const Perfil = () => {
         promptMessage: t("PERFIL.BIOMETRICS_PROMPT"),
         fallbackLabel: t("PERFIL.BIOMETRICS_FALLBACK"),
       });
-      if (success) await setBiometricsEnabledAsync(true);
+      if (success) {
+        await setBiometricsEnabledAsync(true);
+      } else {
+        await setBiometricsEnabledAsync(false);
+      }
     } else {
       await setBiometricsEnabledAsync(false);
     }
@@ -106,7 +108,7 @@ const Perfil = () => {
         }
       >
         <HeaderPerfil
-          image={userData?.userImage_id ? `${BASE_URL}/api/user/image/${userData.userImage_id}` : undefined}
+          image={userData?.userImage_id ? `/api/user/image/${userData.userImage_id}` : undefined}
           name={userData?.name || t("COMMON.NOTINFORMED")}
           email={userData?.email || t("COMMON.NOTINFORMED")}
           cpf={userData?.cpf || t("COMMON.NOTINFORMED")}

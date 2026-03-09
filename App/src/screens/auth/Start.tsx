@@ -8,7 +8,7 @@ import { CardUserLogin } from "@/src/components/auth/CardUserLogin";
 import { useThemeColors } from "@/src/context/ThemeContext";
 import { useStartScreen } from "@/src/hooks/auth/useStartScreen";
 
-function Start() {
+export default function Start() {
 	const { t } = useTranslation();
 	const colors = useThemeColors();
 	const {
@@ -17,7 +17,6 @@ function Start() {
 		showBiometricOnCard,
 		goLogin,
 		goSavedAccount,
-		goToLoginWithPassword,
 		goSwitchAccount,
 		goSingUp,
 		handleRemoveSavedAccount,
@@ -60,5 +59,3 @@ function Start() {
 		</SafeAreaView>
 	);
 }
-
-export default Start;

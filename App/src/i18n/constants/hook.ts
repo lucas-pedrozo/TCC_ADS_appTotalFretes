@@ -20,6 +20,8 @@ export const hookPT = {
     EDITPERFILSUCCESS: "Perfil editado com sucesso!",
     EDITCNHLOADING: "Editando CNH...",
     EDITCNHSUCCESS: "CNH editada com sucesso!",
+    NOCONNECTION: "Sem conexão. Conecte-se à internet para entrar.",
+    TOKENINVALID: "Sessão expirada. Faça login com sua senha.",
   },
 } as const;
 
@@ -39,5 +41,7 @@ export const hookEN = {
     EDITPERFILSUCCESS: "Profile updated successfully!",
     EDITCNHLOADING: "Editing driver license...",
     EDITCNHSUCCESS: "Driver license updated successfully!",
+    NOCONNECTION: "No connection. Connect to the internet to sign in.",
+    TOKENINVALID: "Session expired. Sign in with your password.",
   },
 } as const;

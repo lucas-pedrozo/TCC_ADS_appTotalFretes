@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import http from "@/src/services/http";
 import { useForm } from "react-hook-form";
 import { useAlertDefault } from "@/src/context/AlertDefaultContext";
@@ -23,10 +23,11 @@ interface UseLoginOptions {
 }
 
 export function useLogin(options: UseLoginOptions = {}) {
-  const { passwordOnlyMode = false, getEnableBiometricsAfterLogin } = options;
   const { notify } = useAlertDefault();
-  const { login, lastUsedAccount, addSavedAccount, setBiometricsEnabledAsync } = useAuth();
+  const { passwordOnlyMode = false, getEnableBiometricsAfterLogin } = options;
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  const [isDesabled, setIsDisabled] = useState(false);
+  const { login, lastUsedAccount, addSavedAccount, setBiometricsEnabledAsync } = useAuth();
 
   const { control, handleSubmit, formState: { errors } } = useForm<LoginForm>({
     defaultValues: { email: "", password: "" },
@@ -39,6 +40,7 @@ export function useLogin(options: UseLoginOptions = {}) {
         status: "loading",
         message: i18n.t("NOTIFICATIONS.LOGINLOADING"),
       });
+      setIsDisabled(true);
 
       const email = passwordOnlyMode && lastUsedAccount ? lastUsedAccount.email : data.email;
       const password = data.password;
@@ -66,9 +68,9 @@ export function useLogin(options: UseLoginOptions = {}) {
       });
     } catch (error) {
       const message = (error as AxiosError<{ message: string }>).response?.data?.message ?? "";
-      if (message) {
-        notify({ status: "error", message });
-      }
+      notify({ status: "error", message });
+    } finally {
+      setIsDisabled(false);
     }
   }, [notify, login, navigation, passwordOnlyMode, lastUsedAccount, addSavedAccount, setBiometricsEnabledAsync, getEnableBiometricsAfterLogin]);
 
@@ -84,5 +86,6 @@ export function useLogin(options: UseLoginOptions = {}) {
     control,
     errors,
     rules,
+    isDesabled,
   };
 }

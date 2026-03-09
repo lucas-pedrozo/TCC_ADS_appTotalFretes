@@ -6,7 +6,6 @@ import { useTranslation } from "react-i18next";
 import { useAuth } from "@/src/context/AuthContext";
 import { useThemeColors, useIconColor } from "@/src/context/ThemeContext";
 import { CardHistory } from "@/src/components/cards/CardHistory";
-import { CardCar } from "@/src/components/cards/CardCar";
 import { useWeather } from "@/src/hooks/weather/useWeather";
 import { CardClime } from "@/src/components/cards/CardClime";
 import { useGetUser } from "@/src/hooks/user/useGetUser";

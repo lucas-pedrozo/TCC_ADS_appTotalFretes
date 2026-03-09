@@ -7,51 +7,51 @@ import { AppLanguage } from "@/src/i18n/resources";
 const STORAGE_KEY = "app_language";
 
 type LanguageContextValue = {
-  language: AppLanguage;
-  changeLanguage: (nextLanguage: AppLanguage) => Promise<void>;
+	language: AppLanguage;
+	changeLanguage: (nextLanguage: AppLanguage) => Promise<void>;
 };
 
 const LanguageContext = createContext<LanguageContextValue | undefined>(undefined);
 
 export const LanguageProvider = ({ children }: { children: React.ReactNode }) => {
-  const [language, setLanguage] = useState<AppLanguage>((i18n.language?.split("-")[0] as AppLanguage) || "pt");
+	const [language, setLanguage] = useState<AppLanguage>((i18n.language?.split("-")[0] as AppLanguage) || "pt");
 
-  const changeLanguage = useCallback(async (nextLanguage: AppLanguage) => {
-    await i18n.changeLanguage(nextLanguage);
-    setLanguage(nextLanguage);
-    await SecureStore.setItemAsync(STORAGE_KEY, nextLanguage);
-  }, []);
+	const changeLanguage = useCallback(async (nextLanguage: AppLanguage) => {
+		await i18n.changeLanguage(nextLanguage);
+		setLanguage(nextLanguage);
+		await SecureStore.setItemAsync(STORAGE_KEY, nextLanguage);
+	}, []);
 
-  useEffect(() => {
-    const loadLanguage = async () => {
-      const storedLanguage = await SecureStore.getItemAsync(STORAGE_KEY);
+	useEffect(() => {
+		const loadLanguage = async () => {
+			const storedLanguage = await SecureStore.getItemAsync(STORAGE_KEY);
 
-      if (storedLanguage === "pt" || storedLanguage === "en") {
-        await i18n.changeLanguage(storedLanguage);
-        setLanguage(storedLanguage);
-      }
-    };
+			if (storedLanguage === "pt" || storedLanguage === "en") {
+				await i18n.changeLanguage(storedLanguage);
+				setLanguage(storedLanguage);
+			}
+		};
 
-    loadLanguage();
-  }, []);
+		loadLanguage();
+	}, []);
 
-  const value = useMemo(
-    () => ({
-      language,
-      changeLanguage,
-    }),
-    [changeLanguage, language],
-  );
+	const value = useMemo(
+		() => ({
+			language,
+			changeLanguage,
+		}),
+		[changeLanguage, language],
+	);
 
-  return <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>;
+	return <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>;
 };
 
 export const useLanguage = () => {
-  const context = useContext(LanguageContext);
+	const context = useContext(LanguageContext);
 
-  if (!context) {
-    throw new Error("useLanguage must be used within LanguageProvider");
-  }
+	if (!context) {
+		throw new Error("useLanguage must be used within LanguageProvider");
+	}
 
-  return context;
+	return context;
 };

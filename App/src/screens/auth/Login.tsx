@@ -1,19 +1,17 @@
 import { useCallback, useEffect, useState } from "react";
-import { Platform, Pressable, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
-
 import { Feather } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 import { useAuth } from "@/src/context/AuthContext";
 import { useLogin } from "@/src/hooks/auth/useLogin";
-import { InputDefault, ButtonDefault, OptionKey } from "@/src/components/form";
+import { InputDefault, ButtonDefault } from "@/src/components/form";
 import { useThemeColors, useIconColor } from "@/src/context/ThemeContext";
-
 import { RootStackParamList } from "@/src/routes/Routes";
 import { NavigationProp, RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 
-const Login = () => {
+export default function Login() {
 
   const { t } = useTranslation();
   const colors = useThemeColors();
@@ -23,15 +21,15 @@ const Login = () => {
 
   const route = useRoute<RouteProp<RootStackParamList, "Login">>();
   const initialShowFull = route.params?.startMode === "full";
-  const [showFullForm, setShowFullForm] = useState(initialShowFull);
-  const [enableBiometricsForNextTime, setEnableBiometricsForNextTime] = useState(false);
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
-  const isNative = Platform.OS === "ios" || Platform.OS === "android";
+  const [enableBiometricsForNextTime ] = useState(false);
+  const [showFullForm, setShowFullForm] = useState(initialShowFull);
   const passwordOnlyMode = Boolean(lastUsedAccount && !showFullForm);
   const shouldFocusPassword = Boolean(route.params?.focusPassword && passwordOnlyMode);
   const getEnableBiometricsAfterLogin = useCallback(() => enableBiometricsForNextTime, [enableBiometricsForNextTime]);
-  const { control, rules, handleSubmit, handleLogin } = useLogin({
+
+  const { control, rules, handleSubmit, handleLogin, isDesabled } = useLogin({
     passwordOnlyMode,
     getEnableBiometricsAfterLogin,
   });
@@ -109,12 +107,10 @@ const Login = () => {
         <ButtonDefault
           title={t("LOGIN.SUBMIT")}
           onPress={handleSubmit(handleLogin)}
-          disabled={false}
+          disabled={isDesabled}
           loading={false}
         />
       </View>
     </KeyboardAwareScrollView>
   );
 };
-
-export default Login;
