@@ -1,29 +1,23 @@
-import { useCallback } from "react";
-
 import { AxiosError } from "axios";
-import http from "@/src/services/http";
+import { useCallback } from "react";
 import { useForm } from "react-hook-form";
-import { useAlertDefault } from "@/src/context/AlertDefaultContext";
-import i18n from "@/src/i18n";
 
-import { RootStackParamList } from "@/src/routes/Routes";
-import { getValidationRules } from "@/src/utils/formValidations";
-import { RouteProp, useRoute } from "@react-navigation/native";
+import i18n from "@/src/i18n";
+import http from "@/src/services/http";
 import { useAuth } from "@/src/context/AuthContext";
+import { useAlertDefault } from "@/src/context/AlertDefaultContext";
 import type { EditPerfilMap } from "@/src/interfaces/profile";
 
-const SEX_VALUES = ["M", "F", "N"] as const;
+import { RootStackParamList } from "@/src/routes/Routes";
+import { RouteProp, useRoute } from "@react-navigation/native";
+import { getValidationRules } from "@/src/utils/formValidations";
 
 export function useEditPerfil() {
-  const { notify } = useAlertDefault();
   const { id } = useAuth();
+  const { notify } = useAlertDefault();
+
   const route = useRoute<RouteProp<RootStackParamList, "EditPerfil">>();
   const editPerfilData = route.params?.editPerfilData;
-
-  const normalizedSex =
-    editPerfilData?.sex && SEX_VALUES.includes(editPerfilData.sex as (typeof SEX_VALUES)[number])
-      ? editPerfilData.sex
-      : "";
 
   const { control, handleSubmit, formState: { errors } } = useForm<EditPerfilMap>({
     defaultValues: {
@@ -32,8 +26,8 @@ export function useEditPerfil() {
       birthDate: editPerfilData?.birthDate ?? "",
       phoneNumber: editPerfilData?.phoneNumber ?? "",
       cpf: editPerfilData?.cpf ?? "",
-      isDeficient: editPerfilData?.isDeficient ?? false,
-      sex: normalizedSex,
+      isDeficient: editPerfilData?.isDeficient ?? undefined,
+      sex: editPerfilData?.sex ?? "",
     },
     mode: "onSubmit",
   });
@@ -44,13 +38,8 @@ export function useEditPerfil() {
         status: "loading",
         message: i18n.t("NOTIFICATIONS.EDITPERFILLOADING"),
       });
-      const isDeficientValue =
-        data.isDeficient === true || String(data.isDeficient) === "true";
-      const payload = {
-        ...data,
-        isDeficient: isDeficientValue,
-      };
-      await http.patch<EditPerfilMap>(`/user/${id}`, payload);
+
+      await http.patch<EditPerfilMap>(`/user/${id}`, data);
 
       await notify({
         status: "success",
@@ -58,13 +47,12 @@ export function useEditPerfil() {
       });
     } catch (error) {
       const message = (error as AxiosError<{ message: string }>).response?.data?.message ?? "";
-      if (message) {
-        notify({ status: "error", message });
-      }
+      notify({ status: "error", message });
     }
   }, [notify, id]);
 
   const validationRules = getValidationRules();
+
   const rules = {
     name: validationRules.name,
     email: validationRules.email,

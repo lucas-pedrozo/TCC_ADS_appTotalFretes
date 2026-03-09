@@ -25,8 +25,12 @@ import VerificationCode from "../screens/auth/VerificationCode";
 import AdvancedOptions from "../screens/user/AdvancedOptions";
 import DetailFreight from "../screens/freight/DetailFreight";
 
-import type { EditPerfilMap, EditCnhMap } from "@/src/interfaces/profile";
 import RenewPassword from "../screens/user/RenewPassword";
+import VehicleGroup from "../screens/freight/VehicleGroup";
+import VehicleType from "../screens/freight/VehicleType";
+import VehicleData from "../screens/freight/VehicleData";
+import { EditPerfilMap, EditCnhMap } from "@/src/interfaces/profile";
+import Term from "../screens/advance/Term";
 
 interface EditPerfilRouteParams {
   editPerfilData: EditPerfilMap;
@@ -39,10 +43,7 @@ interface EditCnhRouteParams {
 
 export type RootStackParamList = {
   Home: undefined;
-  Login: {
-    startMode?: "saved" | "full";
-    focusPassword?: boolean;
-  } | undefined;
+  Login: { startMode?: "saved" | "full"; focusPassword?: boolean; };
   Start: undefined;
   SingUp: undefined;
   SingUpCNH: undefined;
@@ -56,6 +57,10 @@ export type RootStackParamList = {
   CancelAccount: undefined;
   RenewPassword: undefined;
   DetailFreight: undefined;
+  VehicleGroup: undefined;
+  VehicleType: undefined;
+  VehicleData: undefined;
+  Term: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -88,6 +93,22 @@ function PrivateDetailFreight() {
   return <PrivateRoute><DetailFreight /></PrivateRoute>;
 }
 
+function PrivateVehicleGroup() {
+  return <PrivateRoute><VehicleGroup /></PrivateRoute>;
+}
+
+function PrivateVehicleType() {
+  return <PrivateRoute><VehicleType /></PrivateRoute>;
+}
+
+function PrivateVehicleData() {
+  return <PrivateRoute><VehicleData /></PrivateRoute>;
+}
+
+function PrivateTerm() {
+  return <PrivateRoute><Term /></PrivateRoute>;
+}
+
 export default function Routes() {
   const { theme } = useThemeMode();
   const { t } = useTranslation();
@@ -105,7 +126,7 @@ export default function Routes() {
         screenOptions={{
           header: ({ options }) => (
             options.title ? (
-              <SafeAreaView edges={["top"]} style={{ paddingHorizontal: 12, backgroundColor }}>
+              <SafeAreaView edges={["top"]} style={{ paddingHorizontal: 16, backgroundColor }}>
                 <Header title={options.title} />
               </SafeAreaView>
             ) : null
@@ -119,6 +140,10 @@ export default function Routes() {
         <Stack.Screen name="CancelAccount" component={PrivateCancelAccount} options={{ title: t("ROUTES.CANCELACCOUNT") }} />
         <Stack.Screen name="RenewPassword" component={PrivateRenewPassword} options={{ title: t("ROUTES.RENEWPASSWORD") }} />
         <Stack.Screen name="DetailFreight" component={PrivateDetailFreight} options={{ title: t("ROUTES.DETAILFREIGHT") }} />
+        <Stack.Screen name="VehicleGroup" component={PrivateVehicleGroup} options={{ title: t("ROUTES.VEHICLEGROUP") }} />
+        <Stack.Screen name="VehicleType" component={PrivateVehicleType} options={{ title: t("ROUTES.VEHICLETYPE") }} />
+        <Stack.Screen name="VehicleData" component={PrivateVehicleData} options={{ title: t("ROUTES.VEHICLEDATA") }} />
+        <Stack.Screen name="Term" component={PrivateTerm} options={{ title: t("ROUTES.TERM") }} />
 
         <Stack.Screen name="Start" component={Start} options={{ headerShown: false }} />
         <Stack.Screen name="Login" component={Login} options={{ title: t("ROUTES.LOGIN") }} />

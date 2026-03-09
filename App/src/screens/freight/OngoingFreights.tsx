@@ -81,13 +81,13 @@ function OngoingFreights() {
                 </TouchableOpacity>
 
                 <Text className="font-semibold text-base pl-2.5 mb-4 mt-5" style={{ color: colors.text }}>Mais detalhes</Text>
-                <DetailRow label="Tipo" value="Cascalho" />
-                <DetailRow label="Categoria" value="Mineral" />
-                <DetailRow label="Peso da carga" value="20T" />
-                <DetailRow label="Tipo" value="Cascalho" />
-                <DetailRow label="Prazo" value="10 dias" />
-                <DetailRow label="Data Embarque" value="Cascalho" />
-                <DetailRow label="Data Desembarque" value="Cascalho" />
+                <DetailRow label="Tipo" value="---" />
+                <DetailRow label="Categoria" value="---" />
+                <DetailRow label="Peso da carga" value="---" />
+                <DetailRow label="Tipo" value="---" />
+                <DetailRow label="Prazo" value="---" />
+                <DetailRow label="Data Embarque" value="---" />
+                <DetailRow label="Data Desembarque" value="---" />
 
             </ScrollView>
 

@@ -2,6 +2,7 @@ import { useCallback } from "react";
 import i18n from "@/src/i18n";
 import { AxiosError } from "axios";
 import http from "@/src/services/http";
+import type { ValidateCodeResponse } from "@/src/types/api";
 import { useForm } from "react-hook-form";
 import { RootStackParamList } from "@/src/routes/Routes";
 import { useAlertDefault } from "@/src/context/AlertDefaultContext";
@@ -33,7 +34,7 @@ export function usePasswordValidate() {
         message: i18n.t("NOTIFICATIONS.CODEVALIDATIONLOADING"),
       });
 
-      const response = await http.post("/auth/validate-code", {
+      const response = await http.post<ValidateCodeResponse>("/auth/validate-code", {
         email,
         code: data.code.trim(),
       });
@@ -43,7 +44,7 @@ export function usePasswordValidate() {
         message: response.data.message ?? i18n.t("NOTIFICATIONS.CODEVALIDATED"),
       });
 
-      const resetToken = response.data.resetToken as string;
+      const resetToken = response.data.resetToken;
       if (!resetToken) {
         await notify({ status: "error", message: "Resposta inválida. Tente novamente." });
         return;

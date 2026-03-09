@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Text, View, ActivityIndicator, ViewStyle } from "react-native";
 import { useTranslation } from "react-i18next";
@@ -22,6 +22,12 @@ interface StatusConfig {
   icon?: IoniconName;
   titleKey: "ALERT.SUCCESS_TITLE" | "ALERT.ERROR_TITLE" | "ALERT.LOADING_TITLE" | "ALERT.NOTIFICATION_TITLE";
 }
+
+const AlertIcon = ({ status, icon }: { status: AlertStatus; icon?: IoniconName }) => {
+  if (status === "loading") return <ActivityIndicator size="large" color="#fff" />;
+  if (icon) return <Ionicons name={icon} size={36} color="#fff" />;
+  return null;
+};
 
 const STATUS_CONFIG: Record<AlertStatus, StatusConfig> = {
   success: {
@@ -57,14 +63,14 @@ function AlertDefault({ visible, status, message, onDismiss }: AlertDefaultProps
     return () => clearTimeout(timeoutId);
   }, [visible, status, onDismiss]);
 
-  if (!visible) return null;
-
-  const containerStyle: ViewStyle = {
+  const containerStyle = useMemo<ViewStyle>(() => ({
     top: insets.top + 30,
     left: 10,
     right: 10,
     backgroundColor: config.backgroundColor,
-  };
+  }), [insets.top, config.backgroundColor]);
+
+  if (!visible) return null;
 
   return (
     <animation.iPhoneBounceDown
@@ -73,11 +79,7 @@ function AlertDefault({ visible, status, message, onDismiss }: AlertDefaultProps
       accessibilityLabel={title}
     >
       <View style={CssAlertNotification.row}>
-        {status === "loading" ? (
-          <ActivityIndicator size="large" color="#fff" />
-        ) : config.icon ? (
-          <Ionicons name={config.icon} size={36} color="#fff" />
-        ) : null}
+        <AlertIcon status={status} icon={config.icon} />
 
         <View style={CssAlertNotification.content}>
           <Text style={CssAlertNotification.title}>{title}</Text>

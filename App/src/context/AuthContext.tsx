@@ -1,15 +1,9 @@
 import { createContext, useState, ReactNode, useContext, useEffect } from "react";
 import * as SecureStore from "expo-secure-store";
 import { jwtDecode } from "jwt-decode";
-import { clearAuthToken, setAuthToken } from "@/src/services/http";
+import { clearAuthToken, setAuthToken, getStoredAuthToken, getBiometricsEnabled, setBiometricsEnabled, clearAuthTokenCacheOnly } from "@/src/services/http";
 import type { SavedAccount } from "@/src/utils/savedAccounts";
-import {
-	getSavedAccounts,
-	getLastUsedAccountEmail,
-	addOrUpdateSavedAccount as persistAddSavedAccount,
-	removeSavedAccount as persistRemoveSavedAccount,
-	setLastUsedAccountEmail,
-} from "@/src/utils/savedAccounts";
+import { getSavedAccounts, getLastUsedAccountEmail, addOrUpdateSavedAccount as persistAddSavedAccount, removeSavedAccount as persistRemoveSavedAccount, setLastUsedAccountEmail} from "@/src/utils/savedAccounts";
 
 /**
  * @description Interface de token decodificado
@@ -31,6 +25,7 @@ interface AuthContextType {
 	token: string | null;
 	accessLevel: string | null;
 	isAuthenticated: boolean | null;
+	isAuthReady: boolean;
 	savedAccounts: SavedAccount[];
 	lastUsedAccount: SavedAccount | null;
 
@@ -40,6 +35,8 @@ interface AuthContextType {
 	setLastUsedAccount: (email: string) => Promise<void>;
 	removeSavedAccount: (email: string) => Promise<void>;
 	refreshSavedAccounts: () => Promise<void>;
+	biometricsEnabled: boolean;
+	setBiometricsEnabledAsync: (enabled: boolean) => Promise<void>;
 }
 
 /**
@@ -51,6 +48,7 @@ const defaultAuthContext: AuthContextType = {
 	id: null,
 	accessLevel: null,
 	isAuthenticated: false,
+	isAuthReady: false,
 	savedAccounts: [],
 	lastUsedAccount: null,
 	login: async () => { },
@@ -59,6 +57,8 @@ const defaultAuthContext: AuthContextType = {
 	setLastUsedAccount: async () => { },
 	removeSavedAccount: async () => { },
 	refreshSavedAccounts: async () => { },
+	biometricsEnabled: false,
+	setBiometricsEnabledAsync: async () => { },
 };
 
 /**
@@ -92,8 +92,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 	const [token, setToken] = useState<string | null>(null);
 	const [accessLevel, setAccessLevel] = useState<string | null>(null);
 	const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+	const [isAuthReady, setIsAuthReady] = useState(false);
 	const [savedAccounts, setSavedAccountsState] = useState<SavedAccount[]>([]);
 	const [lastUsedAccount, setLastUsedAccountState] = useState<SavedAccount | null>(null);
+	const [biometricsEnabled, setBiometricsEnabledState] = useState(false);
 
 	const refreshSavedAccounts = async () => {
 		const accounts = await getSavedAccounts();
@@ -106,29 +108,47 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
 	useEffect(() => {
 		const loadStoredToken = async () => {
-			const storedToken = await SecureStore.getItemAsync("authToken");
-			if (!storedToken) {
+			try {
+				const biometricsPref = await getBiometricsEnabled();
+				setBiometricsEnabledState(biometricsPref);
+
+				// Com biometria ativa: não pedir biometria ao abrir o app; usuário entra ao tocar no card
+				if (biometricsPref) {
+					setIsAuthenticated(false);
+					await refreshSavedAccounts();
+					setIsAuthReady(true);
+					return;
+				}
+
+				const storedToken = await getStoredAuthToken();
+				if (!storedToken) {
+					setIsAuthenticated(false);
+					await refreshSavedAccounts();
+					return;
+				}
+
+				const decoded = decodeToken(storedToken);
+				if (!decoded?.id || !(decoded.role || decoded.accessLevel)) {
+					await SecureStore.deleteItemAsync("authToken");
+					await clearAuthToken();
+					setIsAuthenticated(false);
+					await refreshSavedAccounts();
+					return;
+				}
+
+				setToken(storedToken);
+				setId(Number(decoded.id));
+				setAccessLevel(decoded.role ?? decoded.accessLevel ?? null);
+				setIsAuthenticated(true);
+
+				await setAuthToken(storedToken);
+				await refreshSavedAccounts();
+			} catch {
 				setIsAuthenticated(false);
 				await refreshSavedAccounts();
-				return;
+			} finally {
+				setIsAuthReady(true);
 			}
-
-			const decoded = decodeToken(storedToken);
-			if (!decoded?.id || !(decoded.role || decoded.accessLevel)) {
-				await SecureStore.deleteItemAsync("authToken");
-				await clearAuthToken();
-				setIsAuthenticated(false);
-				await refreshSavedAccounts();
-				return;
-			}
-
-			setToken(storedToken);
-			setId(Number(decoded.id));
-			setAccessLevel(decoded.role ?? decoded.accessLevel ?? null);
-			setIsAuthenticated(true);
-
-			await setAuthToken(storedToken);
-			await refreshSavedAccounts();
 		};
 
 		loadStoredToken();
@@ -151,7 +171,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 		setId(null);
 		setAccessLevel(null);
 		setIsAuthenticated(false);
-		await clearAuthToken();
+		if (biometricsEnabled) {
+			clearAuthTokenCacheOnly();
+		} else {
+			await clearAuthToken();
+		}
 		// Contas salvas permanecem para login rápido na próxima abertura
 	};
 
@@ -170,6 +194,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 		await refreshSavedAccounts();
 	};
 
+	const setBiometricsEnabledAsync = async (enabled: boolean) => {
+		await setBiometricsEnabled(enabled);
+		setBiometricsEnabledState(enabled);
+		if (token) {
+			await setAuthToken(token);
+		}
+	};
+
 	return (
 		<AuthContext.Provider
 			value={{
@@ -177,6 +209,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 				id,
 				accessLevel,
 				isAuthenticated,
+				isAuthReady,
 				savedAccounts,
 				lastUsedAccount,
 				login,
@@ -185,6 +218,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 				setLastUsedAccount,
 				removeSavedAccount,
 				refreshSavedAccounts,
+				biometricsEnabled,
+				setBiometricsEnabledAsync,
 			}}
 		>
 			{children}

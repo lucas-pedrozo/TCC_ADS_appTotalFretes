@@ -1,13 +1,13 @@
-import { ActivityIndicator, Text, TouchableOpacity, View } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
 import { useTranslation } from "react-i18next";
-import { useIconColor, useThemeColors } from "@/src/context/ThemeContext";
+
 import { Ionicons } from "@expo/vector-icons";
 import { IconBox } from "@/src/components/ui/IconBox";
 import type { MapVehicle } from "@/src/interfaces/vehicle";
+import { useIconColor, useThemeColors } from "@/src/context/ThemeContext";
 
 type CardVehicleProps = {
   vehicle: MapVehicle | null;
-  loading?: boolean;
   onPress?: () => void;
 };
 
@@ -16,7 +16,7 @@ function formatWeight(weight: number | undefined | null): string {
   return `${weight}T`;
 }
 
-export const CardVehicle = ({ vehicle, loading, onPress }: CardVehicleProps) => {
+export const CardVehicle = ({ vehicle, onPress }: CardVehicleProps) => {
   const colors = useThemeColors();
   const { t } = useTranslation();
   const iconColor = useIconColor();
@@ -39,7 +39,7 @@ export const CardVehicle = ({ vehicle, loading, onPress }: CardVehicleProps) => 
 
       <TouchableOpacity
         onPress={onPress}
-        className="p-4 rounded-2xl w-full"
+        className={`p-4 rounded-2xl flex-1`}
         style={{ backgroundColor: colors.bgNonary, borderColor: colors.bgTertiary, borderWidth: 1 }}
       >
         <IconBox name="car-outline" />

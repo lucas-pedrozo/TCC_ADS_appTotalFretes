@@ -33,30 +33,30 @@ export function useSignUp() {
         message: i18n.t("NOTIFICATIONS.SIGNUPLOADING"),
       });
 
-      const response = await http.post("/user/end-account", {
+      await http.post<SingUpFormData>("/user/end-account", {
         name: data.name,
         email: data.email,
-        sex: data.sex,
-        cpf: data.cpf,
-        cnhNumber: data.cnhNumber,
-        useGlasses: data.useGlasses,
-        cnhType_id: data.cnhType_id,
-        isDeficient: data.isDeficient,
-        issuingAgencyCnh: data.issuingAgencyCnh,
         birthDate: data.birthDate,
         phoneNumber: data.phoneNumber,
+        cpf: data.cpf,
+        sex: data.sex,
+        useGlasses: data.useGlasses,
+        isDeficient: data.isDeficient,
+        cnhNumber: data.cnhNumber,
+        cnhType_id: data.cnhType_id,
         password: data.password,
         account_type_id: 1,
-      });
-
-      await notify({
+      }
+      );
+ 
+     await notify({
         status: "success",
-        message: response.data.message ?? i18n.t("NOTIFICATIONS.SIGNUPSUCCESS"),
+        message: i18n.t("NOTIFICATIONS.SIGNUPSUCCESS"),
       });
 
       await new Promise(resolve => setTimeout(resolve, 1200));
 
-      await navigation.navigate("Login");
+      await navigation.navigate({ name: "Login", params: { startMode: "saved", focusPassword: true } });
     } catch (error) {
       const message = (error as AxiosError<{ message: string }>).response?.data?.message ?? "";
       if (message) {

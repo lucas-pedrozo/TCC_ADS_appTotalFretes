@@ -1,6 +1,7 @@
 import { AxiosError } from "axios";
 import { useCallback } from "react";
 import http from "@/src/services/http";
+import type { ApiMessageResponse } from "@/src/types/api";
 import { useForm } from "react-hook-form";
 import { getValidationRules } from "@/src/utils/formValidations";
 import i18n from "@/src/i18n";
@@ -29,7 +30,7 @@ export function useForgotPassword() {
         message: i18n.t("NOTIFICATIONS.FORGOTPASSWORDLOADING"),
       });
 
-      const response = await http.post("/auth/forgot-password", { email: data.email });
+      const response = await http.post<ApiMessageResponse>("/auth/forgot-password", { email: data.email });
 
       await notify({
         status: "success",

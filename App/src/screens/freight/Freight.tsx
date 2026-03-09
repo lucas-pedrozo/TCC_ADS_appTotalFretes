@@ -78,7 +78,7 @@ const Freight = () => {
   }, []);
 
   return (
-    <SafeAreaView style={{ flex: 1, paddingHorizontal: 16, backgroundColor: colors.bg }}>
+    <SafeAreaView style={{ flex: 1, paddingHorizontal: 16, backgroundColor: colors.bg, paddingTop: 10 }}>
 
       <Text className="text-2xl text-center font-semibold" style={{ color: colors.text }}>
         {t("FREIGHT.TITLE")}

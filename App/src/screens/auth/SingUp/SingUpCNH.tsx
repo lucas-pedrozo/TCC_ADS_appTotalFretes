@@ -4,19 +4,15 @@ import { useSignUpCnh } from "@/src/hooks/auth/useSignUpCnh";
 import { StepIndicator } from "@/src/components/header/StepIndicator";
 import { InputDefault, ButtonDefault, InputGroup } from "@/src/components/form";
 
+import { useTranslation } from "react-i18next";
 import { useNavigation } from "@react-navigation/native";
 import { RootStackParamList } from "@/src/routes/Routes";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { useTranslation } from "react-i18next";
-
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
-/**
- * @description Componente de cadastro de CNH
- * @returns Componente de cadastro de CNH
- */
+
 const SingUpCNH = () => {
   const { t } = useTranslation();
 
@@ -41,6 +37,7 @@ const SingUpCNH = () => {
 				<InputDefault
 					name="cnhNumber"
 					control={control}
+					type="numeric"
 					placeholder={t("SIGNUP.CNH.CNHPLACEHOLDER")}
 					label={t("SIGNUP.CNH.CNHLABEL")}
 					maxLength={11}

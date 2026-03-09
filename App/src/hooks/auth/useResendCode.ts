@@ -1,6 +1,7 @@
 import { AxiosError } from "axios";
 import { useAlertDefault } from "@/src/context/AlertDefaultContext";
 import http from "@/src/services/http";
+import type { ApiMessageResponse, ResendCodePayload } from "@/src/types/api";
 import { useCallback } from "react";
 
 export function useResendCode(email: string) {
@@ -21,7 +22,8 @@ export function useResendCode(email: string) {
         message: "Reenviando código...",
       });
 
-      await http.post("/auth/resend-code", { email });
+      const payload: ResendCodePayload = { email };
+      await http.post<ApiMessageResponse>("/auth/resend-code", payload);
 
       await notify({
         status: "success",

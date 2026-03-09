@@ -24,6 +24,8 @@ export const screenPT = {
     SAVEDACCOUNT: "Conta salva",
     SWITCHACCOUNT: "Trocar conta",
     USESAVEDACCOUNT: "Usar conta salva",
+    ENTERWITHPASSWORD: "Entrar com senha",
+    ENABLEBIOMETRICS: "Usar biometria na próxima vez",
   },
   ROUTES: {
     LOGIN: "Login",
@@ -38,7 +40,29 @@ export const screenPT = {
     EDITCNH: "Editar CNH",
     ADVANCEDOPTIONS: "Opções Avançadas",  
     CANCELACCOUNT: "Cancelar Conta",
-    RENEWPASSWORD: "Renovar Senha"
+    RENEWPASSWORD: "Renovar Senha",
+    VEHICLEGROUP: "Grupo de Veículo",
+    VEHICLETYPE: "Tipo de Veículo",
+    VEHICLEDATA: "Cadastro de Veículo",
+    TERM: "Termo de Compromisso",
+    TERMS: "Termos de compromisso",
+  },
+  TERM: {
+    TITLE: "TERMO DE COMPROMISSO – ENTREGA DE FRETES",
+    INTRO:
+      "Eu, Lucas Carvalho Pedrozo, CPF nº 000.000.000-00, na função de transportador, assumo o compromisso de cumprir as seguintes regras durante a prestação de serviços de entrega de fretes:",
+    RULES_TITLE: "Regras do Compromisso",
+    RULE_1: "Cumprir os prazos de coleta e entrega combinados.",
+    RULE_2: "Transportar a carga com cuidado, garantindo sua integridade.",
+    RULE_3:
+      "Comunicar imediatamente ao contratante qualquer problema, atraso ou ocorrência durante o transporte.",
+    RULE_4: "Seguir as leis de trânsito e de segurança.",
+    RULE_5: "Não repassar o serviço a terceiros sem autorização do contratante.",
+    RULE_6: "Manter sigilo sobre informações de rotas, valores e clientes envolvidos.",
+    RULE_7:
+      "Responsabilizar-se por danos causados por negligência, descuido ou mau uso do veículo/carga.",
+    DECLARATION:
+      "Declaro que estou ciente e de acordo com as regras acima, comprometendo-me a cumpri-las integralmente.",
   },
   FORGOTPASSWORD: {
     TITLE: "Solicitação de nova senha",
@@ -107,6 +131,9 @@ export const screenPT = {
     LANGUAGE: "Idioma",
     LIGHTMODE: "Modo claro",
     DARKMODE: "Modo escuro",
+    BIOMETRICS: "Acesso com biometria",
+    BIOMETRICS_PROMPT: "Use biometria para ativar o acesso por Face ID ou impressão digital.",
+    BIOMETRICS_FALLBACK: "Usar senha do dispositivo",
     LANGPT: "PT-BR",
     LANGEN: "EN-US",
     LOGOUT: "Sair da conta",
@@ -167,6 +194,8 @@ export const screenEN = {
     SAVEDACCOUNT: "Saved account",
     SWITCHACCOUNT: "Switch account",
     USESAVEDACCOUNT: "Use saved account",
+    ENTERWITHPASSWORD: "Enter with password",
+    ENABLEBIOMETRICS: "Use biometrics next time",
   },
   ROUTES: {
     LOGIN: "Login",
@@ -181,7 +210,29 @@ export const screenEN = {
     EDITCNH: "Edit Driver License",
     ADVANCEDOPTIONS: "Advanced Options",
     CANCELACCOUNT: "Cancel Account",
-    RENEWPASSWORD: "Renew Password"
+    RENEWPASSWORD: "Renew Password",
+    VEHICLEGROUP: "Vehicle Group",
+    VEHICLETYPE: "Vehicle Type",
+    VEHICLEDATA: "Register Vehicle",
+    TERM: "Commitment Term",
+    TERMS: "Terms of commitment",
+  },
+  TERM: {
+    TITLE: "COMMITMENT TERM – FREIGHT DELIVERY",
+    INTRO:
+      "I, Lucas Carvalho Pedrozo, CPF no. 000.000.000-00, in the capacity of carrier, undertake to comply with the following rules during the provision of freight delivery services:",
+    RULES_TITLE: "Commitment Rules",
+    RULE_1: "Meet the agreed collection and delivery deadlines.",
+    RULE_2: "Transport the cargo with care, ensuring its integrity.",
+    RULE_3:
+      "Immediately inform the contractor of any problem, delay or occurrence during transport.",
+    RULE_4: "Comply with traffic and safety laws.",
+    RULE_5: "Do not assign the service to third parties without the contractor's authorization.",
+    RULE_6: "Maintain confidentiality regarding information on routes, amounts and clients involved.",
+    RULE_7:
+      "Take responsibility for damage caused by negligence, carelessness or misuse of the vehicle/cargo.",
+    DECLARATION:
+      "I declare that I am aware of and agree with the rules above, committing to comply with them in full.",
   },
   FORGOTPASSWORD: {
     TITLE: "Forgot Password Request",
@@ -250,6 +301,9 @@ export const screenEN = {
     LANGUAGE: "Language",
     LIGHTMODE: "Light mode",
     DARKMODE: "Dark mode",
+    BIOMETRICS: "Biometric access",
+    BIOMETRICS_PROMPT: "Use biometrics to enable Face ID or fingerprint access.",
+    BIOMETRICS_FALLBACK: "Use device passcode",
     LANGPT: "PT-BR",
     LANGEN: "EN-US",
     LOGOUT: "Sign out",

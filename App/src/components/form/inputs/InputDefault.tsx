@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import { Controller } from "react-hook-form";
-import { View, Text, TextInput } from "react-native";
+import { View, Text, TextInput, Pressable } from "react-native";
+import { Feather } from "@expo/vector-icons";
 
 import { useThemeColors } from "@/src/context/ThemeContext";
 import { INPUT_STYLES, type InputBaseProps } from "./inputShared";
@@ -19,6 +20,7 @@ export function InputDefault({
   disabled = false,
 }: InputBaseProps) {
   const colors = useThemeColors();
+  const [passwordVisible, setPasswordVisible] = useState(false);
 
   return (
     <Controller
@@ -47,23 +49,30 @@ export function InputDefault({
                 {label}
               </Text>
             ) : null}
-            <TextInput
-              id={id}
-              onBlur={onBlur}
-              autoFocus={autoFocus}
-              keyboardType={type}
-              maxLength={maxLength}
-              value={String(value ?? "")}
-              onChangeText={onChange}
-              placeholder={placeholder}
-              placeholderTextColor={placeholderColor}
-              secureTextEntry={secureTextEntry}
-              editable={!disabled}
-              style={inputStyle}
-              className={
-                error ? INPUT_STYLES.error.input : disabled ? INPUT_STYLES.disabled.input : INPUT_STYLES.default.input
-              }
-            />
+            <View className="relative justify-center">
+              <TextInput
+                id={id}
+                onBlur={onBlur}
+                autoFocus={autoFocus}
+                keyboardType={type}
+                maxLength={maxLength}
+                value={String(value ?? "")}
+                onChangeText={onChange}
+                placeholder={placeholder}
+                placeholderTextColor={placeholderColor}
+                secureTextEntry={secureTextEntry && !passwordVisible}
+                editable={!disabled}
+                style={[inputStyle, secureTextEntry ? { paddingRight: 48 } : undefined]}
+                className={
+                  error ? INPUT_STYLES.error.input : disabled ? INPUT_STYLES.disabled.input : INPUT_STYLES.default.input
+                }
+              />
+              {secureTextEntry ? (
+                <Pressable onPress={() => setPasswordVisible((prev) => !prev)} className="absolute right-3 p-1" hitSlop={8}>
+                  <Feather name={passwordVisible ? "eye" : "eye-off"} size={20} color={colors.textSecondary} />
+                </Pressable>
+              ) : null}
+            </View>
             {error ? <Text className="text-red-500 text-sm pl-2.5 pt-1">{error.message}</Text> : null}
           </View>
         );

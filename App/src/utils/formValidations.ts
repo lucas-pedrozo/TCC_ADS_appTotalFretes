@@ -169,12 +169,16 @@ export const getValidationRules = () => ({
     validate: (value: string) => validateTypeCnh(value) || i18n.t("VALIDATION.INVALIDTYPECNH"),
   },
   useGlasses: {
-    required: i18n.t("VALIDATION.REQUIREDUSEGLASSES"),
-    validate: (value: string) => validateUseGlasses(value) || i18n.t("VALIDATION.INVALIDUSEGLASSES"),
+    validate: (value: string) => {
+      if (value === undefined || value === null || value === "") return i18n.t("VALIDATION.REQUIREDUSEGLASSES");
+      return validateUseGlasses(String(value)) || i18n.t("VALIDATION.INVALIDUSEGLASSES");
+    },
   },
   isDeficient: {
-    required: i18n.t("VALIDATION.REQUIREDDISABILITY"),
-    validate: (value: string) => validateDisability(value) || i18n.t("VALIDATION.INVALIDDISABILITY"),
+    validate: (value: string) => {
+      if (value === undefined || value === null || value === "") return i18n.t("VALIDATION.REQUIREDDISABILITY");
+      return validateDisability(String(value)) || i18n.t("VALIDATION.INVALIDDISABILITY");
+    },
   },
   issuingAgencyCnh: {
     required: i18n.t("VALIDATION.REQUIREDISSUINGAGENCY"),

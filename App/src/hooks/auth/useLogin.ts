@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import { useAlertDefault } from "@/src/context/AlertDefaultContext";
 import { getValidationRules } from "@/src/utils/formValidations";
 import { maskEmailForDisplay } from "@/src/utils/savedAccounts";
+import type { LoginResponse } from "@/src/types/api";
 
 import i18n from "@/src/i18n";
 import { AxiosError } from "axios";
@@ -17,14 +18,14 @@ export interface LoginForm {
 }
 
 interface UseLoginOptions {
-  /** Quando true, envia apenas senha; o email vem da conta salva (lastUsedAccount). */
   passwordOnlyMode?: boolean;
+  getEnableBiometricsAfterLogin?: () => boolean;
 }
 
 export function useLogin(options: UseLoginOptions = {}) {
-  const { passwordOnlyMode = false } = options;
+  const { passwordOnlyMode = false, getEnableBiometricsAfterLogin } = options;
   const { notify } = useAlertDefault();
-  const { login, lastUsedAccount, addSavedAccount } = useAuth();
+  const { login, lastUsedAccount, addSavedAccount, setBiometricsEnabledAsync } = useAuth();
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
   const { control, handleSubmit, formState: { errors } } = useForm<LoginForm>({
@@ -43,15 +44,19 @@ export function useLogin(options: UseLoginOptions = {}) {
       const password = data.password;
       const payload = { email, password };
 
-      const response = await http.post("/auth/login", payload);
+      const response = await http.post<LoginResponse>("/auth/login", payload);
       const token = response.data.token;
       await login(token);
 
       await addSavedAccount(email, maskEmailForDisplay(email));
 
+      if (getEnableBiometricsAfterLogin?.()) {
+        await setBiometricsEnabledAsync(true);
+      }
+
       await notify({
         status: "success",
-        message: response.data.message ?? i18n.t("NOTIFICATIONS.LOGINSUCCESS"),
+        message: i18n.t("NOTIFICATIONS.LOGINSUCCESS"),
       });
 
       await new Promise(resolve => setTimeout(resolve, 1200));
@@ -65,7 +70,7 @@ export function useLogin(options: UseLoginOptions = {}) {
         notify({ status: "error", message });
       }
     }
-  }, [notify, login, navigation, passwordOnlyMode, lastUsedAccount, addSavedAccount]);
+  }, [notify, login, navigation, passwordOnlyMode, lastUsedAccount, addSavedAccount, setBiometricsEnabledAsync, getEnableBiometricsAfterLogin]);
 
   const validationRules = getValidationRules();
   const rules = {

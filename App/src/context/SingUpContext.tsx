@@ -38,11 +38,7 @@ export type SingUpPasswordData = {
  * @description Interface de dados de draft
  * @returns Interface de dados de draft
  */
-export type SingUpDraftData = SingUpPersonaData &
-  SingUpCnhData &
-  SingUpPasswordData & {
-    sex?: string;
-  };
+export type SingUpDraftData = SingUpPersonaData & SingUpCnhData & SingUpPasswordData;
 
 /**
  * @description Interface de contexto de cadastro
@@ -52,10 +48,12 @@ type SingUpContextValue = {
   persona: SingUpPersonaData;
   cnh: SingUpCnhData;
   password: SingUpPasswordData;
+
   setPersona: (data: SingUpPersonaData) => void;
   setCnh: (data: SingUpCnhData) => void;
   setPassword: (data: SingUpPasswordData) => void;
   getPayload: () => SingUpDraftData;
+  reset: () => void;
 };
 
 /**
@@ -108,14 +106,29 @@ export function SingUpProvider({ children }: { children: React.ReactNode }) {
   const setCnh = useCallback((data: SingUpCnhData) => setCnhState(data), []);
   const setPassword = useCallback((data: SingUpPasswordData) => setPasswordState(data), []);
 
-  const getPayload = useCallback(
-    () => ({
-      ...persona,
-      ...cnh,
-      ...password,
-    }),
-    [persona, cnh, password]
-  );
+  const getPayload = useCallback(() => ({ ...persona, ...cnh, ...password }), [persona, cnh, password]);
+
+  const reset = useCallback(() => {
+    setPersonaState({
+      name: "",
+      email: "",
+      birthDate: "",
+      phoneNumber: "",
+      cpf: "",
+      isDeficient: undefined,
+      sex: "",
+    });
+    setCnhState({
+      cnhNumber: "",
+      useGlasses: undefined,
+      issuingAgencyCnh: "",
+      cnhType_id: undefined,
+    });
+    setPasswordState({
+      password: "",
+      confirmPassword: "",
+    });
+  }, []);
 
   const value = useMemo(
     () => ({
@@ -126,6 +139,7 @@ export function SingUpProvider({ children }: { children: React.ReactNode }) {
       setCnh,
       setPassword,
       getPayload,
+      reset,
     }),
     [persona, cnh, password, setPersona, setCnh, setPassword, getPayload]
   );
