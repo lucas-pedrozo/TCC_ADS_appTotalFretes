@@ -12,7 +12,7 @@ type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
 export function useStartScreen() {
 	const navigation = useNavigation<NavigationProp>();
-	const { notify } = useAlertDefault();
+	const { notify, hideAlert } = useAlertDefault();
 	const { isAuthReady, lastUsedAccount, removeSavedAccount, login, biometricsEnabled } = useAuth();
 	const [hasStoredToken, setHasStoredToken] = useState<boolean | null>(null);
 
@@ -38,6 +38,7 @@ export function useStartScreen() {
 			}
 			const token = await getStoredAuthToken({ useBiometrics: biometricsEnabled });
 			if (token) {
+				notify({ status: "loading", message: i18n.t("NOTIFICATIONS.LOGINLOADING") });
 				const isValid = await validateAuthToken({ token });
 				if (!isValid) {
 					await clearAuthToken();
@@ -46,6 +47,7 @@ export function useStartScreen() {
 					return;
 				}
 				await login(token);
+				hideAlert();
 				setTimeout(() => {
 					navigation.reset({ index: 0, routes: [{ name: "Home" as never }] });
 				}, 150);
@@ -53,7 +55,7 @@ export function useStartScreen() {
 			}
 		}
 		navigation.navigate("Login", { startMode: "saved", focusPassword: true });
-	}, [navigation, login, biometricsEnabled, notify]);
+	}, [navigation, login, biometricsEnabled, notify, hideAlert]);
 
 	const goToLoginWithPassword = useCallback(() => {
 		navigation.navigate("Login", { startMode: "saved", focusPassword: true });
