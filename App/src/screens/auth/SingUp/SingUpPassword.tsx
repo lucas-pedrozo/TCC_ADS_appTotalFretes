@@ -1,16 +1,11 @@
 import { View } from "react-native";
-
-import { InputDefault, ButtonDefault } from "@/src/components/form";
-
-import { useSignUpPassword } from "@/src/hooks/auth/useSignUpPassword";
-import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
-import { StepIndicator } from "@/src/components/header/StepIndicator";
 import { useTranslation } from "react-i18next";
 
-/**
- * @description Componente de cadastro de senha
- * @returns Componente de cadastro de senha
- */
+import { InputDefault, ButtonDefault } from "@/src/components/form";
+import { StepIndicator } from "@/src/components/header/StepIndicator";
+import { useSignUpPassword } from "@/src/hooks/auth/useSignUpPassword";
+import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
+
 const SingUpPassword = () => {
 	const { t } = useTranslation();
 	const { control, rules, handleFinish } = useSignUpPassword();

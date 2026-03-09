@@ -4,8 +4,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 
 import { useTranslation } from "react-i18next";
-import { OtpInput } from "@/src/components/form";
-import { ButtonDefault } from "@/src/components/form";
+import { ButtonDefault, OtpInput } from "@/src/components/form";
 import { useThemeColors } from "@/src/context/ThemeContext";
 import { useResendCode } from "@/src/hooks/auth/useResendCode";
 import { usePasswordValidate } from "@/src/hooks/auth/usePasswordValidate";

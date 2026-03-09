@@ -4,9 +4,8 @@ import { RefreshControl, ScrollView, Text, View } from "react-native";
 
 import { useTranslation } from "react-i18next";
 import { useAuth } from "@/src/context/AuthContext";
-import { useThemeColors, useThemeMode } from "@/src/context/ThemeContext";
+import { useThemeColors, useIconColor } from "@/src/context/ThemeContext";
 import { CardHistory } from "@/src/components/cards/CardHistory";
-import { CardIntention } from "@/src/components/cards/CardIntention";
 import { useWeather } from "@/src/hooks/weather/useWeather";
 import { CardClime } from "@/src/components/cards/CardClime";
 import { useGetUser } from "@/src/hooks/user/useGetUser";
@@ -16,55 +15,51 @@ import ModalNotificacoes from "@/src/components/modal/ModalNotificacoes";
 import { TabParamList } from "@/src/routes/RoutesTabs";
 import { useNavigation } from "@react-navigation/native";
 import { CardVehicle } from "@/src/components/cards/CardVehicle";
+import { useGetVehicle } from "@/src/hooks/vehicle/useGetVehicle";
 import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
 import { CardActivityHome } from "@/src/components/cards/CardActivityHome";
 import { useGetFreightUser } from "@/src/hooks/freight/useGetFreightUser";
-import { useGetVehicle } from "@/src/hooks/vehicle/useGetVehicle";
 
 function Home() {
-	const colors = useThemeColors();
 	const { logout } = useAuth();
 	const { t } = useTranslation();
-	const { mode } = useThemeMode();
-	const { userData, handleGetUser } = useGetUser();
-	const navigation = useNavigation<BottomTabNavigationProp<TabParamList>>();
-	const { weatherData, loading: weatherLoading, refetch: refetchWeather } = useWeather();
-
+	const iconsColor  = useIconColor()
+	const colors = useThemeColors();
+	
 	const currentHour = new Date().getHours();
 	const [refreshKey, setRefreshKey] = useState(0);
 	const [isRefreshing, setIsRefreshing] = useState(false);
+	const navigation = useNavigation<BottomTabNavigationProp<TabParamList>>();
 	const [isModalNotificacoesVisible, setIsModalNotificacoesVisible] = useState(false);
+	
+	const { userData, handleGetUser } = useGetUser();
+	const { vehicleData } = useGetVehicle();
 	const { freightUser, handleGetFreightUser } = useGetFreightUser();
-	const { vehicleData, handleGetVehicle, isLoading: vehicleLoading } = useGetVehicle();
+	const { weatherData, loading: weatherLoading, refetch: refetchWeather } = useWeather();
 
 	const greeting = currentHour < 12 ? t("HOME.WELCOME2") : currentHour < 18 ? t("HOME.WELCOME3") : t("HOME.WELCOME");
 
-	const goToProfile = () => { navigation.navigate("PerfilTab"); };
-	const goToAndamento = () => { navigation.navigate("AndamentoTab"); };
+	const goToProfile = () => { 
+		navigation.navigate("PerfilTab"); 
+	};
+	const goToAndamento = () => {
+		 navigation.navigate("AndamentoTab");
+	 };
 
 	const handleRefresh = useCallback(async () => {
 		setIsRefreshing(true);
 		try {
 			await Promise.all([handleGetUser(), refetchWeather(), handleGetFreightUser()]);
-			if (userData?.vehicleType_id) {
-				await handleGetVehicle(userData.vehicleType_id);
-			}
 			setRefreshKey((prev) => prev + 1);
 		} finally {
 			setIsRefreshing(false);
 		}
-	}, [handleGetUser, refetchWeather, handleGetFreightUser, handleGetVehicle, userData?.vehicleType_id]);
+	}, [handleGetUser, refetchWeather, handleGetFreightUser]);
 
 	useEffect(() => {
 		handleGetUser();
 		handleGetFreightUser();
 	}, [handleGetUser, handleGetFreightUser]);
-
-	useEffect(() => {
-		if (userData?.vehicleType_id) {
-			handleGetVehicle(userData.vehicleType_id);
-		}
-	}, [userData?.vehicleType_id, handleGetVehicle]);
 
 	return (
 		<SafeAreaView style={{ flex: 1, backgroundColor: colors.bg }}>
@@ -76,7 +71,7 @@ function Home() {
 					<RefreshControl
 						refreshing={isRefreshing}
 						onRefresh={handleRefresh}
-						tintColor={mode === "dark" ? "#FFFFFF" : "#000000"}
+						tintColor={iconsColor}
 					/>
 				}
 			>
@@ -111,15 +106,12 @@ function Home() {
 						weatherCode={weatherData?.weatherCode}
 					/>
 					<View className="w-4" />
-					<CardIntention />
-					<View className="w-4" />
-				<CardHistory />
+					<CardHistory />
 				</ScrollView>
 
 				<CardVehicle
 					key={`card-vehicle-${refreshKey}`}
 					vehicle={vehicleData}
-					loading={vehicleLoading}
 				/>
 			</ScrollView>
 

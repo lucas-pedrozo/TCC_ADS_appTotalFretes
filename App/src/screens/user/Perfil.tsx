@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context"
-import { RefreshControl, ScrollView, Text, View } from "react-native"
+import { Platform, RefreshControl, ScrollView, Text, View } from "react-native"
+import * as LocalAuthentication from "expo-local-authentication";
 
-import { baseURL } from "@/src/services/http";
 import { useGetUser } from "@/src/hooks/user/useGetUser";
 import { useTranslation } from "react-i18next";
 import type { AppLanguage } from "@/src/i18n/resources";
@@ -12,18 +12,17 @@ import { useLanguage } from "@/src/context/LanguageContext";
 import { useAuth } from "@/src/context/AuthContext";
 import { useNavigation } from "@react-navigation/native";
 import { RootStackParamList } from "@/src/routes/Routes";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-
-import { Option, OptionKey, OptionSelect } from "@/src/components/form";
 import { HeaderPerfil } from "@/src/components/header/HeaderPerfil";
-import { ButtonCancel } from "@/src/components/form";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { Option, OptionKey, OptionSelect, ButtonCancel } from "@/src/components/form";
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
+const isNative = Platform.OS === "ios" || Platform.OS === "android";
+
 const Perfil = () => {
-  const BASE_URL = baseURL;
   const colors = useThemeColors();
-  const { logout } = useAuth()
+  const { logout, biometricsEnabled, setBiometricsEnabledAsync } = useAuth()
   const { t } = useTranslation();
   const { mode, toggleMode } = useThemeMode();
   const { language, changeLanguage } = useLanguage();
@@ -32,8 +31,14 @@ const Perfil = () => {
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const goToAdvancedOptions = () => { navigation.navigate("AdvancedOptions"); }
+  const goToVehicleGroup = () => { navigation.navigate("VehicleGroup"); }
 
-  const goToEditPerfil = () => {
+  const idiomaOptions = [
+    { value: "pt", label: t("PERFIL.LANGPT") },
+    { value: "en", label: t("PERFIL.LANGEN") },
+  ];
+
+  const goToEditPerfil = useCallback(() => {
     const validSex = userData?.sex && ["M", "F", "N"].includes(userData.sex) ? userData.sex : "";
     navigation.navigate("EditPerfil", {
       editPerfilData: {
@@ -46,9 +51,9 @@ const Perfil = () => {
         sex: validSex,
       }
     })
-  }
+  }, [navigation, userData]);
 
-  const goToEditCnh = () => {
+  const goToEditCnh = useCallback(() => {
     navigation.navigate("EditCnh", {
       editCnhData: {
         cnhNumber: userData?.cnhNumber ?? "",
@@ -57,12 +62,7 @@ const Perfil = () => {
         useGlasses: userData?.useGlasses ?? false,
       }
     })
-  }
-
-  const idiomaOptions = [
-    { value: "pt", label: t("PERFIL.LANGPT") },
-    { value: "en", label: t("PERFIL.LANGEN") },
-  ];
+  }, [navigation, userData]);
 
   const handleRefresh = useCallback(async () => {
     setIsRefreshing(true);
@@ -72,6 +72,22 @@ const Perfil = () => {
       setIsRefreshing(false);
     }
   }, [handleGetUser]);
+
+  const handleBiometricsToggle = useCallback(async (val: boolean) => {
+    if (val) {
+      const { success } = await LocalAuthentication.authenticateAsync({
+        promptMessage: t("PERFIL.BIOMETRICS_PROMPT"),
+        fallbackLabel: t("PERFIL.BIOMETRICS_FALLBACK"),
+      });
+      if (success) {
+        await setBiometricsEnabledAsync(true);
+      } else {
+        await setBiometricsEnabledAsync(false);
+      }
+    } else {
+      await setBiometricsEnabledAsync(false);
+    }
+  }, [setBiometricsEnabledAsync, t]);
 
   useEffect(() => {
     handleGetUser();
@@ -92,7 +108,7 @@ const Perfil = () => {
         }
       >
         <HeaderPerfil
-          image={userData?.userImage_id ? `${BASE_URL}/api/user/image/${userData.userImage_id}` : undefined}
+          image={userData?.userImage_id ? `/api/user/image/${userData.userImage_id}` : undefined}
           name={userData?.name || t("COMMON.NOTINFORMED")}
           email={userData?.email || t("COMMON.NOTINFORMED")}
           cpf={userData?.cpf || t("COMMON.NOTINFORMED")}
@@ -106,9 +122,9 @@ const Perfil = () => {
           <View className="h-0.5 w-full rounded-full" style={{ backgroundColor: colors.bgNonary }} />
 
           {!userData?.vehicleType_id ?
-            <Option title={t("PERFIL.REGISTERVEHICLE")} icon="car-outline" onPress={() => { }} />
+            <Option title={t("PERFIL.REGISTERVEHICLE")} icon="car-outline" onPress={goToVehicleGroup} />
             :
-            <Option title={t("PERFIL.EDITVEHICLE")} icon="car-outline" onPress={() => { }} />
+            <Option title={t("PERFIL.EDITVEHICLE")} icon="car-outline" onPress={goToVehicleGroup} />
           }
 
           <View className="h-0.5 w-full rounded-full" style={{ backgroundColor: colors.bgNonary }} />
@@ -125,12 +141,23 @@ const Perfil = () => {
           />
           <View className="h-0.5 w-full rounded-full" style={{ backgroundColor: colors.bgNonary }} />
           <OptionKey title={t("PERFIL.DARKMODE")} icon="moon-outline" value={mode === "dark"} setValue={() => toggleMode()} />
+          {isNative ? (
+            <>
+              <View className="h-0.5 w-full rounded-full" style={{ backgroundColor: colors.bgNonary }} />
+              <OptionKey
+                title={t("PERFIL.BIOMETRICS")}
+                icon="finger-print-outline"
+                value={biometricsEnabled}
+                setValue={handleBiometricsToggle}
+              />
+            </>
+          ) : null}
           <View className="h-0.5 w-full rounded-full" style={{ backgroundColor: colors.bgNonary }} />
         </View>
 
-          <View className="w-5/12 self-end pt-8 ">
-            <ButtonCancel title={t("PERFIL.LOGOUT")} onPress={logout}  />
-          </View>
+        <View className="w-5/12 self-end pt-8 ">
+          <ButtonCancel title={t("PERFIL.LOGOUT")} onPress={logout} />
+        </View>
       </ScrollView>
     </SafeAreaView>
   )

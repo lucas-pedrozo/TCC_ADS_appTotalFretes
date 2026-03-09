@@ -13,15 +13,32 @@ export const ButtonDefault = ({ title, onPress, disabled, loading }: ButtonProps
 
 	return (
 		<TouchableOpacity
-			className="py-3 w-full rounded-lg items-center"
+			className={`py-3 w-full rounded-lg items-center ${disabled ? 'opacity-50' : ''}`}
 			style={{ backgroundColor: colors.bgQuaternary }}
+			onPress={onPress}
+			disabled={disabled || loading}
+		>
+			<Text className="font-semibold text-base" style={{ color: colors.textTertiary }}>
+				{title}
+			</Text>
+		</TouchableOpacity>
+	);
+};
+
+export const ButtonNone = ({ title, onPress, disabled, loading }: ButtonProps) => {
+	const colors = useThemeColors();
+
+	return (
+		<TouchableOpacity
+			style={{ borderColor: colors.bg, borderWidth: 1 }}
+			className="py-3 w-full rounded-lg items-center border border-gray-300"
 			onPress={onPress}
 			disabled={disabled || loading}
 		>
 			{loading ? (
 				<ActivityIndicator size="small" color={colors.textTertiary} />
 			) : (
-				<Text className="font-semibold text-base" style={{ color: colors.textTertiary }}>
+				<Text className="font-semibold text-base" style={{ color: colors.text }}>
 					{title}
 				</Text>
 			)}

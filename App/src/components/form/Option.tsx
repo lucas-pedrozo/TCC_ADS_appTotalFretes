@@ -7,17 +7,18 @@ type OptionProps = {
   title?: string;
   icon?: keyof typeof Ionicons.glyphMap;
   onPress?: () => void;
+  critical?: boolean;
 };
 
-export function Option({ title, icon, onPress }: OptionProps) {
+export function Option({ title, icon, onPress, critical }: OptionProps) {
   const colors = useThemeColors();
   const iconColor = useIconColor();
 
   return (
     <TouchableOpacity onPress={onPress} className="flex-row items-center justify-between">
       <View className="flex-row items-center justify-center gap-2.5">
-        {icon && <IconBox name={icon} />}
-        <Text className="font-semibold text-base" style={{ color: colors.text }}>{title}</Text>
+        {icon && <IconBox name={icon}/>}
+        <Text className="font-semibold text-base" style={{ color: critical ? colors.textQuinary : colors.text }}>{title}</Text>
       </View>
 
       <Ionicons name="chevron-forward-outline" size={22} color={iconColor} />

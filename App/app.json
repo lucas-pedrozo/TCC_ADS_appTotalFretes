@@ -34,6 +34,18 @@
     "plugins": [
       "expo-router",
       [
+        "expo-secure-store",
+        {
+          "faceIDPermission": "O Total Fretes usa Face ID para proteger seu acesso ao app."
+        }
+      ],
+      [
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "Use Face ID para entrar no Total Fretes sem digitar a senha."
+        }
+      ],
+      [
         "expo-splash-screen",
         {
           "backgroundColor": "#000000",

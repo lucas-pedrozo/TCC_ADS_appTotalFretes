@@ -12,8 +12,9 @@ import { RouteProp, useRoute } from "@react-navigation/native";
 import type { EditCnhMap } from "@/src/interfaces/profile";
 
 export function useEditCnh() {
-  const { notify } = useAlertDefault();
+
   const { id } = useAuth();
+  const { notify } = useAlertDefault();
 
   const route = useRoute<RouteProp<RootStackParamList, "EditCnh">>();
   const editCnhData = route.params?.editCnhData;
@@ -42,9 +43,7 @@ export function useEditCnh() {
       });
     } catch (error) {
       const message = (error as AxiosError<{ message: string }>).response?.data?.message ?? "";
-      if (message) {
-        notify({ status: "error", message });
-      }
+      notify({ status: "error", message });
     }
   }, [notify, id]);
 

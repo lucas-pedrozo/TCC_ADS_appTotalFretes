@@ -12,8 +12,8 @@ const CancelAccount = () => {
   return (
     <View style={{ paddingHorizontal: 16, paddingTop: 10, paddingBottom: 30, backgroundColor: colors.bg }}>
       <Text className="text-base font-medium" style={{ color: colors.text }}>{t("CANCELACCOUNT.DESCRIPTION")}</Text>
-      <View className="flex-1">
-        <ButtonCancel title={t("CANCELACCOUNT.CONFIRM")} onPress={handleDeleteUser} disabled={isdisabled} />
+      <View className="pt-10">
+        <ButtonCancel title={t("CANCELACCOUNT.CONFIRM")} onPress={handleDeleteUser} disabled={!isdisabled} />
       </View>
     </View>
   )

@@ -25,111 +25,136 @@ import VerificationCode from "../screens/auth/VerificationCode";
 import AdvancedOptions from "../screens/user/AdvancedOptions";
 import DetailFreight from "../screens/freight/DetailFreight";
 
-import type { EditPerfilMap, EditCnhMap } from "@/src/interfaces/profile";
 import RenewPassword from "../screens/user/RenewPassword";
+import VehicleGroup from "../screens/freight/VehicleGroup";
+import VehicleType from "../screens/freight/VehicleType";
+import VehicleData from "../screens/freight/VehicleData";
+import { EditPerfilMap, EditCnhMap } from "@/src/interfaces/profile";
+import Term from "../screens/advance/Term";
 
 interface EditPerfilRouteParams {
-  editPerfilData: EditPerfilMap;
+	editPerfilData: EditPerfilMap;
 }
 
 interface EditCnhRouteParams {
-  editCnhData: EditCnhMap;
+	editCnhData: EditCnhMap;
 }
 
 
 export type RootStackParamList = {
-  Home: undefined;
-  Login: {
-    startMode?: "saved" | "full";
-    focusPassword?: boolean;
-  } | undefined;
-  Start: undefined;
-  SingUp: undefined;
-  SingUpCNH: undefined;
-  SingUpPassword: undefined;
-  ForgotPassword: undefined;
-  VerificationCode: { email: string };
-  EditPerfil: EditPerfilRouteParams;
-  EditCnh: EditCnhRouteParams;
-  AdvancedOptions: undefined;
-  NewPassword: { email: string; resetToken: string };
-  CancelAccount: undefined;
-  RenewPassword: undefined;
-  DetailFreight: undefined;
+	Home: undefined;
+	Login: { startMode?: "saved" | "full"; focusPassword?: boolean; };
+	Start: undefined;
+	SingUp: undefined;
+	SingUpCNH: undefined;
+	SingUpPassword: undefined;
+	ForgotPassword: undefined;
+	VerificationCode: { email: string };
+	EditPerfil: EditPerfilRouteParams;
+	EditCnh: EditCnhRouteParams;
+	AdvancedOptions: undefined;
+	NewPassword: { email: string; resetToken: string };
+	CancelAccount: undefined;
+	RenewPassword: undefined;
+	DetailFreight: undefined;
+	VehicleGroup: undefined;
+	VehicleType: undefined;
+	VehicleData: undefined;
+	Term: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 function PrivateHome() {
-  return <PrivateRoute><RoutesTabs /></PrivateRoute>;
+	return <PrivateRoute><RoutesTabs /></PrivateRoute>;
 }
 
 function PrivateEditPerfil() {
-  return <PrivateRoute><EditPerfil /></PrivateRoute>;
+	return <PrivateRoute><EditPerfil /></PrivateRoute>;
 }
 
 function PrivateEditCnh() {
-  return <PrivateRoute><EditCnh /></PrivateRoute>;
+	return <PrivateRoute><EditCnh /></PrivateRoute>;
 }
 
 function PrivateAdvancedOptions() {
-  return <PrivateRoute><AdvancedOptions /></PrivateRoute>;
+	return <PrivateRoute><AdvancedOptions /></PrivateRoute>;
 }
 
 function PrivateCancelAccount() {
-  return <PrivateRoute><CancelAccount /></PrivateRoute>;
+	return <PrivateRoute><CancelAccount /></PrivateRoute>;
 }
 
 function PrivateRenewPassword() {
-  return <PrivateRoute><RenewPassword /></PrivateRoute>;
+	return <PrivateRoute><RenewPassword /></PrivateRoute>;
 }
 
 function PrivateDetailFreight() {
-  return <PrivateRoute><DetailFreight /></PrivateRoute>;
+	return <PrivateRoute><DetailFreight /></PrivateRoute>;
+}
+
+function PrivateVehicleGroup() {
+	return <PrivateRoute><VehicleGroup /></PrivateRoute>;
+}
+
+function PrivateVehicleType() {
+	return <PrivateRoute><VehicleType /></PrivateRoute>;
+}
+
+function PrivateVehicleData() {
+	return <PrivateRoute><VehicleData /></PrivateRoute>;
+}
+
+function PrivateTerm() {
+	return <PrivateRoute><Term /></PrivateRoute>;
 }
 
 export default function Routes() {
-  const { theme } = useThemeMode();
-  const { t } = useTranslation();
-  const backgroundColor = theme.colors.background;
+	const { theme } = useThemeMode();
+	const { t } = useTranslation();
+	const backgroundColor = theme.colors.background;
 
-  return (
-    <NavigationContainer theme={theme}>
-      <StatusBar
-        style={backgroundColor === "#000000" ? "light" : "dark"}
-        backgroundColor={backgroundColor}
-      />
+	return (
+		<NavigationContainer theme={theme}>
+			<StatusBar
+				style={backgroundColor === "#000000" ? "light" : "dark"}
+				backgroundColor={backgroundColor}
+			/>
 
-      <Stack.Navigator
-        initialRouteName="Start"
-        screenOptions={{
-          header: ({ options }) => (
-            options.title ? (
-              <SafeAreaView edges={["top"]} style={{ paddingHorizontal: 12, backgroundColor }}>
-                <Header title={options.title} />
-              </SafeAreaView>
-            ) : null
-          ),
-        }}
-      >
-        <Stack.Screen name="Home" component={PrivateHome} options={{ headerShown: false }} />
-        <Stack.Screen name="EditCnh" component={PrivateEditCnh} options={{ title: t("ROUTES.EDITCNH") }} />
-        <Stack.Screen name="EditPerfil" component={PrivateEditPerfil} options={{ title: t("ROUTES.EDITPERFIL") }} />
-        <Stack.Screen name="AdvancedOptions" component={PrivateAdvancedOptions} options={{ title: t("ROUTES.ADVANCEDOPTIONS") }} />
-        <Stack.Screen name="CancelAccount" component={PrivateCancelAccount} options={{ title: t("ROUTES.CANCELACCOUNT") }} />
-        <Stack.Screen name="RenewPassword" component={PrivateRenewPassword} options={{ title: t("ROUTES.RENEWPASSWORD") }} />
-        <Stack.Screen name="DetailFreight" component={PrivateDetailFreight} options={{ title: t("ROUTES.DETAILFREIGHT") }} />
+			<Stack.Navigator
+				initialRouteName="Start"
+				screenOptions={{
+					header: ({ options }) => (
+						options.title ? (
+							<SafeAreaView edges={["top"]} style={{ paddingHorizontal: 16, backgroundColor }}>
+								<Header title={options.title} />
+							</SafeAreaView>
+						) : null
+					),
+				}}
+			>
+				<Stack.Screen name="Home" component={PrivateHome} options={{ headerShown: false }} />
+				<Stack.Screen name="EditCnh" component={PrivateEditCnh} options={{ title: t("ROUTES.EDITCNH") }} />
+				<Stack.Screen name="EditPerfil" component={PrivateEditPerfil} options={{ title: t("ROUTES.EDITPERFIL") }} />
+				<Stack.Screen name="AdvancedOptions" component={PrivateAdvancedOptions} options={{ title: t("ROUTES.ADVANCEDOPTIONS") }} />
+				<Stack.Screen name="CancelAccount" component={PrivateCancelAccount} options={{ title: t("ROUTES.CANCELACCOUNT") }} />
+				<Stack.Screen name="RenewPassword" component={PrivateRenewPassword} options={{ title: t("ROUTES.RENEWPASSWORD") }} />
+				<Stack.Screen name="DetailFreight" component={PrivateDetailFreight} options={{ title: t("ROUTES.DETAILFREIGHT") }} />
+				<Stack.Screen name="VehicleGroup" component={PrivateVehicleGroup} options={{ title: t("ROUTES.VEHICLEGROUP") }} />
+				<Stack.Screen name="VehicleType" component={PrivateVehicleType} options={{ title: t("ROUTES.VEHICLETYPE") }} />
+				<Stack.Screen name="VehicleData" component={PrivateVehicleData} options={{ title: t("ROUTES.VEHICLEDATA") }} />
+				<Stack.Screen name="Term" component={PrivateTerm} options={{ title: t("ROUTES.TERM") }} />
 
-        <Stack.Screen name="Start" component={Start} options={{ headerShown: false }} />
-        <Stack.Screen name="Login" component={Login} options={{ title: t("ROUTES.LOGIN") }} />
-        <Stack.Screen name="SingUp" component={SingUp} options={{ title: t("ROUTES.SIGNUPBASIC") }} />
-        <Stack.Screen name="SingUpCNH" component={SingUpCNH} options={{ title: t("ROUTES.SIGNUPCNH") }} />
-        <Stack.Screen name="NewPassword" component={NewPassword} options={{ title: t("ROUTES.NEWPASSWORD") }} />
-        <Stack.Screen name="SingUpPassword" component={SingUpPassword} options={{ title: t("ROUTES.SIGNUPPASSWORD") }} />
-        <Stack.Screen name="ForgotPassword" component={ForgotPassword} options={{ title: t("ROUTES.FORGOTPASSWORD") }} />
-        <Stack.Screen name="VerificationCode" component={VerificationCode} options={{ title: t("ROUTES.VERIFICATIONCODE") }} />
+				<Stack.Screen name="Start" component={Start} options={{ headerShown: false }} />
+				<Stack.Screen name="Login" component={Login} options={{ title: t("ROUTES.LOGIN") }} />
+				<Stack.Screen name="SingUp" component={SingUp} options={{ title: t("ROUTES.SIGNUPBASIC") }} />
+				<Stack.Screen name="SingUpCNH" component={SingUpCNH} options={{ title: t("ROUTES.SIGNUPCNH") }} />
+				<Stack.Screen name="NewPassword" component={NewPassword} options={{ title: t("ROUTES.NEWPASSWORD") }} />
+				<Stack.Screen name="SingUpPassword" component={SingUpPassword} options={{ title: t("ROUTES.SIGNUPPASSWORD") }} />
+				<Stack.Screen name="ForgotPassword" component={ForgotPassword} options={{ title: t("ROUTES.FORGOTPASSWORD") }} />
+				<Stack.Screen name="VerificationCode" component={VerificationCode} options={{ title: t("ROUTES.VERIFICATIONCODE") }} />
 
-      </Stack.Navigator>
-    </NavigationContainer>
-  );
+			</Stack.Navigator>
+		</NavigationContainer>
+	);
 }
