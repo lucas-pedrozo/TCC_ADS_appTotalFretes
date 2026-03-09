@@ -15,7 +15,7 @@ No PowerShell **como Administrador**, execute:
 ```powershell
 # Cria D:\TCC apontando para a pasta do repositório (ajuste se seu repositório estiver em outro lugar)
 New-Item -ItemType Junction -Path "D:\TCC" -Target "D:\ProjetosDev\TCC\TCC_CursoTADS" -Force
-```
+New-Item -ItemType Junction -Path "D:\TCP" -Target "D:\TCC\TCC_ADS_appTotalFretes" -Force```
 
 Ou via CMD (como Administrador):
 
