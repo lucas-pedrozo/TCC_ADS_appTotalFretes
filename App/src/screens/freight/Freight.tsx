@@ -8,18 +8,9 @@ import { useThemeColors, useThemeMode } from "@/src/context/ThemeContext";
 import { CardFreight } from "@/src/components/cards/CardFreight";
 import { InputSearch, ButtonFilter } from "@/src/components/form";
 import ModalFilter, { FreightFilterState } from "@/src/components/modal/ModalFilter";
+import type { FreightUserMap } from "@/src/interfaces";
 
 const normalizeForSearch = (text: string) =>(text ?? "").toLowerCase().normalize("NFD").replace(/\p{Diacritic}/gu, "");
-
-type FreightItem = {
-  id: string;
-  name?: string;
-  origin?: string;
-  destination?: string;
-  cargoType?: string;
-  cargoWeight?: string;
-  freightValue?: string;
-};
 
 const Freight = () => {
   const colors = useThemeColors();
@@ -43,7 +34,7 @@ const Freight = () => {
 
     const term = normalizeForSearch(searchTerm ?? "").trim();
     if (!term) return result;
-    return result.filter((item: FreightItem) => {
+    return result.filter((item) => {
       const cargoType = normalizeForSearch(item.cargoType ?? "");
       const value = normalizeForSearch(item.freightValue ?? "");
       const origin = normalizeForSearch(item.origin ?? "");
@@ -102,7 +93,7 @@ const Freight = () => {
         contentContainerStyle={{ paddingBottom: 120, paddingTop: 20 }}
         renderItem={({ item }) => (
           <CardFreight
-            freight={item}
+            freight={item as unknown as FreightUserMap}
           />
         )}
         refreshControl={

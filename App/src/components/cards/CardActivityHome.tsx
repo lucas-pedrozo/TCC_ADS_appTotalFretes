@@ -12,13 +12,6 @@ type CardActivityHomeProps = {
   AcceptButton?: boolean;
 };
 
-const STATUS_STEP_MAP: Record<string, number> = {
-  pending: 1,
-  accepted: 2,
-  in_transit: 3,
-  delivered: 4,
-  completed: 5,
-};
 
 export const CardActivityHome = ({ onPress, freight, AcceptButton = true }: CardActivityHomeProps) => {
   const colors = useThemeColors();
@@ -26,7 +19,7 @@ export const CardActivityHome = ({ onPress, freight, AcceptButton = true }: Card
   const { mode } = useThemeMode();
   const isDark = mode === "dark";
   const iconColor = isDark ? "#FFFFFF" : "#000000";
-  const currentStep = STATUS_STEP_MAP[freight?.status ?? ""] ?? 0;
+  const currentStep = freight?.status?.id ?? 0;
 
   return (
     <>
@@ -37,6 +30,7 @@ export const CardActivityHome = ({ onPress, freight, AcceptButton = true }: Card
           </Text>
 
           <TouchableOpacity
+            activeOpacity={0.7}
             onPress={onPress}
             className="w-10 h-10 rounded-lg items-center justify-center"
             style={{ backgroundColor: colors.bgNonary }}
@@ -52,7 +46,7 @@ export const CardActivityHome = ({ onPress, freight, AcceptButton = true }: Card
           <IconBox name="cube-outline" />
           <View className="flex-1 flex-row justify-between items-center">
             <Text className="font-semibold text-base" style={{ color: colors.text }}>
-              {freight?.title || t("CARD.ACTIVITY.NONE")}
+              {freight?.vehicle_group?.name ?? t("CARD.ACTIVITY.NONE")}
             </Text>
             <Text className="text-sm" style={{ color: colors.text }}>
               {freight?.cargo?.name ?? t("CARD.ACTIVITY.NONE")} / {freight?.cargo?.weight ?? t("CARD.ACTIVITY.N_A")}
@@ -73,7 +67,7 @@ export const CardActivityHome = ({ onPress, freight, AcceptButton = true }: Card
 
         <View className="flex-row justify-between pt-3 w-full">
           <Text className="text-sm" style={{ color: colors.text }}>
-            {t("CARD.ACTIVITY.STATUS")}: {freight?.status ?? "---"}
+            {t("CARD.ACTIVITY.STATUS")}: {freight?.status?.name ?? "---"}
           </Text>
           <Text className="text-sm" style={{ color: colors.text }}>
             {t("CARD.ACTIVITY.DEADLINE")}: {freight?.time_limit ?? "---"}

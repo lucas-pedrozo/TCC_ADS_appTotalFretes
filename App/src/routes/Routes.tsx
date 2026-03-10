@@ -31,6 +31,7 @@ import VehicleType from "../screens/freight/VehicleType";
 import VehicleData from "../screens/freight/VehicleData";
 import { EditPerfilMap, EditCnhMap } from "@/src/interfaces/profile";
 import Term from "../screens/advance/Term";
+import MapScreen from "../screens/MapBox/MapScreen";
 
 interface EditPerfilRouteParams {
 	editPerfilData: EditPerfilMap;
@@ -61,6 +62,7 @@ export type RootStackParamList = {
 	VehicleType: undefined;
 	VehicleData: undefined;
 	Term: undefined;
+	MapScreen: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -109,6 +111,10 @@ function PrivateTerm() {
 	return <PrivateRoute><Term /></PrivateRoute>;
 }
 
+function PrivateMapScreen() {
+	return <PrivateRoute><MapScreen /></PrivateRoute>;
+}
+
 export default function Routes() {
 	const { theme } = useThemeMode();
 	const { t } = useTranslation();
@@ -144,7 +150,8 @@ export default function Routes() {
 				<Stack.Screen name="VehicleType" component={PrivateVehicleType} options={{ title: t("ROUTES.VEHICLETYPE") }} />
 				<Stack.Screen name="VehicleData" component={PrivateVehicleData} options={{ title: t("ROUTES.VEHICLEDATA") }} />
 				<Stack.Screen name="Term" component={PrivateTerm} options={{ title: t("ROUTES.TERM") }} />
-
+				<Stack.Screen name="MapScreen" component={PrivateMapScreen} options={{ title: t("ROUTES.MAPSCREEN") }} />
+				
 				<Stack.Screen name="Start" component={Start} options={{ headerShown: false }} />
 				<Stack.Screen name="Login" component={Login} options={{ title: t("ROUTES.LOGIN") }} />
 				<Stack.Screen name="SingUp" component={SingUp} options={{ title: t("ROUTES.SIGNUPBASIC") }} />

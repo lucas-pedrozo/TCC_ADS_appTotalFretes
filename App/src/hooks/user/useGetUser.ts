@@ -1,9 +1,9 @@
 import { useCallback, useState } from "react";
-import http from "@/src/services/http";
 import { AxiosError } from "axios";
+import http from "@/src/services/http";
 import { useAuth } from "@/src/context/AuthContext";
-import { useAlertDefault } from "@/src/context/AlertDefaultContext";
 import type { MapUser } from "@/src/interfaces/user";
+import { useAlertDefault } from "@/src/context/AlertDefaultContext";
 
 export function useGetUser() {
 	const { id } = useAuth();

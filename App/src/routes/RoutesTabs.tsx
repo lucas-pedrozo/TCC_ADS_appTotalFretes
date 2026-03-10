@@ -35,7 +35,7 @@ function PlaceholderScreen({ title }: { title: string }) {
 
 const PropostaScreen = () => <PlaceholderScreen title="Proposta" />;
 
-const TAB_BAR_HEIGHT = 72;
+const TAB_BAR_HEIGHT = 70;
 
 export default function RoutesTabs() {
 	const { mode } = useThemeMode();
@@ -91,7 +91,7 @@ export default function RoutesTabs() {
 					right: 12,
 					bottom: insets.bottom + 8,
 					height: TAB_BAR_HEIGHT,
-					borderRadius: 24,
+					borderRadius: 16,
 					marginHorizontal: 12,
 					backgroundColor: tabBackground,
 					borderTopWidth: 0,

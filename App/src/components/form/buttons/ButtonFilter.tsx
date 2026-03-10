@@ -13,7 +13,7 @@ export const ButtonFilter = ({ onPress }: ButtonFilterProps) => {
   return (
     <TouchableOpacity
       onPress={onPress}
-      className="rounded-lg items-center justify-center p-2.5"
+      className="rounded-xl items-center justify-center p-2.5"
       style={{ backgroundColor: colors.bgNonary }}
     >
       <Ionicons name="filter" size={26} color={iconColor} />

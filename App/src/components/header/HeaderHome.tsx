@@ -2,7 +2,6 @@ import { Image, Text, TouchableOpacity, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
 import { formatName } from "@/src/utils/format";
-import { baseURL } from "@/src/services/http";
 import { useIconColor, useThemeColors } from "@/src/context/ThemeContext";
 import type { MapUser } from "@/src/interfaces/user";
 
@@ -31,7 +30,7 @@ export function HeaderHome({
       <View className="flex-row items-center gap-3">
         <TouchableOpacity onPress={onProfilePress} activeOpacity={0.7}>
           {userData?.userImage_id ? (
-            <Image source={{ uri: `${baseURL}/user/image/${userData.userImage_id}` }} className="w-14 h-14 rounded-xl" />
+            <Image source={{ uri: `/user/image/${userData.userImage_id}` }} className="w-14 h-14 rounded-xl" />
           ) : (
             <View className="w-14 h-14 rounded-xl items-center justify-center" style={{ backgroundColor: colors.bgNonary }}>
               <Ionicons name="person-outline" size={24} color={iconColor} />

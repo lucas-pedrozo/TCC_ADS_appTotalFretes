@@ -20,7 +20,7 @@ const CardVehicleGroup = ({ title, onPress }: { title: string; onPress: () => vo
   return (
     <TouchableOpacity
       onPress={onPress}
-      className="flex-row justify-between items-center rounded-lg p-5"
+      className="flex-row justify-between items-center rounded-xl p-5"
       style={{ backgroundColor: colors.bgSecondary, borderWidth: 1, borderColor: colors.bgTertiary }}
     >
       <Text className="font-semibold text-base" style={{ color: colors.text }}>{title}</Text>

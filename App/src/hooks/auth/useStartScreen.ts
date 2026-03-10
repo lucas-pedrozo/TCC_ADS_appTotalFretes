@@ -39,6 +39,7 @@ export function useStartScreen() {
 			const token = await getStoredAuthToken({ useBiometrics: biometricsEnabled });
 			if (token) {
 				notify({ status: "loading", message: i18n.t("NOTIFICATIONS.LOGINLOADING") });
+				await new Promise((r) => setTimeout(r, 150));
 				const isValid = await validateAuthToken({ token });
 				if (!isValid) {
 					await clearAuthToken();

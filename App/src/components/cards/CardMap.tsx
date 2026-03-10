@@ -6,10 +6,9 @@ import { IconBox } from "@/src/components/ui/IconBox";
 
 type CardIntentionProps = {
   onPress?: () => void;
-  id_veicle?: number | null;
 };
 
-  export const CardCar = ({ onPress, id_veicle }: CardIntentionProps) => {
+  export const CardMap = ({ onPress}: CardIntentionProps) => {
   const colors = useThemeColors();
   const { t } = useTranslation();
   const iconColor = useIconColor();
@@ -21,15 +20,15 @@ type CardIntentionProps = {
       style={{ backgroundColor: colors.bgNonary, borderColor: colors.bgTertiary, borderWidth: 1 }}
     >
       <View className="flex-row justify-between">
-        <IconBox name="car-outline" />
+        <IconBox name="map-outline" />
         <Feather name="arrow-up-right" size={24} color={iconColor} />
       </View>
 
       <Text className="text-sm mt-4" style={{ color: colors.text }}>
-        {id_veicle ? "Meu Veículo" : "Cadastre seu veículo"}
+        Ver mapa
       </Text>
       <Text className="text-sm mt-1" style={{ color: colors.textSecondary }}>
-        {id_veicle ? "Veja os detalhes do seu veículo" : "Adicione as informações do seu veículo para ter acesso a fretes compatíveis"}
+        Veja os detalhes do seu frete
       </Text>
     </TouchableOpacity>
   );

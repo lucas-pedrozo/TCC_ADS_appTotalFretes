@@ -19,6 +19,7 @@ import { useGetVehicle } from "@/src/hooks/vehicle/useGetVehicle";
 import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
 import { CardActivityHome } from "@/src/components/cards/CardActivityHome";
 import { useGetFreightUser } from "@/src/hooks/freight/useGetFreightUser";
+import { CardMap } from "@/src/components/cards/CardMap";
 
 function Home() {
 	const { logout } = useAuth();
@@ -40,11 +41,16 @@ function Home() {
 	const greeting = currentHour < 12 ? t("HOME.WELCOME2") : currentHour < 18 ? t("HOME.WELCOME3") : t("HOME.WELCOME");
 
 	const goToProfile = () => { 
-		navigation.navigate("PerfilTab"); 
+		navigation.navigate("PerfilTab");
 	};
+
 	const goToAndamento = () => {
 		 navigation.navigate("AndamentoTab");
 	 };
+
+	const goToMap = () => {
+		navigation.navigate("MapScreen" as never);
+	};
 
 	const handleRefresh = useCallback(async () => {
 		setIsRefreshing(true);
@@ -64,7 +70,7 @@ function Home() {
 	return (
 		<SafeAreaView style={{ flex: 1, backgroundColor: colors.bg }}>
 			<ScrollView
-				contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 100, paddingTop: 10 }}
+				contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 100, paddingTop: 16 }}
 				showsVerticalScrollIndicator={false}
 				className="flex-1"
 				refreshControl={
@@ -105,6 +111,8 @@ function Home() {
 						loading={weatherLoading}
 						weatherCode={weatherData?.weatherCode}
 					/>
+					<View className="w-4" />
+					<CardMap onPress={goToMap} />
 					<View className="w-4" />
 					<CardHistory />
 				</ScrollView>

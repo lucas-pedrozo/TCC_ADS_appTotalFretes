@@ -3,7 +3,7 @@ import { useThemeColors } from "@/src/context/ThemeContext";
 
 type DetailRowProps = {
     label: string;
-    value: string;
+    value: string | number;
 }
 
 export const DetailRow = ({ label, value }: DetailRowProps) => {

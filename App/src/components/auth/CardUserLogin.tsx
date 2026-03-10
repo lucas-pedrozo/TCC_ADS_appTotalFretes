@@ -1,8 +1,7 @@
-import { Pressable, View, Text } from "react-native"
+import { TouchableOpacity, View, Text } from "react-native"
 
 import { Image } from "expo-image"
-import { Feather } from "@expo/vector-icons"
-import { Ionicons } from "@expo/vector-icons"
+import { Feather, Ionicons } from "@expo/vector-icons"
 import { useTranslation } from "react-i18next"
 import { useThemeColors, useIconColor } from "@/src/context/ThemeContext"
 
@@ -24,12 +23,12 @@ export const CardUserLogin = ({ lastUsedAccount, userImage_id, biometricsEnabled
 
     return (
         <>
-            <Pressable onPress={goSavedAccount}
+            <TouchableOpacity onPress={goSavedAccount}
                 className="mt-10 rounded-2xl px-4 py-4 flex-row items-center gap-4"
                 style={{ backgroundColor: colors.bgNonary, borderColor: colors.bgTertiary, borderWidth: 1 }}
             >
-                {userImage_id ? (   
-                <Image source={require("@/src/assets/usuario.jpg")} style={{ width: 48, height: 48, borderRadius: 100 }} />
+                {userImage_id ? (
+                    <Image source={require("@/src/assets/usuario.jpg")} style={{ width: 48, height: 48, borderRadius: 100 }} />
                 ) : (
                     <View className="w-12 h-12 rounded-full items-center justify-center" style={{ backgroundColor: colors.bgNonary }}>
                         <Feather name="user" size={24} color={iconColor} />
@@ -51,21 +50,21 @@ export const CardUserLogin = ({ lastUsedAccount, userImage_id, biometricsEnabled
                         <Ionicons name="finger-print-outline" size={22} color={iconColor} />
                     </View>
                 ) : null}
-            </Pressable>
+            </TouchableOpacity>
 
             <View className="mt-4 flex-row justify-between items-center gap-x-6 gap-y-2 px-2.5 flex-wrap">
-                <Pressable onPress={goSwitchAccount} className="flex-row items-center gap-2">
+                <TouchableOpacity onPress={goSwitchAccount} className="flex-row items-center gap-2">
                     <Feather name="repeat" size={18} color={iconColor} />
                     <Text className="text-base font-medium" style={{ color: colors.text }}>
                         {t("LOGIN.SWITCHACCOUNT")}
                     </Text>
-                </Pressable>
-                <Pressable onPress={handleRemoveSavedAccount} className="flex-row items-center gap-2">
+                </TouchableOpacity>
+                <TouchableOpacity onPress={handleRemoveSavedAccount} className="flex-row items-center gap-2">
                     <Feather name="trash-2" size={18} color={iconColor} />
                     <Text className="text-base font-medium" style={{ color: colors.text }}>
                         Excluir conta
                     </Text>
-                </Pressable>
+                </TouchableOpacity>
             </View>
         </>
     )

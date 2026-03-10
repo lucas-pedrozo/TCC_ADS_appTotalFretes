@@ -16,15 +16,15 @@ export type InputBaseProps = {
 export const INPUT_STYLES = {
   default: {
     label: "font-semibold text-base pl-2.5",
-    input: "rounded-lg px-2.5 py-3 font-semibold text-base",
+    input: "rounded-xl px-2.5 py-3 font-semibold text-base",
   },
   error: {
     label: "text-red-500 font-semibold text-base pl-2.5",
-    input: "rounded-lg px-2.5 py-3 font-semibold text-base",
+    input: "rounded-xl px-2.5 py-3 font-semibold text-base",
   },
   disabled: {
     label: "font-semibold text-base pl-2.5 opacity-70",
-    input: "rounded-lg px-2.5 py-3 font-semibold text-base opacity-70",
+    input: "rounded-xl px-2.5 py-3 font-semibold text-base opacity-70",
   },
 } as const;
 

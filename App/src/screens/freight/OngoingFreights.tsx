@@ -81,24 +81,22 @@ function OngoingFreights() {
                 </TouchableOpacity>
 
                 <Text className="font-semibold text-base pl-2.5 mb-4 mt-5" style={{ color: colors.text }}>Mais detalhes</Text>
-                <DetailRow label="Tipo" value="---" />
-                <DetailRow label="Categoria" value="---" />
-                <DetailRow label="Peso da carga" value="---" />
-                <DetailRow label="Tipo" value="---" />
-                <DetailRow label="Prazo" value="---" />
-                <DetailRow label="Data Embarque" value="---" />
-                <DetailRow label="Data Desembarque" value="---" />
-
+                <DetailRow label="Tipo" value={freightUser?.cargo?.name ?? "---"} />
+                <DetailRow label="Categoria" value={freightUser?.cargo?.vehicle_type?.name ?? "---"} />
+                <DetailRow label="Peso da carga" value={freightUser?.cargo?.weight ?? "---"} />
+                <DetailRow label="Prazo" value={freightUser?.time_limit ?? "---"} />
+                <DetailRow label="Data Embarque" value={freightUser?.departure_date ?? "---"} />
+                <DetailRow label="Data Desembarque" value={freightUser?.arrival_date ?? "---"} />
             </ScrollView>
 
             <DetalhesFreteModal
                 visible={isDetalhesFreteModalVisible}
                 onClose={() => setIsDetalhesFreteModalVisible(false)}
-                enderecoCarga={"Rua São Paulo 4512, Campo Mourão, PR, Brasil"}
-                enderecoDestino={"Juranda, PR, Brasil"}
-                nomeEmpresa={"Coamo, PR, Brasil"}
+                enderecoCarga={freightUser?.origin_label ?? "---"}
+                enderecoDestino={freightUser?.destination_label ?? "---"}
+                nomeEmpresa={freightUser?.company?.name ?? "---"}
                 rotaSimples={false}
-                prazo={"10/09/2025"}
+                prazo={freightUser?.time_limit ?? "---"}
             />
         </SafeAreaView>
     )

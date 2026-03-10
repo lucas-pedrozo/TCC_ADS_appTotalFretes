@@ -20,7 +20,7 @@ type InputButtonGroupProps = {
 const STYLES_INPUT = {
   default: {
     label: "font-semibold text-base pl-2.5",
-    buttonBase: "rounded-lg px-6 py-3 items-center",
+    buttonBase: "rounded-xl px-6 py-3 items-center",
     text: "font-semibold text-sm",
   },
   error: {

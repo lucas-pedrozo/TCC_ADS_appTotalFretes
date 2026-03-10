@@ -17,7 +17,7 @@ const Header = ({ title }: HeaderProps) => {
 	return (
 		<View className="w-full py-4 flex-row items-center justify-between">
 			<TouchableOpacity
-				className="p-2.5 rounded-md"
+				className="p-2.5 rounded-xl"
 				style={{ backgroundColor: backButtonBg }}
 				onPress={() => navigation.goBack()}
 			>

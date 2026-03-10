@@ -76,20 +76,12 @@ export const getStoredAuthToken = async ({ useBiometrics }: { useBiometrics: boo
 
 const http = axios.create({
 	baseURL,
+	timeout: 3000,
 	headers: {
 		Accept: 'application/json',
 		'accept-language': getCurrentLanguage(),
 	}
 });
-
-export const validateAuthToken = async ({ token }: { token: string }): Promise<boolean> => {
-	try {
-		const response = await http.post('/auth/validate', { token });
-		return response.data.valid;
-	} catch {
-		return false;
-	}
-};
 
 http.interceptors.request.use(
 	async (config: InternalAxiosRequestConfig) => {
@@ -114,6 +106,15 @@ http.interceptors.request.use(
 	}
 );
 
+
+export const validateAuthToken = async ({ token }: { token: string }): Promise<boolean> => {
+	try {
+		const response = await http.post<{ valid: boolean }>('/auth/validate', { token });
+		return response.data.valid;
+	} catch {
+		return false;
+	}
+};
 
 http.interceptors.response.use((response: AxiosResponse) => response, async (error: AxiosError) => {
 		if (error.response?.status === 403) {

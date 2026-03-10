@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useMemo } from "react";
 import { View, Text, Modal, TouchableOpacity } from "react-native";
 
 import animation from "@/src/utils/animation";
@@ -8,6 +8,7 @@ import { getCameraFromGeometry } from "@/src/utils/mapboxUtils";
 import { useGetMapBox } from "@/src/hooks/freight/useGetMapBox";
 import { MapRouteView } from "./MapRouteView";
 import { DetailRow } from "../info/DetailRow";
+import { Ionicons } from "@expo/vector-icons";
 
 interface DetalhesFreteModalProps {
   visible: boolean;
@@ -30,7 +31,7 @@ export default function DetalhesFreteModal({
 }: DetalhesFreteModalProps) {
   const colors = useThemeColors();
   const { mode } = useThemeMode();
-  const { rotaData, handleGetMapBox } = useGetMapBox();
+  const { rotaData } = useGetMapBox();
 
   const { center: cameraCenter, zoom: cameraZoom } = useMemo(() => {
     return getCameraFromGeometry(rotaData?.geometria);
@@ -45,20 +46,18 @@ export default function DetalhesFreteModal({
     >
       <animation.FadeDown className="flex-1 justify-center items-center bg-black/50">
         <View className="w-[90%] rounded-2xl overflow-hidden" style={{ borderColor: colors.bgTertiary, borderWidth: 1, backgroundColor: colors.bgSecondary }}>
-          <View className="flex-row justify-between items-center p-4 border-b" style={{ borderBottomColor: colors.bgNonary, borderBottomWidth: 1 }}>
+          <View className="flex-row justify-between items-center border-b p-2.5" style={{ borderBottomColor: colors.bgNonary, borderBottomWidth: 1 }}>
             <Text className="text-lg font-bold" style={{ color: colors.text }}>
-              Rota
+              Rota do Frete
             </Text>
             <TouchableOpacity
               onPress={onClose}
-              className="px-2.5 py-1.5 rounded-lg"
+              className="p-2 rounded-lg"
               style={{ backgroundColor: colors.bgTertiary }}
               accessibilityRole="button"
               accessibilityLabel="Fechar modal"
             >
-              <Text className="font-bold" style={{ color: colors.text }}>
-                X
-              </Text>
+              <Ionicons name="close" size={20} color={colors.text} />
             </TouchableOpacity>
           </View>
 
@@ -69,7 +68,7 @@ export default function DetalhesFreteModal({
             darkMode={mode === "dark"}
           />
 
-          <View className="p-5">
+          <View className="p-2.5">
             <Text className="text-base font-bold mb-4" style={{ color: colors.text }}>
               Mais Detalhes
             </Text>
