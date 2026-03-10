@@ -61,6 +61,16 @@
         {
           "locationAlwaysAndWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location."
         }
+      ],
+      [
+        "react-native-car-projection",
+        {
+          "carAppCategory": "navigation",
+          "mediaSupport": false,
+          "mediaOnly": false,
+          "minCarApiLevel": 1,
+          "targetCarApiLevel": 6
+        }
       ]
     ],
     "experiments": {

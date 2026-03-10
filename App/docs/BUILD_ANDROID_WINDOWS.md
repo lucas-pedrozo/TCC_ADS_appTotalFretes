@@ -65,3 +65,7 @@ npx expo start --clear
 ```
 
 Use o QR code que aparecer nesse terminal para abrir no Expo Go ou no development build. Assim o projeto é servido a partir de `D:\TCC\App` e os caminhos ficam dentro do limite.
+
+
+npx expo prebuild --clean --platform android
+npx expo run:android

@@ -6,23 +6,36 @@ import { useTranslation } from "react-i18next";
 import { useNavigation } from "@react-navigation/native";
 import type { RootStackParamList } from "@/src/routes/Routes";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { useCarProjection } from "@/src/context/CarProjectionContext";
+import { MOCK_FREIGHT } from "@/src/constants/mockFreight";
 
 const AdvancedOptions = () => {
 	const colors = useThemeColors();
 	const { t } = useTranslation();
 	const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+	const { freightForDisplay, setFreightForDisplay } = useCarProjection();
+
+	const isTestFreightActive = freightForDisplay?.id === 0;
 
 	const goToRenewPassword = () => {
 		navigation.navigate("RenewPassword");
-	}
+	};
 
 	const goToCancelAccount = () => {
 		navigation.navigate("CancelAccount");
-	}
+	};
 
 	const goToTerm = () => {
 		navigation.navigate("Term");
-	}
+	};
+
+	const handleStartTestFreight = () => {
+		setFreightForDisplay(MOCK_FREIGHT);
+	};
+
+	const handleEndTestFreight = () => {
+		setFreightForDisplay(null);
+	};
 
 	return (
 		<SafeAreaView style={{ flex: 1, paddingHorizontal: 16, paddingTop: 10, backgroundColor: colors.bg }} edges={["left", "right"]}>
@@ -35,6 +48,11 @@ const AdvancedOptions = () => {
 				<View className="h-0.5 w-full rounded-full" style={{ backgroundColor: colors.bgNonary }} />
 				<Option title={t("ADVANCEDOPTIONS.TERMS")} icon="document-text-outline" onPress={goToTerm} />
 				<View className="h-0.5 w-full rounded-full" style={{ backgroundColor: colors.bgNonary }} />
+				<Option
+					title={isTestFreightActive ? "Encerrar frete de teste" : "Iniciar frete de teste"}
+					icon="car-outline"
+					onPress={isTestFreightActive ? handleEndTestFreight : handleStartTestFreight}
+				/>
 			</View>
 		</SafeAreaView>
 	);
