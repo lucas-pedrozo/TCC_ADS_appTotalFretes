@@ -46,7 +46,6 @@ export function useNewPassword() {
           status: "success",
           message: i18n.t("NOTIFICATIONS.NEWPASSWORDSUCCESS"),
         });
-        await new Promise((r) => setTimeout(r, 1200));
         navigation.navigate({ name: "Login", params: { startMode: "full" } });
       } catch (error) {
         const message = (error as AxiosError<{ message?: string }>).response?.data?.message ?? "";

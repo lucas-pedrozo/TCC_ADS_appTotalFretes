@@ -68,9 +68,9 @@ function Home() {
 	}, [handleGetUser, handleGetFreightUser]);
 
 	return (
-		<SafeAreaView style={{ flex: 1, backgroundColor: colors.bg }}>
+		<SafeAreaView style={{ flex: 1, backgroundColor: colors.bg, paddingHorizontal: 16 }}>
 			<ScrollView
-				contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 100, paddingTop: 16 }}
+				contentContainerStyle={{ paddingBottom: 100, paddingTop: 16 }}
 				showsVerticalScrollIndicator={false}
 				className="flex-1"
 				refreshControl={

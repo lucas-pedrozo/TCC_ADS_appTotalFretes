@@ -63,7 +63,7 @@ export const getStoredAuthToken = async ({ useBiometrics }: { useBiometrics: boo
 	try {
 		if (isNative && useBiometrics) {
 			const { success } = await LocalAuthentication.authenticateAsync({
-				promptMessage: 'Use biometria para entrar no Total Fretes',
+				promptMessage: 'Use Face ID ou biometria para entrar no Total Fretes',
 				fallbackLabel: 'Usar senha do dispositivo',
 			});
 			if (!success) return null;
@@ -106,15 +106,6 @@ http.interceptors.request.use(
 	}
 );
 
-
-export const validateAuthToken = async ({ token }: { token: string }): Promise<boolean> => {
-	try {
-		const response = await http.post<{ valid: boolean }>('/auth/validate', { token });
-		return response.data.valid;
-	} catch {
-		return false;
-	}
-};
 
 http.interceptors.response.use((response: AxiosResponse) => response, async (error: AxiosError) => {
 		if (error.response?.status === 403) {

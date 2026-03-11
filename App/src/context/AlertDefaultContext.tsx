@@ -40,24 +40,48 @@ export const AlertDefaultProvider: React.FC<{ children: React.ReactNode }> = ({ 
     const [alert, setAlert] = useState<AlertState>(INITIAL_ALERT);
     const notifyRequestId = useRef(0);
     const alertRef = useRef<AlertState>(INITIAL_ALERT);
+    const pendingNotifyResolveRef = useRef<(() => void) | null>(null);
 
     const syncAlert = useCallback((nextAlert: AlertState) => {
         alertRef.current = nextAlert;
         setAlert(nextAlert);
     }, []);
 
-    const notify = useCallback(async (payload: AlertPayload) => {
+    const notify = useCallback((payload: AlertPayload): Promise<void> => {
         const currentAlert = alertRef.current;
         const currentRequestId = ++notifyRequestId.current;
         const shouldTransition = shouldTransitionAlert(currentAlert, payload);
+        const resolveWhenDismissed = payload.status !== "loading";
 
-        if (shouldTransition) {
-            syncAlert({ ...currentAlert, visible: false });
-            await wait(150);
-            if (currentRequestId !== notifyRequestId.current) return;
-        }
+        const promise = new Promise<void>((resolve) => {
+            const doResolve = () => {
+                if (currentRequestId !== notifyRequestId.current) return;
+                resolve();
+            };
 
-        syncAlert(buildAlertState(payload.status, payload.message));
+            if (resolveWhenDismissed) {
+                pendingNotifyResolveRef.current?.();
+                pendingNotifyResolveRef.current = doResolve;
+            }
+
+            const applyState = () => {
+                if (currentRequestId !== notifyRequestId.current) return;
+                syncAlert(buildAlertState(payload.status, payload.message));
+                if (!resolveWhenDismissed) doResolve();
+            };
+
+            if (shouldTransition) {
+                syncAlert({ ...currentAlert, visible: false });
+                wait(150).then(() => {
+                    if (currentRequestId !== notifyRequestId.current) return;
+                    applyState();
+                });
+            } else {
+                applyState();
+            }
+        });
+
+        return promise;
     }, [syncAlert]);
 
     const showAlert = useCallback(
@@ -68,6 +92,8 @@ export const AlertDefaultProvider: React.FC<{ children: React.ReactNode }> = ({ 
     );
 
     const hideAlert = useCallback(() => {
+        pendingNotifyResolveRef.current?.();
+        pendingNotifyResolveRef.current = null;
         syncAlert({ ...alertRef.current, visible: false });
     }, [syncAlert]);
 

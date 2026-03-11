@@ -50,8 +50,6 @@ export function usePasswordValidate() {
         return;
       }
 
-      await new Promise((resolve) => setTimeout(resolve, 1200));
-
       navigation.navigate("NewPassword", { email, resetToken });
     } catch (error) {
       const message = (error as AxiosError<{ message: string }>).response?.data?.message ?? "";

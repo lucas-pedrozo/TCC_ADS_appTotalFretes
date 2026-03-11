@@ -47,7 +47,7 @@ export default function RoutesTabs() {
 	const isDark = mode === "dark";
 	const activeColor = isDark ? "#74AEF1" : "#0B3B75";
 	const inactiveColor = isDark ? "rgba(255, 255, 255, 0.5)" : "rgba(0, 0, 0, 0.5)";
-	const tabBackground = isDark ? "#1a1a1a" : "#FFFFFF";
+	const tabBackground = isDark ? "#202020" : "#E5E5E5";
 	const borderColor = isDark ? "rgba(255, 255, 255, 0.08)" : "rgba(0, 0, 0, 0.06)";
 
 	useFocusEffect(
@@ -89,16 +89,16 @@ export default function RoutesTabs() {
 					position: "absolute",
 					left: 12,
 					right: 12,
-					bottom: insets.bottom + 8,
+					bottom: insets.bottom + 10,
 					height: TAB_BAR_HEIGHT,
 					borderRadius: 16,
-					marginHorizontal: 12,
+					marginHorizontal: 16,
 					backgroundColor: tabBackground,
-					borderTopWidth: 0,
-					borderWidth: 1,
-					borderColor,
 					paddingTop: 10,
 					paddingBottom: 10,
+					elevation: 0,
+					shadowOpacity: 0,
+					shadowRadius: 0,
 				},
 				tabBarLabelStyle: {
 					fontSize: 11,

@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { View, Text, TextInput } from "react-native";
 import { Controller } from "react-hook-form";
 import { useThemeColors } from "@/src/context/ThemeContext";
@@ -19,6 +19,13 @@ export function OtpInput({
 }: OtpInputProps) {
   const colors = useThemeColors();
   const inputRefs = useRef<(TextInput | null)[]>([]);
+
+  useEffect(() => {
+    const id = setTimeout(() => {
+      inputRefs.current[0]?.focus();
+    }, 150);
+    return () => clearTimeout(id);
+  }, []);
 
   return (
     <Controller

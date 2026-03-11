@@ -23,7 +23,7 @@ interface UseLoginOptions {
 }
 
 export function useLogin(options: UseLoginOptions = {}) {
-  const { notify,hideAlert } = useAlertDefault();
+  const { notify } = useAlertDefault();
   const { passwordOnlyMode = false, getEnableBiometricsAfterLogin } = options;
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const [isDesabled, setIsDisabled] = useState(false);
@@ -56,8 +56,10 @@ export function useLogin(options: UseLoginOptions = {}) {
         await setBiometricsEnabledAsync(true);
       }
 
-      hideAlert();  
-      await new Promise(resolve => setTimeout(resolve, 150));
+      await notify({
+        status: "success",
+        message: i18n.t("NOTIFICATIONS.LOGINSUCCESS"),
+      });
       navigation.reset({
         index: 0,
         routes: [{ name: "Home" }],

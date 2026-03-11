@@ -145,8 +145,8 @@ const Perfil = () => {
             <>
               <View className="h-0.5 w-full rounded-full" style={{ backgroundColor: colors.bgNonary }} />
               <OptionKey
-                title={t("PERFIL.BIOMETRICS")}
-                icon="finger-print-outline"
+                title={Platform.OS === "ios" ? t("PERFIL.BIOMETRICS_FACE_ID") : t("PERFIL.BIOMETRICS")}
+                icon={Platform.OS === "ios" ? "eye-outline" : "finger-print-outline"}
                 value={biometricsEnabled}
                 setValue={handleBiometricsToggle}
               />

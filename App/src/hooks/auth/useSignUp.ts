@@ -54,8 +54,6 @@ export function useSignUp() {
         message: i18n.t("NOTIFICATIONS.SIGNUPSUCCESS"),
       });
 
-      await new Promise(resolve => setTimeout(resolve, 1200));
-
       await navigation.navigate({ name: "Login", params: { startMode: "saved", focusPassword: true } });
     } catch (error) {
       const message = (error as AxiosError<{ message: string }>).response?.data?.message ?? "";

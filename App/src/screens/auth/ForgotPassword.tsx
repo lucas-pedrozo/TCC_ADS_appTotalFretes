@@ -31,6 +31,7 @@ const ForgotPassword = () => {
 					label={t("FORGOTPASSWORD.EMAILLABEL")}
 					placeholder={t("FORGOTPASSWORD.EMAILPLACEHOLDER")}
 					rules={rules.email}
+					autoFocus
 				/>
 			</View>
 			<View className="flex-1 justify-end pt-4">

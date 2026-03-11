@@ -31,13 +31,11 @@ export function useForgotPassword() {
       });
 
       const response = await http.post<ApiMessageResponse>("/auth/forgot-password", { email: data.email });
-
+      console.log("Email enviado com sucesso");
       await notify({
         status: "success",
         message: response.data.message ?? i18n.t("NOTIFICATIONS.FORGOTPASSWORDSUCCESS"),
       });
-
-      await new Promise((resolve) => setTimeout(resolve, 1200));
 
       navigation.navigate("VerificationCode", { email: data.email.trim() });
     } catch (error) {

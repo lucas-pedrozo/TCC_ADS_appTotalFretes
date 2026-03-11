@@ -25,7 +25,7 @@ export const screenPT = {
     SWITCHACCOUNT: "Trocar conta",
     USESAVEDACCOUNT: "Usar conta salva",
     ENTERWITHPASSWORD: "Entrar com senha",
-    ENABLEBIOMETRICS: "Usar biometria na próxima vez",
+    ENABLEBIOMETRICS: "Usar Face ID ou biometria na próxima vez",
   },
   ROUTES: {
     LOGIN: "Login",
@@ -46,6 +46,7 @@ export const screenPT = {
     VEHICLEDATA: "Cadastro de Veículo",
     TERM: "Termo de Compromisso",
     TERMS: "Termos de compromisso",
+    MAPSCREEN: "Mapa",
   },
   TERM: {
     TITLE: "TERMO DE COMPROMISSO – ENTREGA DE FRETES",
@@ -132,7 +133,8 @@ export const screenPT = {
     LIGHTMODE: "Modo claro",
     DARKMODE: "Modo escuro",
     BIOMETRICS: "Acesso com biometria",
-    BIOMETRICS_PROMPT: "Use biometria para ativar o acesso por Face ID ou impressão digital.",
+    BIOMETRICS_FACE_ID: "Acesso com Face ID",
+    BIOMETRICS_PROMPT: "Use Face ID ou impressão digital para ativar o acesso rápido.",
     BIOMETRICS_FALLBACK: "Usar senha do dispositivo",
     LANGPT: "PT-BR",
     LANGEN: "EN-US",
@@ -195,7 +197,7 @@ export const screenEN = {
     SWITCHACCOUNT: "Switch account",
     USESAVEDACCOUNT: "Use saved account",
     ENTERWITHPASSWORD: "Enter with password",
-    ENABLEBIOMETRICS: "Use biometrics next time",
+    ENABLEBIOMETRICS: "Use Face ID or biometrics next time",
   },
   ROUTES: {
     LOGIN: "Login",
@@ -216,6 +218,7 @@ export const screenEN = {
     VEHICLEDATA: "Register Vehicle",
     TERM: "Commitment Term",
     TERMS: "Terms of commitment",
+    MAPSCREEN: "Map",
   },
   TERM: {
     TITLE: "COMMITMENT TERM – FREIGHT DELIVERY",
@@ -302,7 +305,8 @@ export const screenEN = {
     LIGHTMODE: "Light mode",
     DARKMODE: "Dark mode",
     BIOMETRICS: "Biometric access",
-    BIOMETRICS_PROMPT: "Use biometrics to enable Face ID or fingerprint access.",
+    BIOMETRICS_FACE_ID: "Face ID access",
+    BIOMETRICS_PROMPT: "Use Face ID or fingerprint to enable quick access.",
     BIOMETRICS_FALLBACK: "Use device passcode",
     LANGPT: "PT-BR",
     LANGEN: "EN-US",

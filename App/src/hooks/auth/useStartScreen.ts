@@ -4,9 +4,18 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 import { useAuth } from "@/src/context/AuthContext";
 import { useAlertDefault } from "@/src/context/AlertDefaultContext";
-import { getStoredAuthToken, getStoredAuthTokenSilent, validateAuthToken, clearAuthToken } from "@/src/services/http";
+import http, { getStoredAuthToken, getStoredAuthTokenSilent, clearAuthToken } from "@/src/services/http";
 import { RootStackParamList } from "@/src/routes/Routes";
 import i18n from "@/src/i18n";
+
+const validateAuthToken = async (token: string): Promise<boolean> => {
+	try {
+		const response = await http.post<{ valid: boolean }>("/auth/validate", { token });
+		return response.data.valid;
+	} catch {
+		return false;
+	}
+};
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
@@ -39,9 +48,9 @@ export function useStartScreen() {
 			const token = await getStoredAuthToken({ useBiometrics: biometricsEnabled });
 			if (token) {
 				notify({ status: "loading", message: i18n.t("NOTIFICATIONS.LOGINLOADING") });
-				await new Promise((r) => setTimeout(r, 150));
-				const isValid = await validateAuthToken({ token });
+				const isValid = await validateAuthToken(token);
 				if (!isValid) {
+					hideAlert();
 					await clearAuthToken();
 					notify({ status: "error", message: i18n.t("NOTIFICATIONS.TOKENINVALID") });
 					setHasStoredToken(false);
@@ -49,9 +58,7 @@ export function useStartScreen() {
 				}
 				await login(token);
 				hideAlert();
-				setTimeout(() => {
-					navigation.reset({ index: 0, routes: [{ name: "Home" as never }] });
-				}, 150);
+				navigation.reset({ index: 0, routes: [{ name: "Home" as never }] });
 				return;
 			}
 		}
