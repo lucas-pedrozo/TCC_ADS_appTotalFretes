@@ -16,14 +16,18 @@ export type VehiclePlateData = {
 	country: string;
 	state: string;
 	city: string;
+	model?: string;
+	mark?: string;
 };
 
 type RegisterVehicleContextValue = {
 	group: VehicleGroupType | null;
+	groupVehicleTypeId: number | null;
 	vehicleType: VehicleTypeData | null;
 	plateData: VehiclePlateData;
 
 	setGroup: (group: VehicleGroupType) => void;
+	setGroupVehicleTypeId: (id: number | null) => void;
 	setVehicleType: (type: VehicleTypeData) => void;
 	setPlateData: (data: VehiclePlateData) => void;
 
@@ -36,21 +40,26 @@ const defaultPlateData: VehiclePlateData = {
 	country: "",
 	state: "",
 	city: "",
+	model: "",
+	mark: "",
 };
 
 const RegisterVehicleContext = createContext<RegisterVehicleContextValue | undefined>(undefined);
 
 export function RegisterVehicleProvider({ children }: { children: React.ReactNode }) {
 	const [group, setGroupState] = useState<VehicleGroupType | null>(null);
+	const [groupVehicleTypeId, setGroupVehicleTypeIdState] = useState<number | null>(null);
 	const [vehicleType, setVehicleTypeState] = useState<VehicleTypeData | null>(null);
 	const [plateData, setPlateDataState] = useState<VehiclePlateData>(defaultPlateData);
 
 	const setGroup = useCallback((g: VehicleGroupType) => setGroupState(g), []);
+	const setGroupVehicleTypeId = useCallback((id: number | null) => setGroupVehicleTypeIdState(id), []);
 	const setVehicleType = useCallback((t: VehicleTypeData) => setVehicleTypeState(t), []);
 	const setPlateData = useCallback((d: VehiclePlateData) => setPlateDataState(d), []);
 
 	const reset = useCallback(() => {
 		setGroupState(null);
+		setGroupVehicleTypeIdState(null);
 		setVehicleTypeState(null);
 		setPlateDataState(defaultPlateData);
 	}, []);
@@ -61,8 +70,19 @@ export function RegisterVehicleProvider({ children }: { children: React.ReactNod
 	);
 
 	const value = useMemo(
-		() => ({ group, vehicleType, plateData, setGroup, setVehicleType, setPlateData, getPayload, reset }),
-		[group, vehicleType, plateData, setGroup, setVehicleType, setPlateData, getPayload, reset],
+		() => ({
+			group,
+			groupVehicleTypeId,
+			vehicleType,
+			plateData,
+			setGroup,
+			setGroupVehicleTypeId,
+			setVehicleType,
+			setPlateData,
+			getPayload,
+			reset,
+		}),
+		[group, groupVehicleTypeId, vehicleType, plateData, setGroup, setGroupVehicleTypeId, setVehicleType, setPlateData, getPayload, reset],
 	);
 
 	return (
@@ -72,10 +92,15 @@ export function RegisterVehicleProvider({ children }: { children: React.ReactNod
 	);
 }
 
-export function useRegisterVehicle() {
+export function useRegisterVehicleContext() {
 	const context = useContext(RegisterVehicleContext);
 	if (!context) {
 		throw new Error("useRegisterVehicle must be used within RegisterVehicleProvider");
 	}
 	return context;
+}
+
+// Mantido para compatibilidade com imports já existentes nas telas.
+export function useRegisterVehicle() {
+	return useRegisterVehicleContext();
 }

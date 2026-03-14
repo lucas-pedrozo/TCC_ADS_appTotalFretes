@@ -31,17 +31,13 @@ export default function Start() {
 			style={{ backgroundColor: colors.bg }}
 		>
 			<View className="flex-1 justify-center pt-8">
-				<Text
-					className="text-4xl font-bold text-center"
-					style={{ color: colors.text }}
-				>
+				<Text className="text-4xl font-bold text-center" style={{ color: colors.text }}>
 					{t("COMMON.APPNAME")}
 				</Text>
 
 				{showSavedAccount && lastUsedAccount ? (
 					<CardUserLogin
 						lastUsedAccount={lastUsedAccount}
-						userImage_id={false}
 						biometricsEnabled={showBiometricOnCard}
 						goSavedAccount={goSavedAccount}
 						goSwitchAccount={goSwitchAccount}

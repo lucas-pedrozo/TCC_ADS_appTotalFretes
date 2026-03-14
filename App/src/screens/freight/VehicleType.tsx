@@ -1,17 +1,24 @@
-import { FlatList, Image, Text, TouchableOpacity, View } from "react-native";
+import { useCallback, useEffect, useState } from "react";
+import { ActivityIndicator, FlatList, Image, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useNavigation } from "@react-navigation/native";
 import { useThemeColors } from "@/src/context/ThemeContext";
-import { useRegisterVehicle, type VehicleTypeData } from "@/src/context/RegisterVehicleContext";
+import { useRegisterVehicleContext, VehicleTypeData } from "@/src/context/RegisterVehicleContext";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import type { RootStackParamList } from "@/src/routes/Routes";
+import http from "@/src/services/http";
+import { useAlertDefault } from "@/src/context/AlertDefaultContext";
+import { AxiosError } from "axios";
 
-const VEHICLE_TYPES: VehicleTypeData[] = [
-  { id: 1, name: "Caminhão Toco", image: "https://i.imgur.com/8QKZbOX.png", axle: 2, grossWeight: "16T", length: "14m" },
-  { id: 2, name: "Caminhão Truck", image: "https://i.imgur.com/8QKZbOX.png", axle: 3, grossWeight: "23T", length: "14m" },
-  { id: 3, name: "Caminhão 3/4", image: "https://i.imgur.com/8QKZbOX.png", axle: 2, grossWeight: "11.5T", length: "8m" },
-  { id: 4, name: "Caminhão VUC", image: "https://i.imgur.com/8QKZbOX.png", axle: 2, grossWeight: "7T", length: "6.3m" },
-];
+type VehicleTypeApi = {
+  id: number;
+  nome: string;
+  axes: number;
+  weight: number;
+  capacityWeight: number;
+  length: number;
+  groupVehicleType_id?: number | null;
+};
 
 const CardType = ({ item, onPress }: { item: VehicleTypeData; onPress: () => void }) => {
   const colors = useThemeColors();
@@ -22,12 +29,16 @@ const CardType = ({ item, onPress }: { item: VehicleTypeData; onPress: () => voi
       className="rounded-2xl overflow-hidden"
       style={{ backgroundColor: colors.bgSecondary, borderWidth: 1, borderColor: colors.bgTertiary }}
     >
-      <View className="items-center justify-center p-4">
-        <Image
-          source={{ uri: item.image }}
-          className="w-full h-[120px]"
-          resizeMode="contain"
-        />
+      <View className="items-center justify-center p-4 min-h-[120px]">
+        {item.image ? (
+          <Image source={{ uri: item.image }} className="w-full h-[120px]" resizeMode="contain" />
+        ) : (
+          <Image
+            source={require("@/src/assets/veiculo.png")}
+            className="w-full h-[120px]"
+            resizeMode="contain"
+          />
+        )}
       </View>
 
       <View className="flex-row justify-between px-4 pb-2">
@@ -41,10 +52,44 @@ const CardType = ({ item, onPress }: { item: VehicleTypeData; onPress: () => voi
   );
 };
 
+function mapApiToVehicleTypeData(row: VehicleTypeApi): VehicleTypeData {
+  return {
+    id: row.id,
+    name: row.nome ?? "",
+    image: "",
+    axle: row.axes ?? 0,
+    grossWeight: String(row.weight ?? row.capacityWeight ?? 0),
+    length: String(row.length ?? 0),
+  };
+}
+
 const VehicleType = () => {
   const colors = useThemeColors();
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-  const { setVehicleType } = useRegisterVehicle();
+  const { setVehicleType, groupVehicleTypeId } = useRegisterVehicleContext();
+  const { notify } = useAlertDefault();
+  const [types, setTypes] = useState<VehicleTypeData[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchTypes = useCallback(async () => {
+    try {
+      setLoading(true);
+      const { data } = await http.get<VehicleTypeApi[]>("/vehicle-type");
+      const filtered = groupVehicleTypeId != null
+        ? data.filter((t) => t.groupVehicleType_id === groupVehicleTypeId)
+        : data;
+      setTypes(filtered.map(mapApiToVehicleTypeData));
+    } catch (err) {
+      const message = (err as AxiosError<{ message?: string }>).response?.data?.message ?? "Erro ao carregar tipos.";
+      notify({ status: "error", message });
+    } finally {
+      setLoading(false);
+    }
+  }, [groupVehicleTypeId, notify]);
+
+  useEffect(() => {
+    fetchTypes();
+  }, [fetchTypes]);
 
   const handleSelect = (type: VehicleTypeData) => {
     setVehicleType(type);
@@ -55,15 +100,21 @@ const VehicleType = () => {
     <SafeAreaView edges={["left", "right"]} className="flex-1 px-4" style={{ backgroundColor: colors.bg }}>
       <Text className="pl-2.5 pb-5" style={{ color: colors.text }}>Selecione o Tipo do veículo</Text>
 
-      <FlatList
-        data={VEHICLE_TYPES}
-        keyExtractor={(item) => String(item.id)}
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 40, gap: 16 }}
-        renderItem={({ item }) => (
-          <CardType item={item} onPress={() => handleSelect(item)} />
-        )}
-      />
+      {loading ? (
+        <View className="items-center py-8">
+          <ActivityIndicator size="small" color={colors.text} />
+        </View>
+      ) : (
+        <FlatList
+          data={types}
+          keyExtractor={(item) => String(item.id)}
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 40, gap: 16 }}
+          renderItem={({ item }) => (
+            <CardType item={item} onPress={() => handleSelect(item)} />
+          )}
+        />
+      )}
     </SafeAreaView>
   );
 };

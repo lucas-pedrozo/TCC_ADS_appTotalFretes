@@ -2,7 +2,7 @@ import React from "react";
 import { Modal, Pressable, Text, TouchableOpacity, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
-import { useIconColor, useThemeColors } from "@/src/context/ThemeContext";
+import { useThemeColors } from "@/src/context/ThemeContext";
 import animation from "@/src/utils/animation";
 
 export type FreightFilterState = {
@@ -40,7 +40,6 @@ const FilterChip = ({ label, active, onPress, colors }: FilterChipProps & { colo
 const ModalFilter = ({ visible, onClose, onApply, currentCity, filters, onChangeFilters }: ModalFilterProps) => {
   const colors = useThemeColors();
   const { t } = useTranslation();
-  const iconColor = useIconColor();
 
   return (
     <Modal

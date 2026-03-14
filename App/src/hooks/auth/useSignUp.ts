@@ -43,6 +43,7 @@ export function useSignUp() {
         useGlasses: data.useGlasses,
         isDeficient: data.isDeficient,
         cnhNumber: data.cnhNumber,
+        issuingAgencyCnh: data.issuingAgencyCnh,
         cnhType_id: data.cnhType_id,
         password: data.password,
         account_type_id: 1,

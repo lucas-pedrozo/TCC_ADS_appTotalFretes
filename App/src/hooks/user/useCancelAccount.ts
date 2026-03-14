@@ -26,7 +26,6 @@ export function useDeleteUser() {
 				status: "success",
 				message: "Usuário deletado com sucesso!",
 			});
-			await new Promise((resolve) => setTimeout(resolve, 1200));
 			handleRemoveSavedAccount();
 			logout();
 		} catch (error) {

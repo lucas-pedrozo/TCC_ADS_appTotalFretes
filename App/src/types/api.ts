@@ -8,9 +8,11 @@ export interface ApiMessageResponse {
   message?: string;
 }
 
-/** Resposta do login */
+/** Resposta do login (auth-service devolve token + user) */
 export interface LoginResponse {
   token: string;
+  message?: string;
+  user?: { id: number; role?: string };
 }
 
 /** Resposta do validate-code (inclui resetToken para fluxo de nova senha) */

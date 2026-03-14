@@ -25,6 +25,7 @@ export const screenPT = {
     SWITCHACCOUNT: "Trocar conta",
     USESAVEDACCOUNT: "Usar conta salva",
     ENTERWITHPASSWORD: "Entrar com senha",
+    REMOVESAVEDACCOUNT: "Excluir conta",
     ENABLEBIOMETRICS: "Usar Face ID ou biometria na próxima vez",
   },
   ROUTES: {
@@ -195,6 +196,7 @@ export const screenEN = {
     SUBMIT: "Login",
     SAVEDACCOUNT: "Saved account",
     SWITCHACCOUNT: "Switch account",
+    REMOVESAVEDACCOUNT: "Remove account",
     USESAVEDACCOUNT: "Use saved account",
     ENTERWITHPASSWORD: "Enter with password",
     ENABLEBIOMETRICS: "Use Face ID or biometrics next time",

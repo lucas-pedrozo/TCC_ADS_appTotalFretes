@@ -11,8 +11,8 @@ type CardVehicleProps = {
   onPress?: () => void;
 };
 
-function formatWeight(weight: number | undefined | null): string {
-  if (weight == null) return "N/A";
+function formatWeight(weight: number | undefined | null): string | null {
+  if (weight == null) return null;
   return `${weight}T`;
 }
 
@@ -23,7 +23,7 @@ export const CardVehicle = ({ vehicle, onPress }: CardVehicleProps) => {
 
   return (
     <View>
-      <View className="flex-row justify-between items-center pb-2.5 px-0.5">
+      <View className="flex-row justify-between items-center pb-2.5 px-2.5">
         <Text className="font-semibold text-lg" style={{ color: colors.text }}>
           {t("CARD.VEHICLE.MY_VEHICLE")}
         </Text>
@@ -47,24 +47,24 @@ export const CardVehicle = ({ vehicle, onPress }: CardVehicleProps) => {
         <View className="flex-row justify-between mt-3">
           <View className="flex-col flex-1">
             <Text className="text-sm" style={{ color: colors.text }}>
-              {t("CARD.VEHICLE.MODEL")}: {vehicle?.model || "N/A"}
+              {t("CARD.VEHICLE.MODEL")}: {vehicle?.model || "---"}
             </Text>
             <Text className="text-sm" style={{ color: colors.text }}>
-              {t("CARD.VEHICLE.PLATE")}: {vehicle?.plate || "N/A"}
+              {t("CARD.VEHICLE.PLATE")}: {vehicle?.plate || "---"}
             </Text>
             <Text className="text-sm" style={{ color: colors.text }}>
-              {t("CARD.VEHICLE.BRAND")}: {vehicle?.brand || "N/A"}
+              {t("CARD.VEHICLE.BRAND")}: {vehicle?.mark || "---"}
             </Text>
           </View>
           <View className="flex-col items-end flex-1">
             <Text className="text-sm text-end" style={{ color: colors.text }}>
-              {t("CARD.VEHICLE.AXLES")}: {vehicle?.axle || "N/A"}
+              {t("CARD.VEHICLE.AXLES")}: {vehicle?.axle || "---"}
             </Text>
             <Text className="text-sm text-end" style={{ color: colors.text }}>
-              {t("CARD.VEHICLE.LENGTH")}: {vehicle?.size || "N/A"}
+              {t("CARD.VEHICLE.LENGTH")}: {vehicle?.size || "---"}
             </Text>
             <Text className="text-sm text-end" style={{ color: colors.text }}>
-              {t("CARD.VEHICLE.WEIGHT")}: {formatWeight(vehicle?.weight)}
+              {t("CARD.VEHICLE.WEIGHT")}: {formatWeight(vehicle?.weight) ?? '---'}
             </Text>
           </View>
         </View>

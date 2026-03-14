@@ -75,7 +75,9 @@ const Freight = () => {
         {t("FREIGHT.TITLE")}
       </Text>
 
-      <View className="flex-row items-center gap-2.5 justify-between mt-4 mb-2">
+      <View className="h-7" />
+
+      <View className="flex-row items-center gap-2.5 justify-between mb-2">
         <InputSearch
           control={control}
           name="search"

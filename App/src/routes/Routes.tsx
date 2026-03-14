@@ -1,6 +1,5 @@
 import "react-native-gesture-handler";
 
-import React from "react";
 import RoutesTabs from "./RoutesTabs";
 import { StatusBar } from "expo-status-bar";
 import PrivateRoute from "./PrivateRoutes";
@@ -35,6 +34,7 @@ import MapScreen from "../screens/MapBox/MapScreen";
 
 interface EditPerfilRouteParams {
 	editPerfilData: EditPerfilMap;
+	userImage?: string;
 }
 
 interface EditCnhRouteParams {

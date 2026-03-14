@@ -3,11 +3,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { useIconColor, useThemeColors, useThemeMode } from "@/src/context/ThemeContext";
 
-type HeaderProps = {
-	title?: string;
-};
-
-const Header = ({ title }: HeaderProps) => {
+const Header = ({ title }: { title?: string }) => {
 	const colors = useThemeColors();
 	const { mode } = useThemeMode();
 	const navigation = useNavigation();
@@ -15,12 +11,8 @@ const Header = ({ title }: HeaderProps) => {
 	const backButtonBg = mode === "light" ? colors.bgSecondary : colors.bgTertiary;
 
 	return (
-		<View className="w-full py-4 flex-row items-center justify-between">
-			<TouchableOpacity
-				className="p-2.5 rounded-xl"
-				style={{ backgroundColor: backButtonBg }}
-				onPress={() => navigation.goBack()}
-			>
+		<View className="w-full py-2.5 flex-row items-center justify-between">
+			<TouchableOpacity className="p-2.5 rounded-xl" style={{ backgroundColor: backButtonBg }} onPress={() => navigation.goBack()}>
 				<Ionicons name="arrow-back" size={20} color={iconColor} />
 			</TouchableOpacity>
 

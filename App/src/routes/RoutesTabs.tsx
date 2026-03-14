@@ -48,7 +48,6 @@ export default function RoutesTabs() {
 	const activeColor = isDark ? "#74AEF1" : "#0B3B75";
 	const inactiveColor = isDark ? "rgba(255, 255, 255, 0.5)" : "rgba(0, 0, 0, 0.5)";
 	const tabBackground = isDark ? "#202020" : "#E5E5E5";
-	const borderColor = isDark ? "rgba(255, 255, 255, 0.08)" : "rgba(0, 0, 0, 0.06)";
 
 	useFocusEffect(
 		useCallback(() => {

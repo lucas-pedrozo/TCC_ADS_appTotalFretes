@@ -24,29 +24,29 @@ import { CardMap } from "@/src/components/cards/CardMap";
 function Home() {
 	const { logout } = useAuth();
 	const { t } = useTranslation();
-	const iconsColor  = useIconColor()
+	const iconsColor = useIconColor()
 	const colors = useThemeColors();
-	
+
 	const currentHour = new Date().getHours();
 	const [refreshKey, setRefreshKey] = useState(0);
 	const [isRefreshing, setIsRefreshing] = useState(false);
 	const navigation = useNavigation<BottomTabNavigationProp<TabParamList>>();
 	const [isModalNotificacoesVisible, setIsModalNotificacoesVisible] = useState(false);
-	
+
 	const { userData, handleGetUser } = useGetUser();
-	const { vehicleData } = useGetVehicle();
+	const { vehicleData, handleGetVehicle } = useGetVehicle();
 	const { freightUser, handleGetFreightUser } = useGetFreightUser();
-	const { weatherData, loading: weatherLoading, refetch: refetchWeather } = useWeather();
+	const { weatherData, refetch: refetchWeather } = useWeather();
 
 	const greeting = currentHour < 12 ? t("HOME.WELCOME2") : currentHour < 18 ? t("HOME.WELCOME3") : t("HOME.WELCOME");
 
-	const goToProfile = () => { 
+	const goToProfile = () => {
 		navigation.navigate("PerfilTab");
 	};
 
 	const goToAndamento = () => {
-		 navigation.navigate("AndamentoTab");
-	 };
+		navigation.navigate("AndamentoTab");
+	};
 
 	const goToMap = () => {
 		navigation.navigate("MapScreen" as never);
@@ -67,8 +67,14 @@ function Home() {
 		handleGetFreightUser();
 	}, [handleGetUser, handleGetFreightUser]);
 
+	useEffect(() => {
+		const vehicleId = userData?.vehicle_id ?? null;
+		if (vehicleId != null) handleGetVehicle(vehicleId);
+		else handleGetVehicle(null);
+	}, [userData?.vehicle_id, handleGetVehicle]);
+
 	return (
-		<SafeAreaView style={{ flex: 1, backgroundColor: colors.bg, paddingHorizontal: 16 }}>
+		<SafeAreaView style={{ flex: 1, backgroundColor: colors.bg }}>
 			<ScrollView
 				contentContainerStyle={{ paddingBottom: 100, paddingTop: 16 }}
 				showsVerticalScrollIndicator={false}
@@ -81,34 +87,33 @@ function Home() {
 					/>
 				}
 			>
-				<HeaderHome
-					userData={userData}
-					greeting={greeting}
-					onProfilePress={goToProfile}
-					notInformedLabel={t("COMMON.NOTINFORMED")}
-					onNotificationsPress={() => setIsModalNotificacoesVisible(true)}
-					onLogout={logout}
-				/>
-
-				<Text className="font-bold text-2xl pt-6" style={{ color: colors.text }}> {t("HOME.TITLE")} </Text>
-
-				<CardActivityHome
-					key={`card-activity-${refreshKey}`}
-					onPress={goToAndamento}
-					freight={freightUser}
-				/>
+				<View className="px-4">
+					<HeaderHome
+						userData={userData}
+						greeting={greeting}
+						onProfilePress={goToProfile}
+						notInformedLabel="-----"
+						onNotificationsPress={() => setIsModalNotificacoesVisible(true)}
+						onLogout={logout}
+					/>
+					<Text className="font-bold text-2xl pt-6" style={{ color: colors.text }}> {t("HOME.TITLE")} </Text>
+					<CardActivityHome
+						key={`card-activity-${refreshKey}`}
+						onPress={goToAndamento}
+						freight={freightUser}
+					/>
+				</View>
 
 				<ScrollView
 					horizontal
 					showsHorizontalScrollIndicator={false}
-					contentContainerStyle={{ paddingVertical: 20 }}
+					contentContainerStyle={{ paddingVertical: 20, paddingHorizontal: 16 }}
 					className="-mx-0"
 				>
 					<CardClime
 						clima={weatherData?.descricao}
 						cidade={weatherData?.cidade}
 						temp={weatherData?.temperatura}
-						loading={weatherLoading}
 						weatherCode={weatherData?.weatherCode}
 					/>
 					<View className="w-4" />
@@ -116,11 +121,9 @@ function Home() {
 					<View className="w-4" />
 					<CardHistory />
 				</ScrollView>
-
-				<CardVehicle
-					key={`card-vehicle-${refreshKey}`}
-					vehicle={vehicleData}
-				/>
+				<View className="px-4">
+					<CardVehicle vehicle={vehicleData} />
+				</View>
 			</ScrollView>
 
 			<ModalNotificacoes

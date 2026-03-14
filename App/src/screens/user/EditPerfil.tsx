@@ -3,6 +3,7 @@ import { useThemeColors, useThemeMode } from "@/src/context/ThemeContext";
 import { Image, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
+import { useRoute, RouteProp } from "@react-navigation/native";
 
 import { Ionicons } from "@expo/vector-icons";
 import {
@@ -16,14 +17,19 @@ import {
 } from "@/src/components/form";
 import { useEditPerfil } from "@/src/hooks/user/useEditPerfil";
 import { useImagePicker } from "@/src/hooks/user/useImagePicker";
+import type { RootStackParamList } from "@/src/routes/Routes";
 
 const EditPerfil = () => {
 	const colors = useThemeColors();
 	const { t } = useTranslation();
 	const { mode } = useThemeMode();
 	const insets = useSafeAreaInsets();
-	const { control, handleSubmit, handleEditPerfil, rules } = useEditPerfil();
+	const route = useRoute<RouteProp<RootStackParamList, "EditPerfil">>();
+	const currentProfileImageUrl = route.params?.userImage;
 	const { imageUri, handlePickFromGallery, handleTakePhoto } = useImagePicker();
+	const { control, handleSubmit, handleEditPerfil, rules } = useEditPerfil({ pendingImageUri: imageUri });
+
+	const displayImageUri = imageUri ?? currentProfileImageUrl;
 
 	return (
 		<KeyboardAwareScrollView
@@ -33,9 +39,9 @@ const EditPerfil = () => {
 		>
 			<View className="flex-1 items-center gap-5 mb-8">
 				{
-					imageUri ? (
+					displayImageUri ? (
 						<Image
-							source={{ uri: imageUri }}
+							source={{ uri: displayImageUri }}
 							style={{ width: 80, height: 80, borderRadius: 50 }}
 						/>
 					) : (

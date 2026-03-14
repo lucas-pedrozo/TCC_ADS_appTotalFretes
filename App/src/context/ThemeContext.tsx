@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { Appearance, Platform, View } from "react-native";
 import { DefaultTheme, Theme } from "@react-navigation/native";
 import * as SystemUI from "expo-system-ui";

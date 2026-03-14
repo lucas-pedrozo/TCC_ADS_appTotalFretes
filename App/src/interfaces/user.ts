@@ -1,10 +1,20 @@
 export interface MapCnh {
   id: number;
   name: string;
-  description: string;
+  description?: string;
+}
+
+export interface MapUserImage {
+  id: number;
+  originalName?: string;
+  fileName: string;
+  path: string;
+  mimeType: string;
+  sizeBytes: number;
 }
 
 export interface MapUser {
+  id: number;
   name: string;
   email: string;
   birthDate: string;
@@ -12,11 +22,15 @@ export interface MapUser {
   cpf: string;
   sex: string;
   useGlasses: boolean;
-  issuingAgencyCnh: string;
+  issuingAgencyCnh?: string;
   isDeficient: boolean;
   cnhNumber: string;
   cnhType_id: number;
-  vehicleType_id: number | null;
-  userImage_id: number | null;
+  vehicle_id: number | null;
   CnhType: MapCnh;
+  createdAt: string;
+  updatedAt: string;
+ 
+  userImage_id: number | null;
+  UserImage?: MapUserImage | null;
 }

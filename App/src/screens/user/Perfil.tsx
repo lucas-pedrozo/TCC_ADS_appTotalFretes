@@ -15,6 +15,7 @@ import { RootStackParamList } from "@/src/routes/Routes";
 import { HeaderPerfil } from "@/src/components/header/HeaderPerfil";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { Option, OptionKey, OptionSelect, ButtonCancel } from "@/src/components/form";
+import { ENV_BASE_URL } from "@env";
 
 type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
@@ -29,6 +30,9 @@ const Perfil = () => {
   const navigation = useNavigation<NavigationProp>();
   const { userData, handleGetUser } = useGetUser();
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const userImageUrl = userData?.UserImage?.path
+    ? `${ENV_BASE_URL}/api/${userData.UserImage.path}`
+    : undefined;
 
   const goToAdvancedOptions = () => { navigation.navigate("AdvancedOptions"); }
   const goToVehicleGroup = () => { navigation.navigate("VehicleGroup"); }
@@ -49,9 +53,10 @@ const Perfil = () => {
         cpf: userData?.cpf ?? "",
         isDeficient: userData?.isDeficient ?? false,
         sex: validSex,
-      }
+      },
+      userImage: userImageUrl,
     })
-  }, [navigation, userData]);
+  }, [navigation, userData, userImageUrl]);
 
   const goToEditCnh = useCallback(() => {
     navigation.navigate("EditCnh", {
@@ -108,7 +113,7 @@ const Perfil = () => {
         }
       >
         <HeaderPerfil
-          image={userData?.userImage_id ? `/api/user/image/${userData.userImage_id}` : undefined}
+          image={userImageUrl}
           name={userData?.name || t("COMMON.NOTINFORMED")}
           email={userData?.email || t("COMMON.NOTINFORMED")}
           cpf={userData?.cpf || t("COMMON.NOTINFORMED")}
@@ -121,7 +126,7 @@ const Perfil = () => {
           <Option title={t("PERFIL.EDITCNHDATA")} icon="pencil" onPress={goToEditCnh} />
           <View className="h-0.5 w-full rounded-full" style={{ backgroundColor: colors.bgNonary }} />
 
-          {!userData?.vehicleType_id ?
+          {!userData?.vehicle_id ?
             <Option title={t("PERFIL.REGISTERVEHICLE")} icon="car-outline" onPress={goToVehicleGroup} />
             :
             <Option title={t("PERFIL.EDITVEHICLE")} icon="car-outline" onPress={goToVehicleGroup} />

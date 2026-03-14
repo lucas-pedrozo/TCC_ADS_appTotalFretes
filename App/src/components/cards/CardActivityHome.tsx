@@ -48,7 +48,7 @@ export const CardActivityHome = ({ onPress, freight, AcceptButton = true }: Card
             <Text className="font-semibold text-base" style={{ color: colors.text }}>
               {freight?.vehicle_group?.name ?? t("CARD.ACTIVITY.NONE")}
             </Text>
-            <Text className="text-sm" style={{ color: colors.text }}>
+            <Text className="text-sm" style={{ color: colors.textSecondary}}>
               {freight?.cargo?.name ?? t("CARD.ACTIVITY.NONE")} / {freight?.cargo?.weight ?? t("CARD.ACTIVITY.N_A")}
             </Text>
           </View>

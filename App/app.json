@@ -25,7 +25,8 @@
       "softwareKeyboardLayoutMode": "resize",
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.lucas_pedrozo.App"
+      "package": "com.lucas_pedrozo.App",
+      "usesCleartextTraffic": true
     },
     "web": {
       "output": "static",

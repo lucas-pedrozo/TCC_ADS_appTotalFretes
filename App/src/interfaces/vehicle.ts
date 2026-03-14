@@ -1,7 +1,7 @@
 export interface MapVehicle {
   id: number;
   model: string;
-  brand: string;
+  mark: string;
   size: string;
   plate: string;
   axle: number;

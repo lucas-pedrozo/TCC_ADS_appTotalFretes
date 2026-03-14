@@ -18,7 +18,7 @@ const VerificationCode = () => {
 
 	const [timer, setTimer] = useState(60);
 	const [canResend, setCanResend] = useState(false);
-	const { handleResendCode } = useResendCode(email);
+	const { handleResendCode } = useResendCode({ email });
 
 	useEffect(() => {
 		if (timer > 0) {

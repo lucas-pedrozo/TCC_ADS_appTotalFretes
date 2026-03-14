@@ -1,4 +1,5 @@
 import * as SecureStore from "expo-secure-store";
+import { maskEmailForDisplay } from "./formMask";
 
 const KEY_SAVED_ACCOUNTS = "savedAccounts";
 const KEY_LAST_USED_ACCOUNT = "lastUsedAccountEmail";
@@ -6,41 +7,72 @@ const KEY_LAST_USED_ACCOUNT = "lastUsedAccountEmail";
 export interface SavedAccount {
 	email: string;
 	displayLabel: string;
+	userImageUrl?: string;
 }
 
-export function maskEmailForDisplay(email: string): string {
-	const trimmed = email.trim();
-	if (!trimmed) return "***";
-	const atIndex = trimmed.indexOf("@");
-	if (atIndex <= 0) return "***";
-	const local = trimmed.slice(0, atIndex);
-	const domain = trimmed.slice(atIndex);
-	const visible = local.length <= 2 ? local : local.slice(0, 2);
-	return `${visible}***${domain}`;
+/**
+ * Converte um item JSON em um objeto SavedAccount.
+ * @param item Item JSON a ser convertido.
+ * @returns Objeto SavedAccount ou null se o item não for válido.
+ */
+function toSavedAccount(item: string): SavedAccount | null {
+	try {
+		const parsed = JSON.parse(item) as SavedAccount;
+		const { email, displayLabel, userImageUrl } = parsed;
+
+		if (typeof email !== "string" || typeof displayLabel !== "string") {
+			return null;
+		}
+
+		return {
+			email,
+			displayLabel,
+			userImageUrl: typeof userImageUrl === "string" ? userImageUrl : undefined,
+		};
+	} catch (error) {
+		console.error("[savedAccounts] Falha ao converter item JSON em SavedAccount:", error);
+		return null;
+	}
 }
 
+/**
+ * Obtém a lista de contas salvas do SecureStore.
+ * @returns Lista de contas salvas ou array vazio se não houver contas.
+ */
 export async function getSavedAccounts(): Promise<SavedAccount[]> {
 	try {
 		const raw = await SecureStore.getItemAsync(KEY_SAVED_ACCOUNTS);
 		if (!raw) return [];
-		const parsed = JSON.parse(raw) as unknown;
+
+		const parsed = JSON.parse(raw) as unknown[];
 		if (!Array.isArray(parsed)) return [];
-		return parsed.filter(
-			(item): item is SavedAccount =>
-				typeof item === "object" &&
-				item !== null &&
-				typeof (item as SavedAccount).email === "string" &&
-				typeof (item as SavedAccount).displayLabel === "string"
-		);
+
+		return parsed
+			.map((item) => toSavedAccount(JSON.stringify(item)))
+			.filter((account): account is SavedAccount => account !== null);
 	} catch {
 		return [];
 	}
 }
 
+/**
+ * Salva a lista de contas salvas no SecureStore.
+ * @param accounts Lista de contas salvas a serem salvas.
+ * @throws Erro se a lista não puder ser salva.
+ */
 export async function setSavedAccounts(accounts: SavedAccount[]): Promise<void> {
-	await SecureStore.setItemAsync(KEY_SAVED_ACCOUNTS, JSON.stringify(accounts));
+	try {
+		await SecureStore.setItemAsync(KEY_SAVED_ACCOUNTS, JSON.stringify(accounts));
+	} catch (error) {
+		console.error("[savedAccounts] Falha ao salvar contas:", error);
+		throw error;
+	}
 }
 
+/**
+ * Obtém o e-mail da última conta utilizada, ou null se não houver nenhuma.
+ * @returns E-mail da última conta utilizada ou null se não houver nenhuma.
+ */
 export async function getLastUsedAccountEmail(): Promise<string | null> {
 	try {
 		return await SecureStore.getItemAsync(KEY_LAST_USED_ACCOUNT);
@@ -49,37 +81,68 @@ export async function getLastUsedAccountEmail(): Promise<string | null> {
 	}
 }
 
+
+/**
+ * Define (ou apaga) o e-mail da última conta usada.
+ * @param email E-mail da última conta utilizada ou null para apagar.
+ * @throws Erro se o e-mail não puder ser salvo.
+ */
 export async function setLastUsedAccountEmail(email: string | null): Promise<void> {
-	if (email === null || email === "") {
-		await SecureStore.deleteItemAsync(KEY_LAST_USED_ACCOUNT);
-	} else {
-		await SecureStore.setItemAsync(KEY_LAST_USED_ACCOUNT, email);
+	try {
+		if (!email) {
+			await SecureStore.deleteItemAsync(KEY_LAST_USED_ACCOUNT);
+		} else {
+			await SecureStore.setItemAsync(KEY_LAST_USED_ACCOUNT, email);
+		}
+	} catch (error) {
+		console.error("[savedAccounts] Falha ao salvar última conta:", error);
+		throw error;
 	}
 }
 
-export async function addOrUpdateSavedAccount(email: string, displayLabel: string): Promise<void> {
+/**
+ * Adiciona uma nova conta ou atualiza uma existente (identificada pelo e-mail).
+ * @param email E-mail da conta a ser adicionada ou atualizada.
+ * @param displayLabel Label da conta a ser adicionada ou atualizada.
+ * @param userImageUrl URL da imagem da conta a ser adicionada ou atualizada.
+ * @throws Erro se a conta não puder ser adicionada ou atualizada.
+ */
+export async function addOrUpdateSavedAccount({ email, displayLabel, userImageUrl }: SavedAccount): Promise<void> {
 	const normalizedEmail = email.trim().toLowerCase();
 	const label = displayLabel.trim() || maskEmailForDisplay(normalizedEmail);
+
 	const accounts = await getSavedAccounts();
-	const existing = accounts.findIndex((a) => a.email.toLowerCase() === normalizedEmail);
-	const newEntry: SavedAccount = { email: normalizedEmail, displayLabel: label };
-	const next =
-		existing >= 0
-			? accounts.map((a, i) => (i === existing ? newEntry : a))
-			: [newEntry, ...accounts];
-	await setSavedAccounts(next);
+
+	const filtered = accounts.filter(
+		(a) => a.email.toLowerCase() !== normalizedEmail
+	);
+
+	const newEntry: SavedAccount = {
+		email: normalizedEmail,
+		displayLabel: label,
+		userImageUrl,
+	};
+
+	// Conta mais recente sempre no índice 0
+	await setSavedAccounts([newEntry, ...filtered]);
 	await setLastUsedAccountEmail(normalizedEmail);
 }
 
+/**
+ * Remove uma conta pelo e-mail e atualiza a "última usada" se necessário.
+ */
 export async function removeSavedAccount(email: string): Promise<void> {
 	const normalizedEmail = email.trim().toLowerCase();
-	const accounts = await getSavedAccounts().then((list) =>
-		list.filter((a) => a.email.toLowerCase() !== normalizedEmail)
+
+	const accounts = await getSavedAccounts();
+	const remaining = accounts.filter(
+		(a) => a.email.toLowerCase() !== normalizedEmail
 	);
-	await setSavedAccounts(accounts);
+
+	await setSavedAccounts(remaining);
+
 	const last = await getLastUsedAccountEmail();
 	if (last?.toLowerCase() === normalizedEmail) {
-		const newLast = accounts[0]?.email ?? null;
-		await setLastUsedAccountEmail(newLast);
+		await setLastUsedAccountEmail(remaining[0]?.email ?? null);
 	}
 }

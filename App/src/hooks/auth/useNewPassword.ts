@@ -25,35 +25,39 @@ export function useNewPassword() {
     mode: "onSubmit",
   });
 
-  const handleResetPassword = useCallback(
-    async (data: NewPasswordForm) => {
-      if (!resetToken) {
-        await notify({ status: "error", message: "Sessão inválida. Refça o fluxo de esqueci minha senha." });
-        return;
-      }
-      try {
-        await notify({
-          status: "loading",
-          message: i18n.t("NOTIFICATIONS.NEWPASSWORDLOADING"),
-        });
+  const handleResetPassword = useCallback(async (data: NewPasswordForm) => {
 
-        await http.post("/auth/reset-password", {
-          resetToken,
-          password: data.password,
-        });
+    if (!resetToken) {
+      await notify({
+        status: "error",
+        message: i18n.t("NOTIFICATIONS.INVALIDSESSION")
+      });
+      return;
+    }
 
-        await notify({
-          status: "success",
-          message: i18n.t("NOTIFICATIONS.NEWPASSWORDSUCCESS"),
-        });
-        navigation.navigate({ name: "Login", params: { startMode: "full" } });
-      } catch (error) {
-        const message = (error as AxiosError<{ message?: string }>).response?.data?.message ?? "";
-        if (message) {
-          await notify({ status: "error", message });
-        }
-      }
-    },
+    try {
+      await notify({
+        status: "loading",
+        message: i18n.t("NOTIFICATIONS.NEWPASSWORDLOADING"),
+      });
+
+      await http.post("/auth/reset-password", {
+        resetToken,
+        password: data.password,
+      });
+
+      await notify({
+        status: "success",
+        message: i18n.t("NOTIFICATIONS.NEWPASSWORDSUCCESS"),
+      });
+      navigation.navigate({ name: "Login", params: { startMode: "full" } });
+    } catch (error) {
+      notify({
+        status: "error",
+        message: (error as AxiosError<{ message?: string }>).response?.data?.message ?? i18n.t("NOTIFICATIONS.NEWPASSWORDERROR"),
+      });
+    }
+  },
     [resetToken, notify, navigation]
   );
 

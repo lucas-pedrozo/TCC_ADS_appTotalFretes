@@ -1,17 +1,15 @@
 import { useCallback, useEffect, useState } from "react";
 import { RefreshControl, ScrollView, Text, TouchableOpacity, View } from "react-native";
 
-import { useGetUser } from "@/src/hooks/user/useGetUser";
 import { useGetFreightUser } from "@/src/hooks/freight/useGetFreightUser";
-
 import { Ionicons } from "@expo/vector-icons";
 import { useIconColor, useThemeColors } from "@/src/context/ThemeContext";
 import { DetailRow } from "@/src/components/info/DetailRow";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { CardFreight } from "@/src/components/cards/CardFreight";
-import { HeaderPerfil } from "@/src/components/header/HeaderPerfil";
 import { CardActivityHome } from "@/src/components/cards/CardActivityHome";
 import DetalhesFreteModal from "@/src/components/mapbox/DetalhesFreteModal";
+import { useTranslation } from "react-i18next";
 
 
 function OngoingFreights() {
@@ -19,25 +17,24 @@ function OngoingFreights() {
     const iconColor = useIconColor();
     const [refreshKey, setRefreshKey] = useState(0);
     const [isRefreshing, setIsRefreshing] = useState(false);
+    const { t } = useTranslation();
     const [isDetalhesFreteModalVisible, setIsDetalhesFreteModalVisible] = useState(false);
 
-    const { userData, handleGetUser } = useGetUser();
     const { freightUser, handleGetFreightUser } = useGetFreightUser();
 
     const handleRefresh = useCallback(async () => {
         setIsRefreshing(true);
         try {
-            await Promise.all([handleGetUser(), handleGetFreightUser()]);
+            await Promise.all([handleGetFreightUser()]);
             setRefreshKey((prev) => prev + 1);
         } finally {
             setIsRefreshing(false);
         }
-    }, [handleGetUser, handleGetFreightUser]);
+    }, [handleGetFreightUser]);
 
     useEffect(() => {
-        handleGetUser();
         handleGetFreightUser();
-    }, [handleGetUser, handleGetFreightUser]);
+    }, [handleGetFreightUser]);
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: colors.bg }}>
@@ -53,18 +50,16 @@ function OngoingFreights() {
                     />
                 }
             >
-                <HeaderPerfil
-                    name={userData?.name}
-                    email={userData?.email}
-                    cpf={userData?.cpf}
-                />
-                <View className="h-7"/>
-                
+                <Text className="text-2xl text-center font-semibold" style={{ color: colors.text }}>
+                    {t("FREIGHT.TITLE")}
+                </Text>
+                <View className="h-7" />
+
                 <CardFreight
                     freight={freightUser}
                 />
 
-                <View className="h-7"/>
+                <View className="h-7" />
 
                 <CardActivityHome
                     key={`card-activity-${refreshKey}`}
@@ -72,7 +67,7 @@ function OngoingFreights() {
                     AcceptButton={false}
                 />
 
-                <View className="h-7"/>
+                <View className="h-7" />
 
                 <TouchableOpacity className="flex-1 py-3 w-full rounded-lg items-center" style={{ backgroundColor: colors.bgSecondary, borderColor: colors.bgTertiary, borderWidth: 1 }} onPress={() => setIsDetalhesFreteModalVisible(true)}>
                     <Text className="text-center font-semibold text-base" style={{ color: colors.text }}>
