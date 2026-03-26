@@ -33,7 +33,7 @@ const VerificationCode = () => {
 
 	const onResendCode = () => {
 		if (canResend) {
-			handleResendCode && handleResendCode();
+			handleResendCode && handleResendCode({ email });
 			setTimer(60);
 			setCanResend(false);
 		}

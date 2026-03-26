@@ -2,31 +2,28 @@ import { useCallback } from "react";
 import { useForm } from "react-hook-form";
 import { AxiosError } from "axios";
 import http from "@/src/services/http";
-import { useNavigation, useRoute, RouteProp } from "@react-navigation/native";
-import { NavigationProp } from "@react-navigation/native";
+import { useNavigation, useRoute, RouteProp, NavigationProp } from "@react-navigation/native";
 import { RootStackParamList } from "@/src/routes/Routes";
 import { useAlertDefault } from "@/src/context/AlertDefaultContext";
 import i18n from "@/src/i18n";
-import { getValidationRules, validatePasswordConfirmationMatch } from "@/src/utils/formValidations";
+import { getValidationRules } from "@/src/utils/formValidations";
 
 export interface NewPasswordForm {
+  oldPassword: string;
   password: string;
   confirmPassword: string;
 }
 
 export function useNewPassword() {
+  const { notify } = useAlertDefault();
+
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const route = useRoute<RouteProp<RootStackParamList, "NewPassword">>();
-  const { notify } = useAlertDefault();
-  const resetToken = route.params?.resetToken ?? "";
 
-  const { control, handleSubmit, formState: { errors } } = useForm<NewPasswordForm>({
-    defaultValues: { password: "", confirmPassword: "" },
-    mode: "onSubmit",
-  });
+  const resetToken = route.params?.resetToken ?? "";
+  const { control, handleSubmit, formState: { errors } } = useForm<NewPasswordForm>({ mode: "onSubmit" });
 
   const handleResetPassword = useCallback(async (data: NewPasswordForm) => {
-
     if (!resetToken) {
       await notify({
         status: "error",
@@ -41,35 +38,25 @@ export function useNewPassword() {
         message: i18n.t("NOTIFICATIONS.NEWPASSWORDLOADING"),
       });
 
-      await http.post("/auth/reset-password", {
-        resetToken,
-        password: data.password,
-      });
+      await http.post("auth/reset-password", { resetToken, data });
 
       await notify({
         status: "success",
         message: i18n.t("NOTIFICATIONS.NEWPASSWORDSUCCESS"),
       });
+
       navigation.navigate({ name: "Login", params: { startMode: "full" } });
     } catch (error) {
       notify({
         status: "error",
-        message: (error as AxiosError<{ message?: string }>).response?.data?.message ?? i18n.t("NOTIFICATIONS.NEWPASSWORDERROR"),
+        message: (error as AxiosError<{ message: string }>).response?.data?.message ?? i18n.t("NOTIFICATIONS.ERROR"),
       });
     }
-  },
-    [resetToken, notify, navigation]
-  );
+  }, [resetToken, notify, navigation]);
 
-  const validationRules = getValidationRules();
   const rules = {
-    password: validationRules.password,
-    confirmPassword: {
-      required: i18n.t("VALIDATION.REQUIREDCONFIRMPASSWORD"),
-      validate: (value: string, formValues: NewPasswordForm) =>
-        validatePasswordConfirmationMatch(value, formValues?.password ?? "") ||
-        i18n.t("VALIDATION.INVALIDCONFIRMPASSWORD"),
-    },
+    password: getValidationRules().password,
+    confirmPassword: getValidationRules().confirmPassword,
   };
 
   return {

@@ -33,7 +33,7 @@ export function useSignUp() {
         message: i18n.t("NOTIFICATIONS.SIGNUPLOADING"),
       });
 
-      await http.post<SingUpFormData>("/user/end-account", {
+      await http.post<SingUpFormData>("user/end-account", {
         name: data.name,
         email: data.email,
         birthDate: data.birthDate,

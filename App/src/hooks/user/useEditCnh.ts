@@ -18,13 +18,15 @@ export function useEditCnh() {
 
   const route = useRoute<RouteProp<RootStackParamList, "EditCnh">>();
   const editCnhData = route.params?.editCnhData;
+  const userName = route.params?.userName ?? "";
+  const userImageUrl = route.params?.userImageUrl;
 
   const { control, handleSubmit, formState: { errors } } = useForm<EditCnhMap>({
     defaultValues: {
       cnhNumber: editCnhData?.cnhNumber ?? "",
       issuingAgencyCnh: editCnhData?.issuingAgencyCnh ?? "",
-      cnhType_id: editCnhData?.cnhType_id ?? "",
-      useGlasses: editCnhData?.useGlasses ?? "",
+      cnhType_id: Number(editCnhData?.cnhType_id) || 0,
+      useGlasses: editCnhData?.useGlasses ?? false,
     },
   });
 
@@ -35,7 +37,10 @@ export function useEditCnh() {
         message: i18n.t("NOTIFICATIONS.EDITCNHLOADING"),
       });
 
-      await http.patch<EditCnhMap>(`/user/${id}`, data);
+      await http.patch<EditCnhMap>(`user/${id}`, {
+        ...data,
+        cnhType_id: Number(data.cnhType_id),
+      });
 
       await notify({
         status: "success",
@@ -61,5 +66,8 @@ export function useEditCnh() {
     rules,
     handleEditCnh,
     handleSubmit,
+    editCnhData,
+    userName,
+    userImageUrl,
   };
 }

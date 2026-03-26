@@ -197,4 +197,11 @@ export const getValidationRules = () => ({
     validate: (value: string, formValues: { password: string }) =>
       validatePasswordConfirmationMatch(value, formValues.password) || i18n.t("VALIDATION.INVALIDCONFIRMPASSWORD"),
   },
+  code: {
+    required: i18n.t("FORGOTPASSWORDCODE.CODEREQUIRED"),
+    minLength: {
+      value: 6,
+      message: i18n.t("FORGOTPASSWORDCODE.CODEMINLENGTH"),
+    },
+  },
 });

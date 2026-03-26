@@ -90,7 +90,7 @@ export function SkeletonBox({ width, height = 80, style }: SkeletonBaseProps & {
 		<Animated.View
 			style={[
 				{
-					width: width ?? "100%",
+					width: (width ?? "100%") as number | `${number}%` | "auto",
 					height,
 					borderRadius: 12,
 					backgroundColor: colors.bgTertiary,

@@ -10,7 +10,7 @@ import i18n from "@/src/i18n";
 
 const validateAuthToken = async (token: string): Promise<boolean> => {
 	try {
-		const response = await http.post<{ valid: boolean }>("/auth/validate", { token });
+		const response = await http.post<{ valid: boolean }>("auth/validate", { token });
 		return response.data.valid;
 	} catch {
 		return false;

@@ -23,29 +23,27 @@ interface UseLoginOptions {
 }
 
 export function useLogin(options: UseLoginOptions = {}) {
+
   const { notify } = useAlertDefault();
   const [isDesabled, setIsDisabled] = useState(false);
-  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const { passwordOnlyMode = false, getEnableBiometricsAfterLogin } = options;
+
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const { login, lastUsedAccount, addSavedAccount, setBiometricsEnabledAsync } = useAuth();
-  const { control, handleSubmit, formState: { errors } } = useForm<LoginForm>({
-    defaultValues: { email: "", password: "" },
-    mode: "onSubmit",
-  });
+  const { control, handleSubmit, formState: { errors } } = useForm<LoginForm>({ mode: "onSubmit", });
 
   const handleLogin = useCallback(async (data: LoginForm) => {
     try {
       notify({
         status: "loading",
         message: i18n.t("NOTIFICATIONS.LOGINLOADING"),
-      });
-      setIsDisabled(true);
+      }); setIsDisabled(true);
 
       const email = passwordOnlyMode && lastUsedAccount ? lastUsedAccount.email : data.email;
       const password = data.password;
       const payload = { email, password };
 
-      const { token, user: loginUser } = (await http.post<LoginResponse>("/auth/login", payload)).data;
+      const { token, user: loginUser } = (await http.post<LoginResponse>("auth/login", payload)).data;
       await login(token);
 
       const uid = loginUser?.id != null ? Number(loginUser.id) : NaN;
@@ -65,10 +63,12 @@ export function useLogin(options: UseLoginOptions = {}) {
         index: 0,
         routes: [{ name: "Home" }],
       });
+
     } catch (error) {
-      console.log(error);
-      const message = (error as AxiosError<{ message: string }>).response?.data?.message ?? "";
-      notify({ status: "error", message });
+      notify({
+        status: "error",
+        message: (error as AxiosError<{ message: string }>).response?.data?.message ?? i18n.t("NOTIFICATIONS.ERROR"),
+      });
     } finally {
       setIsDisabled(false);
     }

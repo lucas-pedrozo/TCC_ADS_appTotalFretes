@@ -21,7 +21,7 @@ export function useDeleteUser() {
 			});
 			setIsdisabled(true);
 
-			await http.delete(`/user/${id}`);
+			await http.delete(`user/${id}`);
 			await notify({
 				status: "success",
 				message: "Usuário deletado com sucesso!",

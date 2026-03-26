@@ -39,6 +39,8 @@ interface EditPerfilRouteParams {
 
 interface EditCnhRouteParams {
 	editCnhData: EditCnhMap;
+	userName?: string;
+	userImageUrl?: string;
 }
 
 

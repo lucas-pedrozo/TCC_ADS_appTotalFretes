@@ -31,7 +31,7 @@ const Perfil = () => {
   const { userData, handleGetUser } = useGetUser();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const userImageUrl = userData?.UserImage?.path
-    ? `${ENV_BASE_URL}/api/${userData.UserImage.path}`
+    ? `${ENV_BASE_URL}${userData.UserImage.path}`
     : undefined;
 
   const goToAdvancedOptions = () => { navigation.navigate("AdvancedOptions"); }
@@ -63,11 +63,13 @@ const Perfil = () => {
       editCnhData: {
         cnhNumber: userData?.cnhNumber ?? "",
         issuingAgencyCnh: userData?.issuingAgencyCnh ?? "",
-        cnhType_id: String(userData?.cnhType_id ?? ""),
+        cnhType_id: Number(userData?.cnhType_id) || 0,
         useGlasses: userData?.useGlasses ?? false,
-      }
-    })
-  }, [navigation, userData]);
+      },
+      userName: userData?.name ?? "",
+      userImageUrl,
+    });
+  }, [navigation, userData, userImageUrl]);
 
   const handleRefresh = useCallback(async () => {
     setIsRefreshing(true);

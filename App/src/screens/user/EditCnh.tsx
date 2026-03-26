@@ -1,16 +1,30 @@
-import { View } from "react-native";
+import { View, Text } from "react-native";
 import { useTranslation } from "react-i18next";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
+import { Image } from "expo-image";
+import { Feather } from "@expo/vector-icons";
 
 import { InputGroup, InputDefault, ButtonDefault } from "@/src/components/form";
+import { DetailRow } from "@/src/components/info/DetailRow";
 import { useEditCnh } from "@/src/hooks/user/useEditCnh";
+import { useThemeColors } from "@/src/context/ThemeContext";
+
+const CNH_TYPE_LETTERS: Record<number, string> = { 1: "A", 2: "B", 3: "C", 4: "D", 5: "E" };
+
+const CNH_HEADER_GREEN = "#006b3f";
+const CNH_HEADER_YELLOW = "#fcd116";
 
 const EditCnh = () => {
-
 	const insets = useSafeAreaInsets();
 	const { t } = useTranslation();
-	const { control, rules, handleEditCnh, handleSubmit } = useEditCnh();
+	const colors = useThemeColors();
+	const { control, rules, handleEditCnh, handleSubmit, editCnhData, userName, userImageUrl } = useEditCnh();
+
+	const categoryLabel = editCnhData?.cnhType_id != null ? CNH_TYPE_LETTERS[editCnhData.cnhType_id] ?? String(editCnhData.cnhType_id) : "—";
+	const useGlassesLabel = editCnhData?.useGlasses != null
+		? (editCnhData.useGlasses ? t("SIGNUP.CNH.YES") : t("SIGNUP.CNH.NO"))
+		: "—";
 
 	return (
 		<KeyboardAwareScrollView
@@ -64,7 +78,7 @@ const EditCnh = () => {
 				/>
 				<View className="flex-1 justify-end pt-4">
 					<ButtonDefault
-						title={t("SIGNUP.BASIC.NEXT")}
+						title={t("SIGNUP.BASIC.SAVE")}
 						onPress={handleSubmit(handleEditCnh)}
 					/>
 				</View>

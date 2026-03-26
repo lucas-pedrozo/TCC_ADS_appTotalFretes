@@ -6,6 +6,10 @@ export interface Coordinates {
 	longitude: number;
 }
 
+/**
+ * @returns 'granted' se a permissão foi concedida, 'denied' caso contrário
+ * @description Solicita permissão para usar o GPS do dispositivo
+ */
 export async function requestLocationPermission(): Promise<'granted' | 'denied'> {
 	const { status } = await Location.requestForegroundPermissionsAsync();
 	return status === 'granted' ? 'granted' : 'denied';
@@ -15,11 +19,14 @@ const COORDS_CACHE_TTL_MS = 45_000;
 const GPS_TIMEOUT_MS = 15_000;
 let coordsCache: { coords: Coordinates; expiresAt: number } | null = null;
 
-const timeout = (ms: number) =>
-	new Promise<never>((_, reject) =>
-		setTimeout(() => reject(new Error('GPS_TIMEOUT')), ms)
-	);
+const timeout = (ms: number) => new Promise<never>((_, reject) =>
+	setTimeout(() => reject(new Error('GPS_TIMEOUT')), ms)
+);
 
+/**
+ * @returns Coordinates se a permissão foi concedida, null caso contrário
+ * @description Obtém as coordenadas atuais do dispositivo
+ */
 export async function getCurrentCoordinates(): Promise<Coordinates | null> {
 	if ((await requestLocationPermission()) !== 'granted') return null;
 
@@ -60,6 +67,10 @@ const cityCacheKey = (lat: number, lon: number) => {
 	return `${Math.round(lat * 10 ** COORD_PRECISION) / 10 ** COORD_PRECISION}_${Math.round(lon * 10 ** COORD_PRECISION) / 10 ** COORD_PRECISION}`;
 };
 
+/**
+ * @returns A cidade encontrada ou null se não foi possível obter a cidade
+ * @description Obtém a cidade a partir das coordenadas
+ */
 export async function getCityFromCoordinates(latitude: number, longitude: number): Promise<string | null> {
 	const key = cityCacheKey(latitude, longitude);
 	const now = Date.now();

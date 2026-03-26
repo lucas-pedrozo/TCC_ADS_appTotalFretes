@@ -20,7 +20,7 @@ export function useGetUser() {
 		}
 
 		try {
-			const {data} = await http.get<MapUser>(`/user/${id}`);
+			const { data } = await http.get<MapUser>(`user/${id}`);
 			setUserData(data);
 		} catch (error) {
 			notify({

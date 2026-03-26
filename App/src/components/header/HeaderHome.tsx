@@ -18,7 +18,7 @@ export type HeaderHomeProps = {
 export const HeaderHome = ({ userData, greeting, notInformedLabel, onProfilePress, onNotificationsPress, onLogout }: HeaderHomeProps) => {
   const colors = useThemeColors();
   const iconColor = useIconColor();
-  const profileImageUrl = userData?.UserImage?.path ? `${ENV_BASE_URL}/api/${userData.UserImage.path}` : undefined;
+  const profileImageUrl = userData?.UserImage?.path ? `${ENV_BASE_URL}${userData.UserImage.path}` : undefined;
 
   return (
     <View className="flex-row items-center justify-between w-full">

@@ -6,6 +6,7 @@
 
 export const hookPT = {
   NOTIFICATIONS: {
+    ERROR: "Ocorreu um erro. Tente novamente.",
     LOGINLOADING: "Efetuando login...",
     LOGINSUCCESS: "Login efetuado com sucesso!",
     SIGNUPLOADING: "Criando conta...",
@@ -30,6 +31,7 @@ export const hookPT = {
 
 export const hookEN = {
   NOTIFICATIONS: {
+    ERROR: "An error occurred. Please try again.",
     LOGINLOADING: "Signing in...",
     LOGINSUCCESS: "Signed in successfully!",
     SIGNUPLOADING: "Creating account...",

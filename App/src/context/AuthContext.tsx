@@ -5,10 +5,6 @@ import { clearAuthToken, setAuthToken, getStoredAuthToken, getBiometricsEnabled,
 import type { SavedAccount } from "@/src/utils/savedAccounts";
 import { getSavedAccounts, getLastUsedAccountEmail, addOrUpdateSavedAccount as persistAddSavedAccount, removeSavedAccount as persistRemoveSavedAccount, setLastUsedAccountEmail } from "@/src/utils/savedAccounts";
 
-/**
- * @description Interface de token decodificado
- * @returns Interface de token decodificado
- */
 interface DecodedToken {
     id: number | string;
     role?: string;
@@ -16,10 +12,6 @@ interface DecodedToken {
     exp?: number;
 }
 
-/**
- * @description Interface de contexto de autenticacao
- * @returns Interface de contexto de autenticacao
- */
 interface AuthContextType {
     id: number | null;
     token: string | null;
@@ -28,7 +20,6 @@ interface AuthContextType {
     isAuthReady: boolean;
     savedAccounts: SavedAccount[];
     lastUsedAccount: SavedAccount | null;
-
     login: (token: string) => Promise<void>;
     logout: () => Promise<void>;
     addSavedAccount: (email: string, displayLabel?: string, userImageUrl?: string) => Promise<void>;
@@ -39,10 +30,6 @@ interface AuthContextType {
     setBiometricsEnabledAsync: (enabled: boolean) => Promise<void>;
 }
 
-/**
- * @description Contexto de autenticacao default
- * @returns Contexto de autenticacao default
- */
 const defaultAuthContext: AuthContextType = {
     token: null,
     id: null,
@@ -61,31 +48,26 @@ const defaultAuthContext: AuthContextType = {
     setBiometricsEnabledAsync: async () => { },
 };
 
-/**
- * @description Funcao para decodificar token e verificar se ele é valido (nao expirado)
- * @param token Token a ser decodificado
- * @returns Token decodificado
- */
+/** Decodifica JWT e retorna payload se ainda não expirou; caso contrário null. */
 const decodeToken = (token: string) => {
     try {
         const decoded: DecodedToken = jwtDecode(token);
         if (decoded.exp && decoded.exp * 1000 <= Date.now()) {
             return null;
         }
-
         return decoded;
     } catch (error) {
         console.log("Erro ao decodificar token:", error);
         return null;
     }
-}
+};
 
 export const AuthContext = createContext<AuthContextType>(defaultAuthContext);
 
 /**
- * @description Provider de autenticacao
- * @param children Filhos do provider
- * @returns Provider de autenticacao
+ * AuthContext provider hook and context.
+ * @param param0 React children nodes.
+ * @returns AuthProvider component.
  */
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [id, setId] = useState<number | null>(null);
@@ -139,7 +121,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 setId(Number(decoded.id));
                 setAccessLevel(decoded.role ?? decoded.accessLevel ?? null);
                 setIsAuthenticated(true);
-
                 await setAuthToken(storedToken);
                 await refreshSavedAccounts();
             } catch {
@@ -149,7 +130,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 setIsAuthReady(true);
             }
         };
-
         loadStoredToken();
     }, []);
 
@@ -160,7 +140,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             setId(Number(decoded.id));
             setAccessLevel(decoded.role ?? decoded.accessLevel ?? null);
             setIsAuthenticated(true);
-
             await setAuthToken(token);
         }
     };
@@ -177,43 +156,21 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         }
     };
 
-    /**
-     * @description Funcao para adicionar uma conta salva
-     * @param email Email da conta a ser adicionada
-     * @param displayLabel Label da conta a ser adicionada
-     * @param userImageUrl URL da imagem da conta a ser adicionada
-     * @returns Funcao para adicionar uma conta salva
-     */
     const addSavedAccount = async (email: string, displayLabel?: string, userImageUrl?: string) => {
-        await persistAddSavedAccount({email: email, displayLabel: displayLabel ?? "", userImageUrl: userImageUrl});
+        await persistAddSavedAccount({ email, displayLabel: displayLabel ?? "", userImageUrl });
         await refreshSavedAccounts();
     };
 
-    /**
-     * @description Funcao para definir a conta utilizada mais recentemente
-     * @param email Email da conta a ser definida como utilizada mais recentemente
-     * @returns Funcao para definir a conta utilizada mais recentemente
-     */
     const setLastUsedAccount = async (email: string) => {
         await setLastUsedAccountEmail(email.trim());
         await refreshSavedAccounts();
     };
 
-    /**
-     * @description Funcao para remover uma conta salva
-     * @param email Email da conta a ser removida
-     * @returns Funcao para remover uma conta salva
-     */
     const removeSavedAccount = async (email: string) => {
         await persistRemoveSavedAccount(email);
         await refreshSavedAccounts();
     };
 
-    /**
-     * @description Funcao para definir se a biometria esta habilitada
-     * @param enabled Se a biometria esta habilitada
-     * @returns Funcao para definir se a biometria esta habilitada
-     */
     const setBiometricsEnabledAsync = async (enabled: boolean) => {
         await setBiometricsEnabled(enabled);
         setBiometricsEnabledState(enabled);
@@ -245,12 +202,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             {children}
         </AuthContext.Provider>
     );
-}
+};
 
-/**
- * @description Hook para usar o contexto de autenticacao
- * @returns Hook para usar o contexto de autenticacao
- */
 export const useAuth = () => {
     const context = useContext(AuthContext);
     if (!context) {

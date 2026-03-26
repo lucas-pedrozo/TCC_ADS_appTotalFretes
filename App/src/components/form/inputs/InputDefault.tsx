@@ -1,13 +1,23 @@
 import React, { useState } from "react";
-import { Controller } from "react-hook-form";
+import { Controller, type FieldValues } from "react-hook-form";
 import { View, Text, TextInput, Pressable } from "react-native";
 import { Feather } from "@expo/vector-icons";
-
 import { useThemeColors } from "@/src/context/ThemeContext";
 import { INPUT_STYLES, type InputBaseProps } from "./inputShared";
-import animation from "@/src/utils/animation";
 
-export function InputDefault({ id, control, name, rules, label, placeholder, type, secureTextEntry, autoFocus = false, maxLength, disabled = false }: InputBaseProps) {
+export function InputDefault<T extends FieldValues = FieldValues>({
+	id,
+	control,
+	name,
+	rules,
+	label,
+	placeholder,
+	type,
+	secureTextEntry,
+	autoFocus = false,
+	maxLength,
+	disabled = false,
+}: InputBaseProps<T>) {
 	const colors = useThemeColors();
 	const [passwordVisible, setPasswordVisible] = useState(false);
 

@@ -5,7 +5,7 @@ import * as LocalAuthentication from 'expo-local-authentication';
 import { ENV_BASE_URL } from '@env';
 import i18n from '@/src/i18n';
 
-const baseURL = (`${ENV_BASE_URL}/api`)
+const baseURL = (`${ENV_BASE_URL}`)
 
 const getCurrentLanguage = () => (i18n.resolvedLanguage || i18n.language || 'pt').split('-')[0];
 

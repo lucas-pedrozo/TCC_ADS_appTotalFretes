@@ -13,6 +13,9 @@ export interface MapUserImage {
   sizeBytes: number;
 }
 
+/**
+ * GET /user/:id — include de CnhType e UserImage depende do backend.
+ */
 export interface MapUser {
   id: number;
   name: string;
@@ -27,10 +30,9 @@ export interface MapUser {
   cnhNumber: string;
   cnhType_id: number;
   vehicle_id: number | null;
-  CnhType: MapCnh;
+  CnhType?: MapCnh | null;
   createdAt: string;
   updatedAt: string;
- 
   userImage_id: number | null;
   UserImage?: MapUserImage | null;
 }

@@ -1,19 +1,25 @@
 import React from "react";
-import { Controller } from "react-hook-form";
+import { Controller, type Control, type FieldValues, type Path } from "react-hook-form";
 import { View, TextInput } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useIconColor, useThemeColors } from "@/src/context/ThemeContext";
 
-type InputProps = {
+type InputProps<T extends FieldValues = FieldValues> = {
 	label?: string;
 	placeholder?: string;
 	id?: string;
-	control: any;
-	name: string;
+	control: Control<T>;
+	name: Path<T>;
 	rules?: object;
 };
 
-export const InputSearch = ({ control, name, rules, id, placeholder }: InputProps) => {
+export const InputSearch = <T extends FieldValues = FieldValues>({
+	control,
+	name,
+	rules,
+	id,
+	placeholder,
+}: InputProps<T>) => {
 	const colors = useThemeColors();
 	const iconColor = useIconColor();
 

@@ -1,5 +1,5 @@
 import React from "react";
-import { Controller } from "react-hook-form";
+import { Controller, type FieldValues } from "react-hook-form";
 import { View, Text, TextInput } from "react-native";
 
 import { useThemeColors } from "@/src/context/ThemeContext";
@@ -9,7 +9,7 @@ import { INPUT_STYLES, onlyAlphanumeric, type InputBaseProps } from "./inputShar
 
 const PLATE_MAX_LENGTH = 8;
 
-export function InputPlate({
+export function InputPlate<T extends FieldValues = FieldValues>({
 	id,
 	control,
 	name,
@@ -17,7 +17,7 @@ export function InputPlate({
 	label,
 	placeholder,
 	disabled,
-}: InputBaseProps) {
+}: InputBaseProps<T>) {
 	const colors = useThemeColors();
 
 	return (

@@ -1,5 +1,4 @@
 import { Feather } from "@expo/vector-icons";
-import { useTranslation } from "react-i18next";
 import { useIconColor, useThemeColors } from "@/src/context/ThemeContext";
 import { Text, TouchableOpacity, View } from "react-native";
 import { IconBox } from "@/src/components/ui/IconBox";
@@ -10,7 +9,6 @@ type CardIntentionProps = {
 
   export const CardMap = ({ onPress}: CardIntentionProps) => {
   const colors = useThemeColors();
-  const { t } = useTranslation();
   const iconColor = useIconColor();
 
   return (

@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 
 import { Ionicons } from "@expo/vector-icons";
 import { IconBox } from "@/src/components/ui/IconBox";
-import type { MapVehicle } from "@/src/interfaces/vehicle";
+import { MapVehicle } from "@/src/interfaces/vehicle";
 import { useIconColor, useThemeColors } from "@/src/context/ThemeContext";
 
 type CardVehicleProps = {
@@ -50,7 +50,7 @@ export const CardVehicle = ({ vehicle, onPress }: CardVehicleProps) => {
               {t("CARD.VEHICLE.MODEL")}: {vehicle?.model || "---"}
             </Text>
             <Text className="text-sm" style={{ color: colors.text }}>
-              {t("CARD.VEHICLE.PLATE")}: {vehicle?.plate || "---"}
+              {t("CARD.VEHICLE.PLATE")}: {vehicle?.plateNumber || "---"}
             </Text>
             <Text className="text-sm" style={{ color: colors.text }}>
               {t("CARD.VEHICLE.BRAND")}: {vehicle?.mark || "---"}
@@ -58,13 +58,13 @@ export const CardVehicle = ({ vehicle, onPress }: CardVehicleProps) => {
           </View>
           <View className="flex-col items-end flex-1">
             <Text className="text-sm text-end" style={{ color: colors.text }}>
-              {t("CARD.VEHICLE.AXLES")}: {vehicle?.axle || "---"}
+              {t("CARD.VEHICLE.AXLES")}: {vehicle?.vehicleType?.axes || "---"}
             </Text>
             <Text className="text-sm text-end" style={{ color: colors.text }}>
-              {t("CARD.VEHICLE.LENGTH")}: {vehicle?.size || "---"}
+              {t("CARD.VEHICLE.LENGTH")}: {vehicle?.vehicleType?.length || "---"}
             </Text>
             <Text className="text-sm text-end" style={{ color: colors.text }}>
-              {t("CARD.VEHICLE.WEIGHT")}: {formatWeight(vehicle?.weight) ?? '---'}
+              {t("CARD.VEHICLE.WEIGHT")}: {formatWeight(vehicle?.vehicleType?.weight) ?? '---'}
             </Text>
           </View>
         </View>

@@ -17,11 +17,7 @@ interface ForgotPasswordForm {
 export function useForgotPassword() {
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
   const { notify } = useAlertDefault();
-
-  const { control, handleSubmit, formState: { errors } } = useForm<ForgotPasswordForm>({
-    defaultValues: { email: "" },
-    mode: "onSubmit",
-  });
+  const { control, handleSubmit, formState: { errors } } = useForm<ForgotPasswordForm>({ mode: "onSubmit", });
 
   const handleForgotPassword = useCallback(async (data: ForgotPasswordForm) => {
     try {
@@ -30,19 +26,19 @@ export function useForgotPassword() {
         message: i18n.t("NOTIFICATIONS.FORGOTPASSWORDLOADING"),
       });
 
-      const response = await http.post<ApiMessageResponse>("/auth/forgot-password", { email: data.email });
-      console.log("Email enviado com sucesso");
+      const response = await http.post<ApiMessageResponse>("auth/forgot-password", data);
+
       await notify({
         status: "success",
         message: response.data.message ?? i18n.t("NOTIFICATIONS.FORGOTPASSWORDSUCCESS"),
       });
 
-      navigation.navigate("VerificationCode", { email: data.email.trim() });
+      navigation.navigate("VerificationCode", data);
     } catch (error) {
-      const message = (error as AxiosError<{ message: string }>).response?.data?.message ?? "";
-      if (message) {
-        await notify({ status: "error", message });
-      }
+      await notify({
+        status: "error",
+        message: (error as AxiosError<{ message: string }>).response?.data?.message ?? i18n.t("NOTIFICATIONS.ERROR"),
+      });
     }
   }, [notify, navigation]);
 

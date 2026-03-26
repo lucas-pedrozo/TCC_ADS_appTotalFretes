@@ -4,8 +4,7 @@ import { useForm } from "react-hook-form";
 import { useAlertDefault } from "@/src/context/AlertDefaultContext";
 import { AxiosError } from "axios";
 import i18n from "@/src/i18n";
-import { useNavigation } from "@react-navigation/native";
-import { NavigationProp } from "@react-navigation/native";
+import { useNavigation, NavigationProp } from "@react-navigation/native";
 import { RootStackParamList } from "@/src/routes/Routes";
 
 interface RegisterVehicleFormData {
@@ -24,25 +23,10 @@ interface RegisterVehicleFormData {
 
 export function useRegisterVehicle() {
   const { notify } = useAlertDefault();
-  const { vehicleType, plateData, group } = useRegisterVehicleContext();
+  const { vehicleType } = useRegisterVehicleContext();
   const navigation = useNavigation<NavigationProp<RootStackParamList>>();
 
-  const { control, handleSubmit, formState: { errors } } = useForm<RegisterVehicleFormData>({
-    defaultValues: {
-      plate: plateData.plate ?? "",
-      model: plateData.model ?? "",
-      mark: plateData.mark ?? "",
-      chassisNumber: "",
-      country: plateData.country ?? "",
-      state: plateData.state ?? "",
-      city: plateData.city ?? "",
-      size: vehicleType?.length ?? "",
-      axle: vehicleType?.axle ?? 0,
-      weight: Number(vehicleType?.grossWeight) || 0,
-      group: group ?? "caminhao",
-    },
-    mode: "onSubmit",
-  });
+  const { control, handleSubmit, formState: { errors } } = useForm<RegisterVehicleFormData>({ mode: "onSubmit", });
 
   const handleRegisterVehicle = async (data: RegisterVehicleFormData) => {
     if (!vehicleType?.id) {
@@ -53,24 +37,22 @@ export function useRegisterVehicle() {
       return;
     }
 
-    const payload = {
-      plateNumber: data.plate.replace(/[^A-Za-z0-9]/g, "").toUpperCase(),
-      chassisNumber: (data.chassisNumber ?? "").replace(/\s/g, "").toUpperCase(),
-      model: data.model?.trim() ?? "",
-      mark: data.mark?.trim() ?? "",
-      city: data.city?.trim() ?? "",
-      stateUF: data.state?.trim() ?? "",
-      country: data.country?.trim() ?? "",
-      vehicleType_id: vehicleType.id,
-    };
-
     try {
       await notify({
         status: "loading",
         message: i18n.t("NOTIFICATIONS.REGISTERVEHICLELOADING"),
       });
 
-      await http.post("/vehicle/register", payload);
+      await http.post("vehicle/register", {
+        plateNumber: data.plate.replace(/[^A-Za-z0-9]/g, "").toUpperCase(),
+        chassisNumber: (data.chassisNumber ?? "").replace(/\s/g, "").toUpperCase(),
+        model: data.model?.trim() ?? "",
+        mark: data.mark?.trim() ?? "",
+        city: data.city?.trim() ?? "",
+        stateUF: data.state?.trim() ?? "",
+        country: data.country?.trim() ?? "",
+        vehicleType_id: vehicleType.id,
+      });
 
       await notify({
         status: "success",

@@ -129,7 +129,7 @@ const EditPerfil = () => {
 
 				<View className="flex-1 justify-end pt-4">
 					<ButtonDefault
-						title={t("SIGNUP.BASIC.NEXT")}
+						title={t("SIGNUP.BASIC.SAVE")}
 						onPress={handleSubmit(handleEditPerfil)}
 					/>
 				</View>

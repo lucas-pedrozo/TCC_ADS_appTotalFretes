@@ -1,4 +1,6 @@
-export type InputBaseProps = {
+import type { Control, FieldValues, Path } from "react-hook-form";
+
+export type InputBaseProps<T extends FieldValues = FieldValues> = {
 	label?: string;
 	placeholder?: string;
 	type?: "default" | "email-address" | "numeric" | "phone-pad";
@@ -7,9 +9,9 @@ export type InputBaseProps = {
 	maxLength?: number;
 	disabled?: boolean;
 	id?: string;
-
-	control: any;
-	name: string;
+	control: Control<T>;
+	name: Path<T>;
+	/** object evita conflito com Validate<> em campos boolean | string */
 	rules?: object;
 };
 

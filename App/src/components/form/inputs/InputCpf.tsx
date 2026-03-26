@@ -1,5 +1,5 @@
 import React from "react";
-import { Controller } from "react-hook-form";
+import { Controller, type FieldValues } from "react-hook-form";
 import { View, Text, TextInput } from "react-native";
 
 import { useThemeColors } from "@/src/context/ThemeContext";
@@ -7,7 +7,7 @@ import { maskCpf } from "@/src/utils/formMask";
 
 import { INPUT_STYLES, onlyDigits, type InputBaseProps } from "./inputShared";
 
-export function InputCpf({
+export function InputCpf<T extends FieldValues = FieldValues>({
 	id,
 	control,
 	name,
@@ -17,7 +17,7 @@ export function InputCpf({
 	secureTextEntry,
 	maxLength,
 	disabled,
-}: InputBaseProps) {
+}: InputBaseProps<T>) {
 	const colors = useThemeColors();
 
 	return (

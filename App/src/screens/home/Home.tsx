@@ -64,14 +64,11 @@ function Home() {
 
 	useEffect(() => {
 		handleGetUser();
+		if (userData?.vehicle_id) {
+			handleGetVehicle(userData?.vehicle_id);
+		}
 		handleGetFreightUser();
-	}, [handleGetUser, handleGetFreightUser]);
-
-	useEffect(() => {
-		const vehicleId = userData?.vehicle_id ?? null;
-		if (vehicleId != null) handleGetVehicle(vehicleId);
-		else handleGetVehicle(null);
-	}, [userData?.vehicle_id, handleGetVehicle]);
+	}, [handleGetUser, handleGetFreightUser, handleGetVehicle, userData?.vehicle_id]);
 
 	return (
 		<SafeAreaView style={{ flex: 1, backgroundColor: colors.bg }}>

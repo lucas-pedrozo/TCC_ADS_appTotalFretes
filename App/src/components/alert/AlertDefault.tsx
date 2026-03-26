@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { Text, View, ActivityIndicator, ViewStyle, StyleSheet } from "react-native";
+import { Text, View, ActivityIndicator, ViewStyle } from "react-native";
 import { useTranslation } from "react-i18next";
 import { Ionicons } from "@expo/vector-icons";
 import animation from "@/src/utils/animation";

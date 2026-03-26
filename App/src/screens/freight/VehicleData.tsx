@@ -9,7 +9,7 @@ import { useRegisterVehicleContext } from "@/src/context/RegisterVehicleContext"
 const VehicleData = () => {
 	const colors = useThemeColors();
 	const { control, handleSubmit, handleRegisterVehicle, rules } = useRegisterVehicle();
-	const { vehicleType, plateData } = useRegisterVehicleContext();
+	const { vehicleType } = useRegisterVehicleContext();
 
 	return (
 		<KeyboardAwareScrollView

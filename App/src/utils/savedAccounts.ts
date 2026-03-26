@@ -100,13 +100,7 @@ export async function setLastUsedAccountEmail(email: string | null): Promise<voi
 	}
 }
 
-/**
- * Adiciona uma nova conta ou atualiza uma existente (identificada pelo e-mail).
- * @param email E-mail da conta a ser adicionada ou atualizada.
- * @param displayLabel Label da conta a ser adicionada ou atualizada.
- * @param userImageUrl URL da imagem da conta a ser adicionada ou atualizada.
- * @throws Erro se a conta não puder ser adicionada ou atualizada.
- */
+/** Insere ou atualiza conta por e-mail; última conta fica no topo da lista. */
 export async function addOrUpdateSavedAccount({ email, displayLabel, userImageUrl }: SavedAccount): Promise<void> {
 	const normalizedEmail = email.trim().toLowerCase();
 	const label = displayLabel.trim() || maskEmailForDisplay(normalizedEmail);
