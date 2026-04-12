@@ -2,7 +2,7 @@
 module.exports = {
   content: ["./App.tsx", "./src/**/*.{js,jsx,ts,tsx}"],
   presets: [require("nativewind/preset")],
-  darkMode: "class",
+  darkMode: "media",
   theme: {
     extend: {
       colors: {
@@ -22,16 +22,17 @@ module.exports = {
         darkTextQuaternary: "rgba(0, 0, 0, 0.6)",
         darkTextQuinary: "#FF0000",
         darkTextSenary: "#FFAA2E",
+        darkTextSeptenary: "rgba(255, 255, 255, 0.8)",
 
         lightBg: "#FFFFFF",
-        lightBgSecondary: "#3F3F3F",
-        lightBgTertiary: "#E5E5E5",
+        lightBgSecondary: "#E5E5E5",
+        lightBgTertiary: "#3F3F3F",
         lightBgQuaternary: "#000000",
         lightBgQuinary: "#D1F9E2",
         lightBgSenary: "#E3992C",
         lightBgSeptenary: "#FF0000",
         lightBgOctonary: "#74AEF1",
-        lightBgNonary: "rgba(0, 0, 0, 0.06)",
+        lightBgNonary: "rgba(0, 0, 0, 0.1)",
 
         lightText: "#000000",
         lightTextSecondary: "rgba(0, 0, 0, 0.6)",
@@ -39,6 +40,7 @@ module.exports = {
         lightTextQuaternary: "rgba(255, 255, 255, 0.6)",
         lightTextQuinary: "#FF0000",
         lightTextSenary: "#FFAA2E",
+        lightTextSeptenary: "rgba(0, 0, 0, 0.8)",
       },
     },
   },

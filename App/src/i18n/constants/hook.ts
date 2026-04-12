@@ -1,0 +1,55 @@
+/**
+ * Traduções usadas nos hooks: apenas loading e success.
+ * Chaves em UPPERCASE: NOTIFICATIONS.LOGINLOADING
+ * Mensagens de erro vêm do backend (não traduzir aqui).
+ */
+
+export const hookPT = {
+  NOTIFICATIONS: {
+    ERROR: "Ocorreu um erro. Tente novamente.",
+    LOGINLOADING: "Efetuando login...",
+    LOGINSUCCESS: "Login efetuado com sucesso!",
+    SIGNUPLOADING: "Criando conta...",
+    SIGNUPSUCCESS: "Conta criada com sucesso!",
+    CODEVALIDATIONLOADING: "Validando código...",
+    CODEVALIDATED: "Código validado com sucesso!",
+    FORGOTPASSWORDLOADING: "Enviando código de verificação...",
+    FORGOTPASSWORDSUCCESS: "Se o email estiver cadastrado, você receberá o código.",
+    NEWPASSWORDLOADING: "Alterando senha...",
+    NEWPASSWORDSUCCESS: "Senha alterada com sucesso!",
+    EDITPERFILLOADING: "Editando perfil...",
+    EDITPERFILSUCCESS: "Perfil editado com sucesso!",
+    EDITPERFILUPLOADOKPATCHFAIL: "Foto enviada, mas não foi possível atualizar o perfil. Tente novamente.",
+    EDITCNHLOADING: "Editando CNH...",
+    EDITCNHSUCCESS: "CNH editada com sucesso!",
+    REGISTERVEHICLELOADING: "Cadastrando veículo...",
+    REGISTERVEHICLESUCCESS: "Veículo cadastrado com sucesso!",
+    NOCONNECTION: "Sem conexão. Conecte-se à internet para entrar.",
+    TOKENINVALID: "Sessão expirada. Faça login com sua senha.",
+  },
+} as const;
+
+export const hookEN = {
+  NOTIFICATIONS: {
+    ERROR: "An error occurred. Please try again.",
+    LOGINLOADING: "Signing in...",
+    LOGINSUCCESS: "Signed in successfully!",
+    SIGNUPLOADING: "Creating account...",
+    SIGNUPSUCCESS: "Account created successfully!",
+    CODEVALIDATIONLOADING: "Validating code...",
+    CODEVALIDATED: "Code validated successfully!",
+    FORGOTPASSWORDLOADING: "Sending verification code...",
+    FORGOTPASSWORDSUCCESS: "If the email is registered, you will receive the code.",
+    NEWPASSWORDLOADING: "Changing password...",
+    NEWPASSWORDSUCCESS: "Password changed successfully!",
+    EDITPERFILLOADING: "Editing profile...",
+    EDITPERFILSUCCESS: "Profile updated successfully!",
+    EDITPERFILUPLOADOKPATCHFAIL: "Photo uploaded, but profile could not be updated. Please try again.",
+    EDITCNHLOADING: "Editing driver license...",
+    EDITCNHSUCCESS: "Driver license updated successfully!",
+    REGISTERVEHICLELOADING: "Registering vehicle...",
+    REGISTERVEHICLESUCCESS: "Vehicle registered successfully!",
+    NOCONNECTION: "No connection. Connect to the internet to sign in.",
+    TOKENINVALID: "Session expired. Sign in with your password.",
+  },
+} as const;

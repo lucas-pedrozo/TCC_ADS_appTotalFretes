@@ -1,7 +1,8 @@
 {
   "expo": {
     "name": "Total Fretes",
-    "slug": "Total Fretes",
+    "slug": "App",
+    "icon": "./src/assets/logo.jpeg",
     "version": "1.0.0",
     "orientation": "portrait",
     "scheme": "app",
@@ -21,9 +22,11 @@
         "image": "./src/assets/logo.jpeg",
         "resizeMode": "contain"
       },
+      "softwareKeyboardLayoutMode": "resize",
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.lucas_pedrozo.App"
+      "package": "com.lucas_pedrozo.App",
+      "usesCleartextTraffic": true
     },
     "web": {
       "output": "static",
@@ -32,11 +35,32 @@
     "plugins": [
       "expo-router",
       [
+        "expo-secure-store",
+        {
+          "faceIDPermission": "O Total Fretes usa Face ID para proteger seu acesso ao app."
+        }
+      ],
+      [
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "Use Face ID para entrar no Total Fretes sem digitar a senha."
+        }
+      ],
+      [
         "expo-splash-screen",
         {
           "backgroundColor": "#000000",
           "image": "./src/assets/logo.jpeg",
           "resizeMode": "contain"
+        }
+      ],
+      [
+        "@rnmapbox/maps"
+      ],
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location."
         }
       ]
     ],

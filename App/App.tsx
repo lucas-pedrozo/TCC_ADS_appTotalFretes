@@ -7,6 +7,7 @@ import { KeyboardProvider } from "react-native-keyboard-controller";
 
 import { AuthProvider } from "./src/context/AuthContext";
 import { SingUpProvider } from "./src/context/SingUpContext";
+import { RegisterVehicleProvider } from "./src/context/RegisterVehicleContext";
 import AlertNotification from "./src/components/alert/AlertDefault";
 import { useAlertDefault, AlertDefaultProvider } from "./src/context/AlertDefaultContext";
 import { LanguageProvider } from "./src/context/LanguageContext";
@@ -34,8 +35,10 @@ function App() {
             <AlertDefaultProvider>
               <KeyboardProvider>
                 <SingUpProvider>
-                  <AlertNotificationGlobal />
-                  <Routes />
+                  <RegisterVehicleProvider>
+                    <AlertNotificationGlobal />
+                    <Routes />
+                  </RegisterVehicleProvider>
                 </SingUpProvider>
               </KeyboardProvider>
             </AlertDefaultProvider>
