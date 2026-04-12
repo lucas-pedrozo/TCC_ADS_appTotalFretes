@@ -99,9 +99,6 @@ export default function MapScreen() {
 		});
 	}, [currentZoom, zoom]);
 
-	const buttonClass = "p-2.5 rounded-xl border flex-row items-center gap-2";
-	const buttonStyle = { backgroundColor: colors.bgTertiary, borderColor: colors.bgNonary };
-
 	if (loading) {
 		return (
 			<View className="flex-1 justify-center items-center">
