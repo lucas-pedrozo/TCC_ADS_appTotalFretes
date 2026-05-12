@@ -12,6 +12,22 @@ export const ROTA_LINE_STYLE = {
 	lineJoin: "round" as const,
 };
 
+/** Halo sob a linha (efeito “brilho” estilo apps de navegação). */
+export const ROTA_LINE_GLOW_STYLE = {
+	lineColor: "#5DADE2",
+	lineWidth: 14,
+	lineOpacity: 0.35,
+	lineCap: "round" as const,
+	lineJoin: "round" as const,
+};
+
+export const ROTA_LINE_NAV_STYLE = {
+	lineColor: "#74D4FF",
+	lineWidth: 5,
+	lineCap: "round" as const,
+	lineJoin: "round" as const,
+};
+
 export const THEME_COLORS = {
 	dark: "#74AEF1",
 	light: "#3498db",

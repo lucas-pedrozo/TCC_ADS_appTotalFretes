@@ -1,16 +1,9 @@
 import { createContext, useState, ReactNode, useContext, useEffect } from "react";
 import * as SecureStore from "expo-secure-store";
-import { jwtDecode } from "jwt-decode";
 import { clearAuthToken, setAuthToken, getStoredAuthToken, getBiometricsEnabled, setBiometricsEnabled, clearAuthTokenCacheOnly } from "@/src/services/http";
+import { decodeAuthToken } from "@/src/utils/authToken";
 import type { SavedAccount } from "@/src/utils/savedAccounts";
 import { getSavedAccounts, getLastUsedAccountEmail, addOrUpdateSavedAccount as persistAddSavedAccount, removeSavedAccount as persistRemoveSavedAccount, setLastUsedAccountEmail } from "@/src/utils/savedAccounts";
-
-interface DecodedToken {
-    id: number | string;
-    role?: string;
-    accessLevel?: string;
-    exp?: number;
-}
 
 interface AuthContextType {
     id: number | null;
@@ -46,20 +39,6 @@ const defaultAuthContext: AuthContextType = {
     refreshSavedAccounts: async () => { },
     biometricsEnabled: false,
     setBiometricsEnabledAsync: async () => { },
-};
-
-/** Decodifica JWT e retorna payload se ainda não expirou; caso contrário null. */
-const decodeToken = (token: string) => {
-    try {
-        const decoded: DecodedToken = jwtDecode(token);
-        if (decoded.exp && decoded.exp * 1000 <= Date.now()) {
-            return null;
-        }
-        return decoded;
-    } catch (error) {
-        console.log("Erro ao decodificar token:", error);
-        return null;
-    }
 };
 
 export const AuthContext = createContext<AuthContextType>(defaultAuthContext);
@@ -108,7 +87,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                     return;
                 }
 
-                const decoded = decodeToken(storedToken);
+                const decoded = decodeAuthToken(storedToken);
                 if (!decoded?.id || !(decoded.role || decoded.accessLevel)) {
                     await SecureStore.deleteItemAsync("authToken");
                     await clearAuthToken();
@@ -134,7 +113,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }, []);
 
     const login = async (token: string) => {
-        const decoded = decodeToken(token);
+        const decoded = decodeAuthToken(token);
         if (decoded?.id && (decoded.role || decoded.accessLevel)) {
             setToken(token);
             setId(Number(decoded.id));

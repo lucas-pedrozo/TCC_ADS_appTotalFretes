@@ -167,6 +167,10 @@ export const screenPT = {
     TITLE: "Notificações",
     EMPTY: "Nenhuma notificação disponível.",
   },
+  MODALFREIGHTMAP: {
+    TITLE: "Detalhes do frete",
+    OPENBUTTON: "Ver detalhes do frete",
+  },
   FORGOTPASSWORDCODE: {
     CODEREQUIRED: "Código é obrigatório",
     CODEMINLENGTH: "Código deve ter 6 dígitos",
@@ -340,6 +344,10 @@ export const screenEN = {
   MODALNOTIFICACOES: {
     TITLE: "Notifications",
     EMPTY: "No notifications available.",
+  },
+  MODALFREIGHTMAP: {
+    TITLE: "Freight details",
+    OPENBUTTON: "View freight details",
   },
   FORGOTPASSWORDCODE: {
     CODEREQUIRED: "Code is required",

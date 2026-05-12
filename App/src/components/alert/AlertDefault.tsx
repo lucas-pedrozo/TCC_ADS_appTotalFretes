@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Text, View, ActivityIndicator, ViewStyle } from "react-native";
 import { useTranslation } from "react-i18next";

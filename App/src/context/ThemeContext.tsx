@@ -29,7 +29,7 @@ export type ThemeColors = {
 	textTertiary: string;
 	textQuaternary: string;
 	textQuinary: string;
-	textSenary: string;
+	textSenary: string	;
 	textSeptenary: string;
 };
 

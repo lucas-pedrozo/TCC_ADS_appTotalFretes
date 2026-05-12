@@ -49,8 +49,8 @@ export function useSignUp() {
         account_type_id: 1,
       }
       );
- 
-     await notify({
+
+      await notify({
         status: "success",
         message: i18n.t("NOTIFICATIONS.SIGNUPSUCCESS"),
       });
