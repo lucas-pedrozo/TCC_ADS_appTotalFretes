@@ -1,7 +1,7 @@
 import { useCallback, useRef, useState } from "react";
 import http from "@/src/services/http";
 import axios, { AxiosError } from "axios";
-import { getCurrentCoordinates } from "@/src/services/location";
+import { getCurrentCoordinates, type Coordinates } from "@/src/services/location";
 import { useAlertDefault } from "@/src/context/AlertDefaultContext";
 import type { MapRotaResponse } from "@/src/interfaces/mapbox";
 
@@ -18,15 +18,25 @@ const routeCacheKey = (
   moradaCarga: string,
   moradaDestino: string,
   rotaSimples: boolean,
-  coordenadasOrigem?: string
+  coordenadasOrigem: string | undefined,
+  coordenadasMotorista: string | undefined,
 ): string => {
   if (coordenadasOrigem) {
     return `orig|${coordenadasOrigem}|${moradaDestino}`;
   }
-  return `${moradaCarga}|${moradaDestino}|${rotaSimples}`;
+  const m = coordenadasMotorista ?? "no-motorista";
+  return `${moradaCarga}|${moradaDestino}|rs:${rotaSimples}|${m}`;
 };
 
 const ROTA_HTTP_TIMEOUT_MS = 30_000;
+
+/** Evita enviar GPS lixo (ex.: 0,0 no simulador) que faz o Mapbox Directions responder 422. */
+function isUsableGps(c: Coordinates): boolean {
+	if (!Number.isFinite(c.latitude) || !Number.isFinite(c.longitude)) return false;
+	if (Math.abs(c.latitude) > 90 || Math.abs(c.longitude) > 180) return false;
+	if (Math.abs(c.latitude) < 1e-4 && Math.abs(c.longitude) < 1e-4) return false;
+	return true;
+}
 
 export function useGetMapBox() {
   const { notify } = useAlertDefault();
@@ -54,12 +64,20 @@ export function useGetMapBox() {
     abortRef.current = new AbortController();
     const signal = abortRef.current.signal;
 
-    const key = routeCacheKey(moradaCarga, moradaDestino, rotaSimples, coordenadasOrigem);
-    const cached = routeCache.get(key);
-    if (cached && cached.expiresAt > Date.now()) {
-      setRotaData(cached.data);
-      setRotaErro(null);
-      return;
+    if (rotaSimples || coordenadasOrigem) {
+      const earlyKey = routeCacheKey(
+        moradaCarga,
+        moradaDestino,
+        rotaSimples,
+        coordenadasOrigem,
+        undefined,
+      );
+      const early = routeCache.get(earlyKey);
+      if (early && early.expiresAt > Date.now()) {
+        setRotaData(early.data);
+        setRotaErro(null);
+        return;
+      }
     }
 
     setLoadingRota(true);
@@ -95,8 +113,25 @@ export function useGetMapBox() {
           setLoadingRota(false);
           return;
         }
-        params.coordenadasMotorista = `${coords.longitude},${coords.latitude}`;
+        if (isUsableGps(coords)) {
+          params.coordenadasMotorista = `${coords.longitude},${coords.latitude}`;
+        }
       }
+    }
+
+    const key = routeCacheKey(
+      moradaCarga,
+      moradaDestino,
+      rotaSimples,
+      coordenadasOrigem,
+      params.coordenadasMotorista,
+    );
+    const cached = routeCache.get(key);
+    if (cached && cached.expiresAt > Date.now()) {
+      setRotaData(cached.data);
+      setRotaErro(null);
+      setLoadingRota(false);
+      return;
     }
 
     try {
@@ -118,11 +153,20 @@ export function useGetMapBox() {
       if (signal.aborted) return;
       if (axios.isAxiosError(error) && error.code === "ERR_CANCELED") return;
 
-      const err = error as AxiosError<{ error?: string; erro?: string }>;
-      let msg =
-        err.response?.data?.error ??
-        err.response?.data?.erro ??
-        "Não foi possível carregar a rota.";
+      const err = error as AxiosError<{ error?: string; erro?: string; message?: string } | string>;
+      const raw = err.response?.data;
+      let msg = "Não foi possível carregar a rota.";
+      if (typeof raw === "string" && raw.trim()) {
+        msg = raw.trim();
+      } else if (raw && typeof raw === "object") {
+        const o = raw as { message?: string; error?: string; erro?: string };
+        if (typeof o.message === "string" && o.message.trim()) msg = o.message.trim();
+        else if (typeof o.error === "string" && o.error.trim()) msg = o.error.trim();
+        else if (typeof o.erro === "string" && o.erro.trim()) msg = o.erro.trim();
+      }
+      if (msg === "Não foi possível carregar a rota." && err.message?.trim()) {
+        msg = err.message.trim();
+      }
 
       if (err.code === "ECONNABORTED" || err.message?.toLowerCase().includes("timeout")) {
         msg = "Tempo esgotado ao buscar a rota. Verifique a conexão ou tente de novo.";

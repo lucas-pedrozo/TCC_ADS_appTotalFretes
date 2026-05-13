@@ -125,7 +125,6 @@ const Freight = () => {
 }
 
 export default Freight;
-
 const freights = [
   {
     id: "1",
@@ -146,3 +145,4 @@ const freights = [
     freightValue: "2.300,00",
   },
 ];
+

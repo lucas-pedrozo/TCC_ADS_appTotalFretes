@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { View, ActivityIndicator, TouchableOpacity, Text, StyleSheet } from "react-native";
+import { View, ActivityIndicator, TouchableOpacity, Text, StyleSheet, Linking } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import Mapbox, { UserTrackingMode } from "@rnmapbox/maps";
@@ -18,9 +18,13 @@ import {
 } from "@/src/services/location";
 import { useGetFreightUser } from "@/src/hooks/freight/useGetFreightUser";
 import { useGetMapBox } from "@/src/hooks/freight/useGetMapBox";
-import ModalFreightMap from "@/src/components/modal/ModalFreightMap";
 import { getCameraFromGeometry } from "@/src/utils/mapboxUtils";
+import { buildGoogleMapsDirectionsUrl, isUsableGps } from "@/src/utils/googleMapsDirections";
 import { useTranslation } from "react-i18next";
+import { useNavigation } from "@react-navigation/native";
+import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import type { RootStackParamList } from "@/src/routes/Routes";
+import { useAlertDefault } from "@/src/context/AlertDefaultContext";
 
 const DEFAULT_CENTER: [number, number] = [-47.9292, -15.7801]; // Brasília
 const DEFAULT_ZOOM = 12;
@@ -81,12 +85,13 @@ type NavState = "idle" | "running" | "paused";
 export default function MapScreen() {
 	const { mode } = useThemeMode();
 	const { t } = useTranslation();
+	const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+	const { notify } = useAlertDefault();
 	const colors = useThemeColors();
 	const iconColor = useIconColor();
 	const [coords, setCoords] = useState<Coordinates | null>(null);
 	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState(false);
-	const [freightModalVisible, setFreightModalVisible] = useState(false);
 	const [currentZoom, setCurrentZoom] = useState(USER_ZOOM);
 	const [navState, setNavState] = useState<NavState>("idle");
 	const [navFollowUser, setNavFollowUser] = useState(true);
@@ -129,6 +134,38 @@ export default function MapScreen() {
 		}
 		return { origem: "—", destino: "—" };
 	}, [hasFreightRoute, freightUser, coords]);
+
+	const destinationLabelForGoogle = freightUser?.destination_label?.trim() ?? "";
+	const stopLabelForGoogle = freightUser?.origin_label?.trim() ?? "";
+	const canOpenGoogleMaps = Boolean(destinationLabelForGoogle);
+
+	const openGoogleMapsFromMap = useCallback(async () => {
+		if (!destinationLabelForGoogle) return;
+		let origin: Coordinates | null =
+			coords && !error && isUsableGps(coords) ? coords : null;
+		if (!origin) {
+			try {
+				const pos = await getCurrentCoordinates();
+				if (pos && isUsableGps(pos)) origin = pos;
+			} catch {
+				/* Google Maps usa posição atual se não houver origem */
+			}
+		}
+		const url = buildGoogleMapsDirectionsUrl({
+			origin,
+			waypointLabel: stopLabelForGoogle,
+			destinationLabel: destinationLabelForGoogle,
+		});
+		try {
+			await Linking.openURL(url);
+		} catch {
+			await notify({ status: "error", message: t("FREIGHT.OPENGOOGLEMAPS_ERROR") });
+		}
+	}, [coords, destinationLabelForGoogle, error, notify, stopLabelForGoogle, t]);
+
+	const goToFreightDetailsTab = useCallback(() => {
+		navigation.navigate("Home", { screen: "AndamentoTab" });
+	}, [navigation]);
 
 	const lineCoordinates = rotaData?.geometria?.coordinates;
 
@@ -297,7 +334,6 @@ export default function MapScreen() {
 	const handleIniciarNavegacao = useCallback(() => {
 		if (!rotaData || loadingRota) return;
 		setNavFollowUser(true);
-		setFreightModalVisible(false);
 		setNavState("running");
 		if (coords && !error) {
 			setCurrentZoom(NAV_ZOOM);
@@ -536,6 +572,26 @@ export default function MapScreen() {
 						<Text className="text-sm leading-5" style={{ color: colors.text }} numberOfLines={2}>
 							{routeSummary.origem} → {routeSummary.destino}
 						</Text>
+						{rotaData.trecho_ate_carga != null ? (
+							<View
+								className="mt-3 rounded-xl px-3 py-2.5"
+								style={{ backgroundColor: colors.bgSecondary }}
+							>
+								<Text
+									className="text-xs font-semibold uppercase tracking-wide"
+									style={{ color: colors.textSecondary }}
+								>
+									Até a saída (coleta)
+								</Text>
+								<Text className="text-base font-semibold mt-1" style={{ color: colors.text }}>
+									{rotaData.trecho_ate_carga.distancia_km.toFixed(1)} km · ~
+									{Math.round(rotaData.trecho_ate_carga.tempo_min)} min
+								</Text>
+								<Text className="text-xs mt-1" style={{ color: colors.textSecondary }}>
+									Da sua posição até o ponto de embarque do frete
+								</Text>
+							</View>
+						) : null}
 						<View
 							className="mt-3 flex-row items-center justify-between px-1 pt-3"
 							style={{ borderTopWidth: StyleSheet.hairlineWidth, borderTopColor: colors.bgNonary }}
@@ -659,26 +715,41 @@ export default function MapScreen() {
 				) : null}
 
 				{!isNavActive ? (
-					<TouchableOpacity
-						className="mb-2 flex-row items-center justify-center gap-2 rounded-xl border py-3 px-4"
-						style={{ backgroundColor: colors.bg, borderColor: colors.bgNonary, borderWidth: 1 }}
-						onPress={() => setFreightModalVisible(true)}
-						accessibilityRole="button"
-						accessibilityLabel={t("MODALFREIGHTMAP.OPENBUTTON")}
-					>
-						<Ionicons name="document-text-outline" size={22} color={iconColor} />
-						<Text className="text-base font-semibold" style={{ color: colors.text }}>
-							{t("MODALFREIGHTMAP.OPENBUTTON")}
-						</Text>
-					</TouchableOpacity>
+					<View className="mb-2 flex-row w-full gap-2">
+						<TouchableOpacity
+							className="flex-1 flex-row items-center justify-center gap-2 rounded-xl border py-3 px-2"
+							style={{
+								backgroundColor: colors.bg,
+								borderColor: colors.bgNonary,
+								borderWidth: 1,
+								opacity: canOpenGoogleMaps ? 1 : 0.45,
+							}}
+							disabled={!canOpenGoogleMaps}
+							onPress={openGoogleMapsFromMap}
+							accessibilityRole="button"
+							accessibilityLabel={t("FREIGHT.OPENGOOGLEMAPS_A11Y")}
+						>
+							<Ionicons name="logo-google" size={22} color={iconColor} />
+							<Text className="text-base font-semibold text-center" style={{ color: colors.text }} numberOfLines={2}>
+								{t("FREIGHT.OPENGOOGLEMAPS")}
+							</Text>
+						</TouchableOpacity>
+						<TouchableOpacity
+							className="flex-1 flex-row items-center justify-center gap-2 rounded-xl border py-3 px-2"
+							style={{ backgroundColor: colors.bg, borderColor: colors.bgNonary, borderWidth: 1 }}
+							onPress={goToFreightDetailsTab}
+							accessibilityRole="button"
+							accessibilityLabel={t("FREIGHT.VIEW_FREIGHT_DETAILS")}
+						>
+							<Ionicons name="document-text-outline" size={22} color={iconColor} />
+							<Text className="text-base font-semibold text-center" style={{ color: colors.text }} numberOfLines={2}>
+								{t("FREIGHT.VIEW_FREIGHT_DETAILS")}
+							</Text>
+						</TouchableOpacity>
+					</View>
 				) : null}
 			</SafeAreaView>
 
-			<ModalFreightMap
-				visible={freightModalVisible}
-				onClose={() => setFreightModalVisible(false)}
-				freight={freightUser}
-			/>
 		</View>
 	);
 }

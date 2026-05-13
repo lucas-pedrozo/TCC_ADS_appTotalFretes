@@ -146,6 +146,12 @@ export const screenPT = {
     TITLE: "Fretes Disponiveis",
     SEARCHPLACEHOLDER: "Buscar frete",
     EMPTYLIST: "Nenhum frete encontrado.",
+    OPEN_APP_MAP: "Mapa do app",
+    VIEW_FREIGHT_DETAILS: "Ver detalhes do frete",
+    OPENGOOGLEMAPS: "Abrir no Google Maps",
+    OPENGOOGLEMAPS_A11Y:
+      "Abrir no Google Maps: da sua posição até a saída do frete e em seguida até o destino",
+    OPENGOOGLEMAPS_ERROR: "Não foi possível abrir o Google Maps. Tente novamente.",
   },
   ADVANCEDOPTIONS: {
     RESETPASSWORD: "Redefinir Minha Senha",
@@ -166,10 +172,6 @@ export const screenPT = {
   MODALNOTIFICACOES: {
     TITLE: "Notificações",
     EMPTY: "Nenhuma notificação disponível.",
-  },
-  MODALFREIGHTMAP: {
-    TITLE: "Detalhes do frete",
-    OPENBUTTON: "Ver detalhes do frete",
   },
   FORGOTPASSWORDCODE: {
     CODEREQUIRED: "Código é obrigatório",
@@ -324,6 +326,12 @@ export const screenEN = {
     TITLE: "Available Freights",
     SEARCHPLACEHOLDER: "Search freight",
     EMPTYLIST: "No freight found.",
+    OPEN_APP_MAP: "In-app map",
+    VIEW_FREIGHT_DETAILS: "View freight details",
+    OPENGOOGLEMAPS: "Open in Google Maps",
+    OPENGOOGLEMAPS_A11Y:
+      "Open in Google Maps: from your location to pickup, then to destination",
+    OPENGOOGLEMAPS_ERROR: "Could not open Google Maps. Please try again.",
   },
   ADVANCEDOPTIONS: {
     RESETPASSWORD: "Reset My Password",
@@ -344,10 +352,6 @@ export const screenEN = {
   MODALNOTIFICACOES: {
     TITLE: "Notifications",
     EMPTY: "No notifications available.",
-  },
-  MODALFREIGHTMAP: {
-    TITLE: "Freight details",
-    OPENBUTTON: "View freight details",
   },
   FORGOTPASSWORDCODE: {
     CODEREQUIRED: "Code is required",

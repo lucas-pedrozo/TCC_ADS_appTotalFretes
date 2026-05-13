@@ -1,12 +1,13 @@
 import "react-native-gesture-handler";
 
-import RoutesTabs from "./RoutesTabs";
+import RoutesTabs, { type TabParamList } from "./RoutesTabs";
 import { StatusBar } from "expo-status-bar";
 import PrivateRoute from "./PrivateRoutes";
 import { useTranslation } from "react-i18next";
 import Header from "../components/header/Header";
 import { useThemeMode } from "../context/ThemeContext";
 import { SafeAreaView } from "react-native-safe-area-context";
+import type { NavigatorScreenParams } from "@react-navigation/native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 
@@ -45,7 +46,7 @@ interface EditCnhRouteParams {
 
 
 export type RootStackParamList = {
-	Home: undefined;
+	Home: NavigatorScreenParams<TabParamList> | undefined;
 	Login: { startMode?: "saved" | "full"; focusPassword?: boolean; };
 	Start: undefined;
 	SingUp: undefined;

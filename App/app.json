@@ -10,6 +10,9 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
+      "infoPlist": {
+        "LSApplicationQueriesSchemes": ["comgooglemaps"]
+      },
       "splash": {
         "image": "./src/assets/logo.png",
         "resizeMode": "contain",
