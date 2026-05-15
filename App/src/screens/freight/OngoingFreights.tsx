@@ -15,6 +15,8 @@ import type { TabParamList } from "@/src/routes/RoutesTabs";
 import { getCurrentCoordinates, type Coordinates } from "@/src/services/location";
 import { buildGoogleMapsDirectionsUrl, isUsableGps } from "@/src/utils/googleMapsDirections";
 import { useAlertDefault } from "@/src/context/AlertDefaultContext";
+import { maskDate } from "@/src/utils/formMask";
+
 
 function OngoingFreights() {
 	const colors = useThemeColors();
@@ -143,11 +145,10 @@ function OngoingFreights() {
 					Mais detalhes
 				</Text>
 				<DetailRow label="Tipo" value={freightUser?.cargo?.name ?? "---"} />
-				<DetailRow label="Categoria" value={freightUser?.cargo?.vehicle_type?.name ?? "---"} />
-				<DetailRow label="Peso da carga" value={freightUser?.cargo?.weight ?? "---"} />
-				<DetailRow label="Prazo" value={freightUser?.time_limit ?? "---"} />
-				<DetailRow label="Data Embarque" value={freightUser?.departure_date ?? "---"} />
-				<DetailRow label="Data Desembarque" value={freightUser?.arrival_date ?? "---"} />
+				<DetailRow label="Peso da carga" value={`${freightUser?.weight ?? "---"} kg`} />
+				<DetailRow label="Prazo" value={`${freightUser?.daysLimit ?? "---"} dias`} />
+				<DetailRow label="Data Embarque" value={maskDate(freightUser?.createdAt ?? "---")} />
+				<DetailRow label="Data Desembarque" value={maskDate(freightUser?.updatedAt ?? "---")} />
 			</ScrollView>
 		</SafeAreaView>
 	);

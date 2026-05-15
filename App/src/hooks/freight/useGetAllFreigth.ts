@@ -1,10 +1,10 @@
 import { AxiosError } from "axios";
 import { useCallback, useState } from "react";
 import { useAlertDefault } from "@/src/context/AlertDefaultContext";
-import { useAuth } from "@/src/context/AuthContext";
 import http from "@/src/services/http";
 
-export interface FreightMap {
+
+export interface FreightAllMap {
 	id: number;
 	company_id: number;
 	cargoType_id: number;
@@ -31,7 +31,7 @@ export interface FreightMap {
 	proposals?: ProposalMap[];
 }
 
-export interface CargoMap {
+interface CargoMap {
 	id: number;
 	name: string;
 	imageCargo_id?: number | null;
@@ -40,12 +40,12 @@ export interface CargoMap {
 	updatedAt?: string;
 }
 
-export interface StatusFreightMap {
+interface StatusFreightMap {
 	id: number;
 	name: string;
 }
 
-export interface ProposalMap {
+interface ProposalMap {
 	id: number;
 	freight_id: number;
 	driver_id: number;
@@ -55,24 +55,18 @@ export interface ProposalMap {
 	updatedAt?: string;
 }
 
-export function useGetFreightUser() {
-	const { id } = useAuth();
+export function useGetAllFreigth() {
 	const { notify } = useAlertDefault();
 	const [isLoading, setIsLoading] = useState(false);
-	const [freightUser, setFreightUser] = useState<FreightMap | null>(null);
+	const [allFreigth, setAllFreigth] = useState<FreightAllMap[]>([]);
 
-	const handleGetFreightUser = useCallback(async () => {
+	const handleGetAllFreigth = useCallback(async () => {
 		try {
 			setIsLoading(true);
 
-			if (!id) {
-				notify({ status: "error", message: "Usuario nao encontrado" });
-				return;
-			}
+			const { data } = await http.get<FreightAllMap[]>(`freight`);
 
-			const { data } = await http.get(`freight/user/${id}`);
-
-			setFreightUser(data);
+			setAllFreigth(data);
 		} catch (error) {
 			const message = (error as AxiosError<{ message: string }>).response?.data?.message ?? "";
 			if (message) {
@@ -81,11 +75,11 @@ export function useGetFreightUser() {
 		} finally {
 			setIsLoading(false);
 		}
-	}, [id, notify]);
+	}, [notify]);
 
 	return {
-		freightUser,
-		handleGetFreightUser,
+		allFreigth,
+		handleGetAllFreigth,
 		isLoading,
 	};
 }

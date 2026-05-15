@@ -4,11 +4,11 @@ import { useThemeColors, useThemeMode } from "@/src/context/ThemeContext";
 import { Text, TouchableOpacity, View } from "react-native";
 import { ProgressBarWithPins } from "./ProgressBarWithPins";
 import { IconBox } from "@/src/components/ui/IconBox";
-import type { FreightUserMap } from "@/src/interfaces/freight";
+import { FreightMap } from "@/src/hooks/freight/useGetFreightUser";
 
 type CardActivityHomeProps = {
   onPress?: () => void;
-  freight: FreightUserMap | null;
+  freight: FreightMap | null;
   AcceptButton?: boolean;
 };
 
@@ -46,10 +46,10 @@ export const CardActivityHome = ({ onPress, freight, AcceptButton = true }: Card
           <IconBox name="cube-outline" />
           <View className="flex-1 flex-row justify-between items-center">
             <Text className="font-semibold text-base" style={{ color: colors.text }}>
-              {freight?.vehicle_group?.name ?? t("CARD.ACTIVITY.NONE")}
+              {freight?.name ?? t("CARD.ACTIVITY.NONE")}
             </Text>
-            <Text className="text-sm" style={{ color: colors.textSecondary}}>
-              {freight?.cargo?.name ?? t("CARD.ACTIVITY.NONE")} / {freight?.cargo?.weight ?? t("CARD.ACTIVITY.N_A")}
+            <Text className="text-sm" style={{ color: colors.textSecondary }}>
+              {freight?.cargo?.name ?? t("CARD.ACTIVITY.NONE")} / {freight?.weight ? `${freight?.weight} kg` : t("CARD.ACTIVITY.N_A")}
             </Text>
           </View>
         </View>
@@ -70,7 +70,7 @@ export const CardActivityHome = ({ onPress, freight, AcceptButton = true }: Card
             {t("CARD.ACTIVITY.STATUS")}: {freight?.status?.name ?? "---"}
           </Text>
           <Text className="text-sm" style={{ color: colors.text }}>
-            {t("CARD.ACTIVITY.DEADLINE")}: {freight?.time_limit ?? "---"}
+            {t("CARD.ACTIVITY.DEADLINE")}: {`${freight?.daysLimit ?? "---"} dias`}
           </Text>
         </View>
 
