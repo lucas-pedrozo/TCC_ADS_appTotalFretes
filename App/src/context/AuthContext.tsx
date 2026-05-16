@@ -88,7 +88,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                 }
 
                 const decoded = decodeAuthToken(storedToken);
-                if (!decoded?.id || !(decoded.role || decoded.accessLevel)) {
+                const role = decoded?.role || decoded?.accessLevel;
+                if (!decoded?.id || !role || role === 'COMPANY') {
                     await SecureStore.deleteItemAsync("authToken");
                     await clearAuthToken();
                     setIsAuthenticated(false);
@@ -98,7 +99,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
                 setToken(storedToken);
                 setId(Number(decoded.id));
-                setAccessLevel(decoded.role ?? decoded.accessLevel ?? null);
+                setAccessLevel(role);
                 setIsAuthenticated(true);
                 await setAuthToken(storedToken);
                 await refreshSavedAccounts();
@@ -114,10 +115,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     const login = async (token: string) => {
         const decoded = decodeAuthToken(token);
-        if (decoded?.id && (decoded.role || decoded.accessLevel)) {
+        const role = decoded?.role || decoded?.accessLevel;
+        
+        if (role === 'COMPANY') {
+            throw new Error('Acesso negado: Aplicativo exclusivo para Motoristas e Administradores.');
+        }
+
+        if (decoded?.id && role) {
             setToken(token);
             setId(Number(decoded.id));
-            setAccessLevel(decoded.role ?? decoded.accessLevel ?? null);
+            setAccessLevel(role);
             setIsAuthenticated(true);
             await setAuthToken(token);
         }

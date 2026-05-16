@@ -9,6 +9,7 @@ import type { RootStackParamList } from "@/src/routes/Routes";
 import http from "@/src/services/http";
 import { useAlertDefault } from "@/src/context/AlertDefaultContext";
 import { AxiosError } from "axios";
+import { useTranslation } from "react-i18next";
 
 type VehicleTypeApi = {
   id: number;
@@ -22,6 +23,7 @@ type VehicleTypeApi = {
 
 const CardType = ({ item, onPress }: { item: VehicleTypeData; onPress: () => void }) => {
   const colors = useThemeColors();
+  const { t } = useTranslation();
 
   return (
     <TouchableOpacity
@@ -42,11 +44,11 @@ const CardType = ({ item, onPress }: { item: VehicleTypeData; onPress: () => voi
       </View>
 
       <View className="flex-row justify-between px-4 pb-2">
-        <Text className="text-sm" style={{ color: colors.text }}>Eixo: {item.axle}</Text>
-        <Text className="text-sm" style={{ color: colors.text }}>Peso Bruto: {item.grossWeight}</Text>
+        <Text className="text-sm" style={{ color: colors.text }}>{t("VEHICLE.AXLE")}: {item.axle}</Text>
+        <Text className="text-sm" style={{ color: colors.text }}>{t("VEHICLE.GROSS_WEIGHT")}: {item.grossWeight}</Text>
       </View>
       <View className="px-4 pb-4">
-        <Text className="text-sm" style={{ color: colors.text }}>Comprimento: {item.length}</Text>
+        <Text className="text-sm" style={{ color: colors.text }}>{t("VEHICLE.LENGTH")}: {item.length}</Text>
       </View>
     </TouchableOpacity>
   );
@@ -65,6 +67,7 @@ function mapApiToVehicleTypeData(row: VehicleTypeApi): VehicleTypeData {
 
 const VehicleType = () => {
   const colors = useThemeColors();
+  const { t } = useTranslation();
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { setVehicleType, groupVehicleTypeId } = useRegisterVehicleContext();
   const { notify } = useAlertDefault();
@@ -80,12 +83,12 @@ const VehicleType = () => {
         : data;
       setTypes(filtered.map(mapApiToVehicleTypeData));
     } catch (err) {
-      const message = (err as AxiosError<{ message?: string }>).response?.data?.message ?? "Erro ao carregar tipos.";
+      const message = (err as AxiosError<{ message?: string }>).response?.data?.message ?? t("VEHICLE.LOAD_TYPES_ERROR");
       notify({ status: "error", message });
     } finally {
       setLoading(false);
     }
-  }, [groupVehicleTypeId, notify]);
+  }, [groupVehicleTypeId, notify, t]);
 
   useEffect(() => {
     fetchTypes();
@@ -98,7 +101,7 @@ const VehicleType = () => {
 
   return (
     <SafeAreaView edges={["left", "right"]} className="flex-1 px-4" style={{ backgroundColor: colors.bg }}>
-      <Text className="pl-2.5 pb-5" style={{ color: colors.text }}>Selecione o Tipo do veículo</Text>
+      <Text className="pl-2.5 pb-5" style={{ color: colors.text }}>{t("VEHICLE.TYPE_SELECT")}</Text>
 
       {loading ? (
         <View className="items-center py-8">

@@ -1,7 +1,7 @@
 import type { FreightAllMap } from "@/src/hooks/freight/useGetAllFreigth";
 import type { Coordinates } from "@/src/services/location";
 import type { FreightFilterState } from "@/src/types/freightFilter";
-import { haversineMeters, type LngLat } from "@/src/utils/routeProgress";
+import * as turf from "@turf/turf";
 
 export function freightEffectiveValue(f: FreightAllMap): number {
 	const v = f.finalValue ?? f.originalValue;
@@ -9,9 +9,10 @@ export function freightEffectiveValue(f: FreightAllMap): number {
 }
 
 function distanceToOriginM(f: FreightAllMap, user: Coordinates): number {
-	return haversineMeters(
-		[user.longitude, user.latitude] as LngLat,
-		[f.origin_lng, f.origin_lat] as LngLat,
+	return turf.distance(
+		turf.point([user.longitude, user.latitude]),
+		turf.point([f.origin_lng, f.origin_lat]),
+		{ units: "meters" },
 	);
 }
 

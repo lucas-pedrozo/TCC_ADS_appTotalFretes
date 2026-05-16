@@ -33,6 +33,9 @@ import { EditPerfilMap, EditCnhMap } from "@/src/interfaces/profile";
 import Term from "../screens/advance/Term";
 import MapScreen from "../screens/MapBox/MapScreen";
 
+import type { FreightAllMap } from "@/src/hooks/freight/useGetAllFreigth";
+import type { FreightMap } from "@/src/hooks/freight/useGetFreightUser";
+
 interface EditPerfilRouteParams {
 	editPerfilData: EditPerfilMap;
 	userImage?: string;
@@ -60,7 +63,7 @@ export type RootStackParamList = {
 	NewPassword: { email: string; resetToken: string };
 	CancelAccount: undefined;
 	RenewPassword: undefined;
-	DetailFreight: undefined;
+	DetailFreight: { freight: FreightMap | FreightAllMap };
 	VehicleGroup: undefined;
 	VehicleType: undefined;
 	VehicleData: undefined;

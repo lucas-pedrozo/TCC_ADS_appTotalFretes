@@ -37,7 +37,7 @@ export const CardFreight = ({ navigateTo, freight }: CardFreightProps) => {
           </Text>
           <Image source={require("@/src/assets/Logos.png")} className="max-w-auto h-auto pb-1" resizeMode="contain" />
           <Text className="font-semibold text-sm" style={{ color: colors.text }}>
-            {t("CARD.FREIGHT.FREIGHT")}: {freight?.originalValue ? maskMoney(freight.originalValue) : freight?.finalValue ? maskMoney(freight.finalValue) : t("CARD.ACTIVITY.N_A")}
+            {t("CARD.FREIGHT.FREIGHT")}: {freight?.finalValue ? maskMoney(freight.finalValue) : freight?.originalValue ? maskMoney(freight.originalValue) : t("CARD.ACTIVITY.N_A")}
           </Text>
         </View>
 

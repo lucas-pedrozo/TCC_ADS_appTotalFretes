@@ -14,11 +14,15 @@ import { getCurrentCoordinates } from "@/src/services/location";
 import { isUsableGps } from "@/src/utils/googleMapsDirections";
 import { filterAndSortFreights } from "@/src/utils/freightListQuery";
 import { DEFAULT_FREIGHT_FILTER_STATE, type FreightFilterState } from "@/src/types/freightFilter";
+import { useNavigation } from "@react-navigation/native";
+import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import type { RootStackParamList } from "@/src/routes/Routes";
 
 const Freight = () => {
 	const colors = useThemeColors();
 	const iconColor = useIconColor();
 	const { t } = useTranslation();
+	const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 	const { mode } = useThemeMode();
 	const [isRefreshing, setIsRefreshing] = useState(false);
 	const [showFilterModal, setShowFilterModal] = useState(false);
@@ -29,7 +33,21 @@ const Freight = () => {
 	const { control, watch } = useForm<{ search: string }>({ defaultValues: { search: "" } });
 	const searchQuery = watch("search");
 
-	const { allFreigth, handleGetAllFreigth, isLoading } = useGetAllFreigth();
+	const { allFreigth, handleGetAllFreigth, loadMore, isLoading, isLoadingMore } = useGetAllFreigth();
+
+	const handleEndReached = useCallback(() => {
+		void loadMore();
+	}, [loadMore]);
+
+	const listFooter = useMemo(
+		() =>
+			isLoadingMore ? (
+				<View className="py-4 items-center">
+					<ActivityIndicator size="small" color={iconColor} />
+				</View>
+			) : null,
+		[isLoadingMore, iconColor],
+	);
 
 	const displayedFreights = useMemo(
 		() => filterAndSortFreights(allFreigth, searchQuery, filters, userCoords),
@@ -138,8 +156,16 @@ const Freight = () => {
 					keyExtractor={(item) => String(item.id)}
 					showsVerticalScrollIndicator={false}
 					ItemSeparatorComponent={() => <View style={{ height: 16 }} />}
-					contentContainerStyle={{ paddingBottom: 120, paddingTop: 20 }}
-					renderItem={({ item }) => <CardFreight freight={item} />}
+					contentContainerStyle={{ paddingBottom: 120, paddingTop: 20, flexGrow: 1 }}
+					renderItem={({ item }) => (
+						<CardFreight
+							freight={item}
+							navigateTo={() => navigation.navigate("DetailFreight", { freight: item })}
+						/>
+					)}
+					onEndReached={handleEndReached}
+					onEndReachedThreshold={0.3}
+					ListFooterComponent={listFooter}
 					refreshControl={
 						<RefreshControl
 							refreshing={isRefreshing}

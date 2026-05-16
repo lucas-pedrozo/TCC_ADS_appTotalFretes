@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { Linking, RefreshControl, ScrollView, Text, TouchableOpacity, View } from "react-native";
 
+import { useCancelFreight } from "@/src/hooks/freight/useCancelFreight";
 import { useGetFreightUser } from "@/src/hooks/freight/useGetFreightUser";
 import { Ionicons } from "@expo/vector-icons";
 import { useIconColor, useThemeColors } from "@/src/context/ThemeContext";
@@ -16,6 +17,7 @@ import { getCurrentCoordinates, type Coordinates } from "@/src/services/location
 import { buildGoogleMapsDirectionsUrl, isUsableGps } from "@/src/utils/googleMapsDirections";
 import { useAlertDefault } from "@/src/context/AlertDefaultContext";
 import { maskDate } from "@/src/utils/formMask";
+import { ButtonCancel, ButtonDefault } from "@/src/components/form";
 
 
 function OngoingFreights() {
@@ -28,6 +30,7 @@ function OngoingFreights() {
 	const { notify } = useAlertDefault();
 
 	const { freightUser, handleGetFreightUser } = useGetFreightUser();
+	const { handleCancelFreight, isLoading: isCancelling } = useCancelFreight();
 
 	const handleRefresh = useCallback(async () => {
 		setIsRefreshing(true);
@@ -50,6 +53,14 @@ function OngoingFreights() {
 	const goToMapScreen = useCallback(() => {
 		navigation.navigate("MapScreen" as never);
 	}, [navigation]);
+
+	const handleCancel = useCallback(async () => {
+		if (!freightUser?.id) return;
+
+		await handleCancelFreight(freightUser.id);
+		await handleGetFreightUser();
+		setRefreshKey((prev) => prev + 1);
+	}, [freightUser?.id, handleCancelFreight, handleGetFreightUser]);
 
 	const openGoogleMaps = useCallback(async () => {
 		if (!destinationLabel) return;
@@ -97,7 +108,7 @@ function OngoingFreights() {
 				}
 			>
 				<Text className="text-2xl text-center font-semibold" style={{ color: colors.text }}>
-					{t("FREIGHT.TITLE")}
+					{t("FREIGHT.ONGOING_TITLE")}
 				</Text>
 				<View className="h-7" />
 
@@ -142,13 +153,30 @@ function OngoingFreights() {
 				</View>
 
 				<Text className="font-semibold text-base pl-2.5 mb-4 mt-5" style={{ color: colors.text }}>
-					Mais detalhes
+					{t("FREIGHT.MORE_DETAILS")}
 				</Text>
-				<DetailRow label="Tipo" value={freightUser?.cargo?.name ?? "---"} />
-				<DetailRow label="Peso da carga" value={`${freightUser?.weight ?? "---"} kg`} />
-				<DetailRow label="Prazo" value={`${freightUser?.daysLimit ?? "---"} dias`} />
-				<DetailRow label="Data Embarque" value={maskDate(freightUser?.createdAt ?? "---")} />
-				<DetailRow label="Data Desembarque" value={maskDate(freightUser?.updatedAt ?? "---")} />
+				<DetailRow label={t("FREIGHT.TYPE")} value={freightUser?.cargo?.name ?? t("COMMON.EMPTY")} />
+				<DetailRow
+					label={t("FREIGHT.WEIGHT")}
+					value={t("FREIGHT.WEIGHT_VALUE", { weight: freightUser?.weight ?? t("COMMON.EMPTY") })}
+				/>
+				<DetailRow
+					label={t("FREIGHT.DEADLINE")}
+					value={t("FREIGHT.DEADLINE_VALUE", { days: freightUser?.daysLimit ?? t("COMMON.EMPTY") })}
+				/>
+				<DetailRow label={t("FREIGHT.ORIGIN")} value={freightUser?.origin_label ?? t("COMMON.EMPTY")} />
+				<DetailRow label={t("FREIGHT.DESTINATION")} value={freightUser?.destination_label ?? t("COMMON.EMPTY")} />
+				{freightUser?.id != null ? (
+					<View className="flex-row gap-2.5 w-full mt-5 justify-between">
+						<ButtonCancel
+							title={t("COMMON.CANCEL")}
+							onPress={handleCancel}
+							size="small"
+							disabled={isCancelling}
+						/>
+						<ButtonDefault title={t("COMMON.CONFIRM")} onPress={() => { }} size="small" />
+					</View>
+				) : null}
 			</ScrollView>
 		</SafeAreaView>
 	);

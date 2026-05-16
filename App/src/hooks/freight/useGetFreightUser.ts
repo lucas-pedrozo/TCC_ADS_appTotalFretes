@@ -3,6 +3,7 @@ import { useCallback, useState } from "react";
 import { useAlertDefault } from "@/src/context/AlertDefaultContext";
 import { useAuth } from "@/src/context/AuthContext";
 import http from "@/src/services/http";
+import i18n from "@/src/i18n";
 
 export interface FreightMap {
 	id: number;
@@ -66,7 +67,7 @@ export function useGetFreightUser() {
 			setIsLoading(true);
 
 			if (!id) {
-				notify({ status: "error", message: "Usuario nao encontrado" });
+				notify({ status: "error", message: i18n.t("NOTIFICATIONS.USERNOTFOUND") });
 				return;
 			}
 

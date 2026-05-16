@@ -1,8 +1,7 @@
 import { AxiosError } from "axios";
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useAlertDefault } from "@/src/context/AlertDefaultContext";
 import http from "@/src/services/http";
-
 
 export interface FreightAllMap {
 	id: number;
@@ -55,31 +54,93 @@ interface ProposalMap {
 	updatedAt?: string;
 }
 
+export type FreightListPageResponse = {
+	items: FreightAllMap[];
+	total: number;
+	page: number;
+	limit: number;
+	hasMore: boolean;
+};
+
+const PAGE_SIZE = 20;
+
+function mergeUniqueById(prev: FreightAllMap[], incoming: FreightAllMap[]): FreightAllMap[] {
+	const seen = new Set(prev.map((x) => x.id));
+	const out = [...prev];
+	for (const row of incoming) {
+		if (!seen.has(row.id)) {
+			seen.add(row.id);
+			out.push(row);
+		}
+	}
+	return out;
+}
+
 export function useGetAllFreigth() {
 	const { notify } = useAlertDefault();
 	const [isLoading, setIsLoading] = useState(false);
+	const [isLoadingMore, setIsLoadingMore] = useState(false);
 	const [allFreigth, setAllFreigth] = useState<FreightAllMap[]>([]);
+	const [hasMore, setHasMore] = useState(true);
+	const [nextPage, setNextPage] = useState(1);
+	const inFlightRef = useRef(false);
+
+	const fetchPage = useCallback(
+		async (page: number, mode: "replace" | "append") => {
+			if (inFlightRef.current) return;
+			inFlightRef.current = true;
+			if (page === 1) setIsLoading(true);
+			else setIsLoadingMore(true);
+			try {
+				const { data } = await http.get<FreightListPageResponse | FreightAllMap[]>("freight", {
+					params: { page, limit: PAGE_SIZE },
+				});
+
+				if (Array.isArray(data)) {
+					if (mode === "replace") setAllFreigth(data);
+					else setAllFreigth((prev) => mergeUniqueById(prev, data));
+					setHasMore(false);
+					setNextPage(1);
+					return;
+				}
+
+				setHasMore(data.hasMore);
+				setNextPage(data.page + 1);
+				if (mode === "replace") {
+					setAllFreigth(data.items);
+				} else {
+					setAllFreigth((prev) => mergeUniqueById(prev, data.items));
+				}
+			} catch (error) {
+				const message = (error as AxiosError<{ message: string }>).response?.data?.message ?? "";
+				if (message) {
+					notify({ status: "error", message });
+				}
+			} finally {
+				inFlightRef.current = false;
+				setIsLoading(false);
+				setIsLoadingMore(false);
+			}
+		},
+		[notify],
+	);
 
 	const handleGetAllFreigth = useCallback(async () => {
-		try {
-			setIsLoading(true);
+		setHasMore(true);
+		await fetchPage(1, "replace");
+	}, [fetchPage]);
 
-			const { data } = await http.get<FreightAllMap[]>(`freight`);
-
-			setAllFreigth(data);
-		} catch (error) {
-			const message = (error as AxiosError<{ message: string }>).response?.data?.message ?? "";
-			if (message) {
-				notify({ status: "error", message });
-			}
-		} finally {
-			setIsLoading(false);
-		}
-	}, [notify]);
+	const loadMore = useCallback(async () => {
+		if (!hasMore || isLoading || isLoadingMore) return;
+		await fetchPage(nextPage, "append");
+	}, [fetchPage, hasMore, isLoading, isLoadingMore, nextPage]);
 
 	return {
 		allFreigth,
 		handleGetAllFreigth,
+		loadMore,
 		isLoading,
+		isLoadingMore,
+		hasMore,
 	};
 }

@@ -1,6 +1,7 @@
 import { useCallback, useState } from "react";
 import * as ImagePicker from "expo-image-picker";
 import { useAlertDefault } from "@/src/context/AlertDefaultContext";
+import i18n from "@/src/i18n";
 
 export function useImagePicker() {
   const { notify } = useAlertDefault();
@@ -12,7 +13,7 @@ export function useImagePicker() {
     if (!permission.granted) {
       await notify({
         status: "alert",
-        message: "Permissão para acessar a galeria foi negada.",
+        message: i18n.t("NOTIFICATIONS.GALLERYPERMISSIONDENIED"),
       });
       return;
     }
@@ -35,7 +36,7 @@ export function useImagePicker() {
     if (!permission.granted) {
       await notify({
         status: "alert",
-        message: "Permissão para usar a câmera foi negada.",
+        message: i18n.t("NOTIFICATIONS.CAMERAPERMISSIONDENIED"),
       });
       return;
     }

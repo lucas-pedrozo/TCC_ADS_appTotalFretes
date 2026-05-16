@@ -12,6 +12,22 @@ type CardActivityHomeProps = {
   AcceptButton?: boolean;
 };
 
+const PROGRESS_STEPS = 6;
+const CANCELED_STATUS_ID = 2;
+
+const getProgressStepFromStatusId = (statusId?: number): number => {
+  if (!statusId || statusId <= 0) {
+    return 0;
+  }
+
+  if (statusId === CANCELED_STATUS_ID) {
+    return 0;
+  }
+
+  const normalizedStep = statusId > CANCELED_STATUS_ID ? statusId - 1 : statusId;
+  return Math.min(Math.max(normalizedStep, 0), PROGRESS_STEPS);
+};
+
 
 export const CardActivityHome = ({ onPress, freight, AcceptButton = true }: CardActivityHomeProps) => {
   const colors = useThemeColors();
@@ -19,7 +35,7 @@ export const CardActivityHome = ({ onPress, freight, AcceptButton = true }: Card
   const { mode } = useThemeMode();
   const isDark = mode === "dark";
   const iconColor = isDark ? "#FFFFFF" : "#000000";
-  const currentStep = freight?.status?.id ?? 0;
+  const currentStep = getProgressStepFromStatusId(freight?.status?.id);
 
   return (
     <>
@@ -55,12 +71,12 @@ export const CardActivityHome = ({ onPress, freight, AcceptButton = true }: Card
         </View>
 
         <View className="flex-row justify-between pt-3 w-full">
-          <Text className="text-sm" style={{ color: colors.text }}>
+          <Text className="text-sm" numberOfLines={1} style={{ color: colors.text }}>
             {t("CARD.ACTIVITY.ORIGIN")}: {freight?.origin_label ?? t("CARD.ACTIVITY.NONE")}
           </Text>
         </View>
         <View className="flex-row justify-between pt-1 w-full">
-          <Text className="text-sm" style={{ color: colors.text }}>
+          <Text className="text-sm" numberOfLines={1} style={{ color: colors.text }}>
             {t("CARD.ACTIVITY.DESTINATION")}: {freight?.destination_label ?? t("CARD.ACTIVITY.NONE")}
           </Text>
         </View>
@@ -74,7 +90,7 @@ export const CardActivityHome = ({ onPress, freight, AcceptButton = true }: Card
           </Text>
         </View>
 
-        <ProgressBarWithPins steps={5} currentStep={currentStep} isDark={isDark} />
+        <ProgressBarWithPins steps={PROGRESS_STEPS} currentStep={currentStep} isDark={isDark} />
       </TouchableOpacity >
     </>
   );

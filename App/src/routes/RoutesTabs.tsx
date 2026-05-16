@@ -12,6 +12,7 @@ import Home from "../screens/home/Home";
 import { useThemeColors, useThemeMode } from "@/src/context/ThemeContext";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import OngoingFreights from "../screens/freight/OngoingFreights";
+import { useTranslation } from "react-i18next";
 
 export type TabParamList = {
 	HomeTab: undefined;
@@ -33,11 +34,10 @@ function PlaceholderScreen({ title }: { title: string }) {
 }
 
 
-const PropostaScreen = () => <PlaceholderScreen title="Proposta" />;
-
 const TAB_BAR_HEIGHT = 70;
 
 export default function RoutesTabs() {
+	const { t } = useTranslation();
 	const { mode } = useThemeMode();
 	const { logout } = useAuth();
 	const insets = useSafeAreaInsets();
@@ -65,13 +65,13 @@ export default function RoutesTabs() {
 				}
 
 				lastBackPress.current = now;
-				ToastAndroid.show("Pressione novamente para sair", ToastAndroid.SHORT);
+				ToastAndroid.show(t("TABS.PRESS_BACK_AGAIN"), ToastAndroid.SHORT);
 				return true;
 			};
 
 			const subscription = BackHandler.addEventListener("hardwareBackPress", onBackPress);
 			return () => subscription.remove();
-		}, [])
+		}, [t])
 	);
 
 	return (
@@ -125,31 +125,31 @@ export default function RoutesTabs() {
 			<Tab.Screen
 				name="HomeTab"
 				component={Home}
-				options={{ tabBarLabel: "Home" }}
+				options={{ tabBarLabel: t("TABS.HOME") }}
 				listeners={{ focus: () => { currentTab.current = "HomeTab"; } }}
 			/>
 			<Tab.Screen
 				name="FretesTab"
 				component={Freight}
-				options={{ tabBarLabel: "Fretes" }}
+				options={{ tabBarLabel: t("TABS.FREIGHTS") }}
 				listeners={{ focus: () => { currentTab.current = "FretesTab"; } }}
 			/>
 			<Tab.Screen
 				name="AndamentoTab"
 				component={OngoingFreights}
-				options={{ tabBarLabel: "Andamento" }}
+				options={{ tabBarLabel: t("TABS.ONGOING") }}
 				listeners={{ focus: () => { currentTab.current = "AndamentoTab"; } }}
 			/>
 			<Tab.Screen
 				name="PropostaTab"
-				component={PropostaScreen}
-				options={{ tabBarLabel: "Proposta" }}
+				children={() => <PlaceholderScreen title={t("TABS.PROPOSAL")} />}
+				options={{ tabBarLabel: t("TABS.PROPOSAL") }}
 				listeners={{ focus: () => { currentTab.current = "PropostaTab"; } }}
 			/>
 			<Tab.Screen
 				name="PerfilTab"
 				component={Perfil}
-				options={{ tabBarLabel: "Perfil" }}
+				options={{ tabBarLabel: t("TABS.PROFILE") }}
 				listeners={{ focus: () => { currentTab.current = "PerfilTab"; } }}
 			/>
 		</Tab.Navigator>

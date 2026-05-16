@@ -51,8 +51,8 @@ const EditPerfil = () => {
 					)
 				}
 				<View className="flex-row gap-3">
-					<ButtonOutline title="Tirar" onPress={handleTakePhoto} />
-					<ButtonOutline title="Buscar" onPress={handlePickFromGallery} />
+					<ButtonOutline title={t("EDITPERFIL.TAKE_PHOTO")} onPress={handleTakePhoto} />
+					<ButtonOutline title={t("EDITPERFIL.PICK_GALLERY")} onPress={handlePickFromGallery} />
 				</View>
 			</View>
 

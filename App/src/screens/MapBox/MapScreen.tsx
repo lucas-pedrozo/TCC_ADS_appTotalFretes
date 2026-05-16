@@ -4,6 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import Mapbox, { UserTrackingMode, type MapState } from "@rnmapbox/maps";
 import { Ionicons } from "@expo/vector-icons";
+import * as turf from "@turf/turf";
 
 import { useThemeMode, useThemeColors, useIconColor } from "@/src/context/ThemeContext";
 import {
@@ -26,15 +27,6 @@ import {
 } from "@/src/services/location";
 import { useGetFreightUser } from "@/src/hooks/freight/useGetFreightUser";
 import { useGetMapBox } from "@/src/hooks/freight/useGetMapBox";
-import { getCameraFromGeometry } from "@/src/utils/mapboxUtils";
-import {
-	clampMonotonicProgress,
-	haversineMeters,
-	polylineLengthMeters,
-	projectUserOntoPolyline,
-	splitRouteAtDistance,
-	type LngLat,
-} from "@/src/utils/routeProgress";
 import { buildGoogleMapsDirectionsUrl, isUsableGps } from "@/src/utils/googleMapsDirections";
 import { useTranslation } from "react-i18next";
 import { useNavigation } from "@react-navigation/native";
@@ -42,10 +34,14 @@ import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import type { RootStackParamList } from "@/src/routes/Routes";
 import { useAlertDefault } from "@/src/context/AlertDefaultContext";
 
+type LngLat = [number, number];
+
 const DEFAULT_CENTER: [number, number] = [-47.9292, -15.7801]; // Brasília
 const DEFAULT_ZOOM = 12;
 const USER_ZOOM = 15;
 const NAV_ZOOM = 16;
+const MAX_BACKWARD_PROGRESS_M = 12;
+const ROUTE_VIEW_PADDING: [number, number, number, number] = [120, 32, 220, 32];
 
 /** Com follow ativo, o puck fica no centro da área útil (mapa menos os insets). Mais paddingTop / menos paddingBottom desce o puck na tela. */
 const MAP_EDGE_PADDING_IDLE = {
@@ -79,32 +75,91 @@ function maneuverIconName(
 	mod?: string | null,
 	tipo?: string | null,
 ): React.ComponentProps<typeof Ionicons>["name"] {
-	const raw = `${mod ?? ""} ${tipo ?? ""}`.toLowerCase();
-	if (raw.includes("uturn") || raw.includes("u-turn")) return "return-up-back";
-	if (raw.includes("sharp left") || raw.includes("hard left")) return "arrow-undo";
-	if (raw.includes("slight left") || raw.includes("merge left")) return "arrow-back-outline";
-	if (raw.includes("left")) return "arrow-back";
-	if (raw.includes("sharp right") || raw.includes("hard right")) return "arrow-redo";
-	if (raw.includes("slight right") || raw.includes("merge right")) return "arrow-forward-outline";
-	if (raw.includes("right")) return "arrow-forward";
-	if (raw.includes("roundabout") || raw.includes("rotat")) return "sync";
-	if (raw.includes("arrive")) return "flag";
-	return "arrow-up";
+	const MANEUVER_ICONS: Record<string, React.ComponentProps<typeof Ionicons>["name"]> = {
+		uturn: "return-up-back",
+		"u-turn": "return-up-back",
+		"sharp left": "arrow-undo",
+		"hard left": "arrow-undo",
+		"slight left": "arrow-back-outline",
+		"merge left": "arrow-back-outline",
+		left: "arrow-back",
+		"sharp right": "arrow-redo",
+		"hard right": "arrow-redo",
+		"slight right": "arrow-forward-outline",
+		"merge right": "arrow-forward-outline",
+		right: "arrow-forward",
+		roundabout: "sync",
+		rotat: "sync",
+		arrive: "flag",
+	};
+	const raw = `${mod ?? ""} ${tipo ?? ""}`.toLowerCase().trim();
+	const match = Object.keys(MANEUVER_ICONS).find((k) => raw.includes(k));
+	return match ? MANEUVER_ICONS[match] : "arrow-up";
 }
 
-function boundsFromLineString(coords: [number, number][]): { ne: [number, number]; sw: [number, number] } {
-	let minLng = coords[0][0];
-	let maxLng = coords[0][0];
-	let minLat = coords[0][1];
-	let maxLat = coords[0][1];
-	for (const [lng, lat] of coords) {
-		minLng = Math.min(minLng, lng);
-		maxLng = Math.max(maxLng, lng);
-		minLat = Math.min(minLat, lat);
-		maxLat = Math.max(maxLat, lat);
+function distanceMeters(a: LngLat, b: LngLat): number {
+	return turf.distance(turf.point(a), turf.point(b), { units: "meters" });
+}
+
+function polylineLengthMeters(coords: LngLat[]): number {
+	if (coords.length < 2) return 0;
+	return turf.length(turf.lineString(coords), { units: "kilometers" }) * 1000;
+}
+
+function projectUserOntoPolyline(userLat: number, userLon: number, route: LngLat[]) {
+	const userPoint = turf.point([userLon, userLat]);
+	if (!route.length) {
+		return {
+			distanceAlongMeters: 0,
+			nearestOnRoute: [userLon, userLat] as LngLat,
+			distanceToRouteMeters: Number.POSITIVE_INFINITY,
+		};
 	}
-	const p = 0.006;
-	return { ne: [maxLng + p, maxLat + p], sw: [minLng - p, minLat - p] };
+	if (route.length === 1) {
+		return {
+			distanceAlongMeters: 0,
+			nearestOnRoute: route[0],
+			distanceToRouteMeters: distanceMeters(route[0], [userLon, userLat]),
+		};
+	}
+
+	const snapped = turf.nearestPointOnLine(turf.lineString(route), userPoint, {
+		units: "meters",
+	});
+	const props = snapped.properties as { dist?: number; location?: number };
+	return {
+		distanceAlongMeters: Number.isFinite(props.location) ? (props.location as number) : 0,
+		nearestOnRoute: snapped.geometry.coordinates as LngLat,
+		distanceToRouteMeters: Number.isFinite(props.dist)
+			? (props.dist as number)
+			: distanceMeters(snapped.geometry.coordinates as LngLat, [userLon, userLat]),
+	};
+}
+
+function splitRouteAtDistance(route: LngLat[], distanceAlongMeters: number) {
+	if (!route.length) {
+		return { completed: [] as LngLat[], remaining: [] as LngLat[] };
+	}
+	if (route.length === 1) {
+		return { completed: [...route], remaining: [] as LngLat[] };
+	}
+
+	const line = turf.lineString(route);
+	const totalKm = turf.length(line, { units: "kilometers" });
+	const progressKm = Math.max(0, Math.min(distanceAlongMeters / 1000, totalKm));
+
+	const completed = turf.lineSliceAlong(line, 0, progressKm, {
+		units: "kilometers",
+	}).geometry.coordinates as LngLat[];
+	const remaining = turf.lineSliceAlong(line, progressKm, totalKm, {
+		units: "kilometers",
+	}).geometry.coordinates as LngLat[];
+
+	return { completed, remaining };
+}
+
+function clampMonotonicProgress(previousAlongMeters: number, proposedAlongMeters: number): number {
+	return Math.max(previousAlongMeters - MAX_BACKWARD_PROGRESS_M, proposedAlongMeters);
 }
 
 type CameraRef = React.ComponentRef<typeof Mapbox.Camera>;
@@ -217,16 +272,11 @@ export default function MapScreen() {
 
 	const lineCoordinates = rotaData?.geometria?.coordinates;
 
-	const routeCenterZoom = useMemo(() => {
-		if (!lineCoordinates?.length) return null;
-		return getCameraFromGeometry({ coordinates: lineCoordinates });
-	}, [lineCoordinates]);
-
 	const instrucaoTopo = useMemo(() => {
 		if (rotaData?.proxima_instrucao?.trim()) return rotaData.proxima_instrucao.trim();
 		const dest = routeSummary.destino;
-		return dest && dest !== "—" ? `Em direção a ${dest}` : "Siga na rota";
-	}, [rotaData?.proxima_instrucao, routeSummary.destino]);
+		return dest && dest !== "—" ? t("MAP.HEADING_TO", { dest }) : t("MAP.FOLLOW_ROUTE");
+	}, [rotaData?.proxima_instrucao, routeSummary.destino, t]);
 
 	const iconeManobra = useMemo(
 		() => maneuverIconName(rotaData?.manobra_modificador, rotaData?.manobra_tipo),
@@ -324,17 +374,28 @@ export default function MapScreen() {
 		[routeLngLat],
 	);
 
+	const fitCameraToRoute = useCallback(
+		(coordsList: LngLat[], animationDuration = CAMERA_ANIMATION_MS): boolean => {
+			if (coordsList.length < 2) return false;
+			const [minLng, minLat, maxLng, maxLat] = turf.bbox(turf.lineString(coordsList));
+			cameraRef.current?.fitBounds(
+				[maxLng, maxLat],
+				[minLng, minLat],
+				ROUTE_VIEW_PADDING,
+				animationDuration,
+			);
+			return true;
+		},
+		[],
+	);
+
 	const cameraCenterStatic = followUserActive
 		? undefined
-		: navState === "running" && !navFollowUser && routeCenterZoom?.center
-			? routeCenterZoom.center
-			: center;
+		: center;
 
 	const cameraZoomStatic = followUserActive
 		? undefined
-		: navState === "running" && !navFollowUser && routeCenterZoom
-			? Math.min(routeCenterZoom.zoom, 14)
-			: navState === "paused" && activeCoords
+		: navState === "paused" && activeCoords
 				? NAV_ZOOM
 				: currentZoom ?? zoom;
 
@@ -452,7 +513,7 @@ export default function MapScreen() {
 			const movedEnoughSinceLastReroute = (() => {
 				if (!lastRerouteCoordsRef.current) return true;
 				return (
-					haversineMeters(lastRerouteCoordsRef.current, [
+					distanceMeters(lastRerouteCoordsRef.current, [
 						user.longitude,
 						user.latitude,
 					]) >= NAV_REROUTE_MIN_MOVE_M
@@ -501,22 +562,15 @@ export default function MapScreen() {
 	useEffect(() => {
 		if (navState !== "idle") return;
 		const coordsList = rotaData?.geometria?.coordinates;
-		const geom = rotaData?.geometria;
-		if (!geom || !coordsList?.length) {
+		if (!coordsList?.length) {
 			lastFittedGeometryRef.current = null;
 			return;
 		}
 		const signature = JSON.stringify(coordsList);
 		if (lastFittedGeometryRef.current === signature) return;
 		lastFittedGeometryRef.current = signature;
-		const { center: c, zoom: z } = getCameraFromGeometry(geom);
-		setCurrentZoom(z);
-		cameraRef.current?.setCamera({
-			centerCoordinate: c,
-			zoomLevel: z,
-			animationDuration: CAMERA_ANIMATION_MS,
-		});
-	}, [rotaData?.geometria, navState]);
+		void fitCameraToRoute(coordsList as LngLat[]);
+	}, [rotaData?.geometria, navState, fitCameraToRoute]);
 
 	const handleCentralizarMinhaLocalizacao = useCallback(() => {
 		if (isNavActive) setNavFollowUser(true);
@@ -571,33 +625,20 @@ export default function MapScreen() {
 				padding: { ...MAP_EDGE_PADDING_NAV_FOLLOW },
 				animationDuration: CAMERA_ANIMATION_MS,
 			});
-		} else if (rotaData.geometria) {
-			const { center: c, zoom: z } = getCameraFromGeometry(rotaData.geometria);
-			setCurrentZoom(z);
-			cameraRef.current?.setCamera({
-				centerCoordinate: c,
-				zoomLevel: z,
-				animationDuration: CAMERA_ANIMATION_MS,
-			});
+		} else if (lineCoordinates?.length) {
+			void fitCameraToRoute(lineCoordinates as LngLat[]);
 		}
-	}, [rotaData, loadingRota, coords, error, lineCoordinates]);
+	}, [rotaData, loadingRota, coords, error, lineCoordinates, fitCameraToRoute]);
 
 	const handleVerRotaCompleta = useCallback(() => {
 		if (!lineCoordinates?.length) return;
 		setNavFollowUser(false);
-		const b = boundsFromLineString(lineCoordinates as [number, number][]);
 		cameraRef.current?.setCamera({
-			bounds: b,
-			padding: {
-				paddingTop: 120,
-				paddingBottom: 220,
-				paddingLeft: 32,
-				paddingRight: 32,
-			},
 			pitch: 0,
 			animationDuration: 700,
 		});
-	}, [lineCoordinates]);
+		void fitCameraToRoute(lineCoordinates as LngLat[], 700);
+	}, [lineCoordinates, fitCameraToRoute]);
 
 	const applyFollowVehicleCamera = useCallback(() => {
 		if (!activeCoords) return;
@@ -614,6 +655,10 @@ export default function MapScreen() {
 
 	const handleMapCameraChanged = useCallback(
 		(state: MapState) => {
+			const nextZoom = state.properties?.zoom;
+			if (typeof nextZoom === "number" && Number.isFinite(nextZoom)) {
+				setCurrentZoom(nextZoom);
+			}
 			if (navState !== "running") return;
 			if (Date.now() < ignoreMapGestureUnfollowUntilRef.current) return;
 			if (!state.gestures?.isGestureActive) return;
@@ -654,17 +699,14 @@ export default function MapScreen() {
 	const handleCancelarNavegacao = useCallback(() => {
 		setNavState("idle");
 		setNavFollowUser(true);
-		if (rotaData?.geometria) {
-			const { center: c, zoom: z } = getCameraFromGeometry(rotaData.geometria);
-			setCurrentZoom(z);
-			cameraRef.current?.setCamera({
-				centerCoordinate: c,
-				zoomLevel: z,
-				pitch: 0,
-				animationDuration: CAMERA_ANIMATION_MS,
-			});
+		cameraRef.current?.setCamera({
+			pitch: 0,
+			animationDuration: CAMERA_ANIMATION_MS,
+		});
+		if (lineCoordinates?.length) {
+			void fitCameraToRoute(lineCoordinates as LngLat[]);
 		}
-	}, [rotaData]);
+	}, [lineCoordinates, fitCameraToRoute]);
 
 	if (loading) {
 		return (
@@ -742,19 +784,19 @@ export default function MapScreen() {
 				) : null}
 
 				{!isNavActive && rotaData?.trecho_ate_carga != null && lineCoordinates?.[0] && (
-					<Mapbox.PointAnnotation id="marker-inicio" coordinate={lineCoordinates[0]} title="Início">
+					<Mapbox.PointAnnotation id="marker-inicio" coordinate={lineCoordinates[0]} title={t("MAP.MARKER_START")}>
 						<Ionicons name="person" size={24} color={themeColor} />
 					</Mapbox.PointAnnotation>
 				)}
 
 				{!isNavActive && rotaData?.coords_carga && (
-					<Mapbox.PointAnnotation id="marker-carga" coordinate={rotaData.coords_carga} title="Origem / carga">
+					<Mapbox.PointAnnotation id="marker-carga" coordinate={rotaData.coords_carga} title={t("MAP.MARKER_PICKUP")}>
 						<Ionicons name={hasFreightRoute ? "cube" : "navigate"} size={24} color={themeColor} />
 					</Mapbox.PointAnnotation>
 				)}
 
 				{rotaData?.coords_destino && (
-					<Mapbox.PointAnnotation id="marker-destino" coordinate={rotaData.coords_destino} title="Destino">
+					<Mapbox.PointAnnotation id="marker-destino" coordinate={rotaData.coords_destino} title={t("MAP.MARKER_DESTINATION")}>
 						<Ionicons name="flag" size={26} color={isNavActive ? colors.bgOctonary : themeColor} />
 					</Mapbox.PointAnnotation>
 				)}
@@ -768,7 +810,7 @@ export default function MapScreen() {
 				>
 					<ActivityIndicator size="small" color={iconColor} />
 					<Text className="text-sm" style={{ color: colors.textSecondary }}>
-						Calculando rota…
+						{t("MAP.CALCULATING_ROUTE")}
 					</Text>
 				</View>
 			) : null}
@@ -816,7 +858,7 @@ export default function MapScreen() {
 				<TouchableOpacity
 					onPress={handleZoomIn}
 					accessibilityRole="button"
-					accessibilityLabel="Aumentar zoom"
+					accessibilityLabel={t("MAP.ZOOM_IN_A11Y")}
 					className="w-11 h-11 rounded-xl border items-center justify-center"
 					style={{ backgroundColor: colors.bg, borderColor: colors.bgNonary, borderWidth: 1 }}
 				>
@@ -827,7 +869,7 @@ export default function MapScreen() {
 					style={{ backgroundColor: colors.bg, borderColor: colors.bgNonary, borderWidth: 1 }}
 					onPress={handleZoomOut}
 					accessibilityRole="button"
-					accessibilityLabel="Diminuir zoom"
+					accessibilityLabel={t("MAP.ZOOM_OUT_A11Y")}
 				>
 					<Ionicons name="remove" size={24} color={iconColor} />
 				</TouchableOpacity>
@@ -836,7 +878,7 @@ export default function MapScreen() {
 					style={{ backgroundColor: colors.bg, borderColor: colors.bgNonary, borderWidth: 1 }}
 					onPress={handleCentralizarMinhaLocalizacao}
 					accessibilityRole="button"
-					accessibilityLabel="Centralizar na minha localização"
+					accessibilityLabel={t("MAP.CENTER_LOCATION_A11Y")}
 				>
 					<Ionicons name="locate" size={22} color={iconColor} />
 				</TouchableOpacity>
@@ -847,11 +889,11 @@ export default function MapScreen() {
 						onPress={handleAlternarModoNavegacao}
 						accessibilityRole="button"
 						accessibilityLabel={
-							navFollowUser ? "Ativar navegação livre" : "Vincular mapa ao carro"
+							navFollowUser ? t("MAP.ENABLE_FREE_NAV_A11Y") : t("MAP.LINK_MAP_TO_CAR_A11Y")
 						}
 					>
 						<Text className="text-xs font-semibold" style={{ color: navFollowUser ? colors.textSecondary : colors.bgOctonary }}>
-							{navFollowUser ? "Livre" : "Carro"}
+							{navFollowUser ? t("MAP.FREE") : t("MAP.CAR")}
 						</Text>
 					</TouchableOpacity>
 				) : null}
@@ -877,7 +919,7 @@ export default function MapScreen() {
 						}}
 					>
 						<Text className="text-xs font-semibold uppercase tracking-wide mb-1" style={{ color: colors.textSecondary }}>
-							Prévia da rota
+							{t("MAP.ROUTE_PREVIEW")}
 						</Text>
 						<Text className="text-sm leading-5" style={{ color: colors.text }} numberOfLines={2}>
 							{routeSummary.origem} → {routeSummary.destino}
@@ -891,14 +933,14 @@ export default function MapScreen() {
 									className="text-xs font-semibold uppercase tracking-wide"
 									style={{ color: colors.textSecondary }}
 								>
-									Até a saída (coleta)
+									{t("MAP.UNTIL_PICKUP")}
 								</Text>
 								<Text className="text-base font-semibold mt-1" style={{ color: colors.text }}>
 									{rotaData.trecho_ate_carga.distancia_km.toFixed(1)} km · ~
 									{Math.round(rotaData.trecho_ate_carga.tempo_min)} min
 								</Text>
 								<Text className="text-xs mt-1" style={{ color: colors.textSecondary }}>
-									Da sua posição até o ponto de embarque do frete
+									{t("MAP.UNTIL_PICKUP_HINT")}
 								</Text>
 							</View>
 						) : null}
@@ -908,7 +950,7 @@ export default function MapScreen() {
 						>
 							<View className="flex-1 items-center">
 								<Text className="text-xs" style={{ color: colors.textSecondary }}>
-									Distância
+									{t("MAP.DISTANCE")}
 								</Text>
 								<Text className="text-xl font-semibold mt-1" style={{ color: colors.text }}>
 									{rotaData.distancia_total_km != null
@@ -919,7 +961,7 @@ export default function MapScreen() {
 							<View style={{ width: StyleSheet.hairlineWidth, height: 44, backgroundColor: colors.bgNonary }} />
 							<View className="flex-1 items-center">
 								<Text className="text-xs" style={{ color: colors.textSecondary }}>
-									Tempo estimado
+									{t("MAP.ESTIMATED_TIME")}
 								</Text>
 								<Text className="text-xl font-semibold mt-1" style={{ color: colors.text }}>
 									{rotaData.tempo_total_min != null
@@ -939,10 +981,10 @@ export default function MapScreen() {
 								disabled={!rotaData || loadingRota}
 								onPress={handleIniciarNavegacao}
 								accessibilityRole="button"
-								accessibilityLabel="Iniciar navegação"
+								accessibilityLabel={t("MAP.START_NAV_A11Y")}
 							>
 								<Text className="text-base font-semibold" style={{ color: "#FFFFFF" }}>
-									Iniciar navegação
+									{t("MAP.START_NAV")}
 								</Text>
 							</TouchableOpacity>
 						</View>
@@ -969,7 +1011,7 @@ export default function MapScreen() {
 								className="h-12 w-12 shrink-0 rounded-full items-center justify-center"
 								style={{ backgroundColor: colors.bgTertiary }}
 								accessibilityRole="button"
-								accessibilityLabel="Encerrar navegação"
+								accessibilityLabel={t("MAP.END_NAV_A11Y")}
 							>
 								<Ionicons name="close" size={24} color={colors.text} />
 							</TouchableOpacity>
@@ -999,7 +1041,7 @@ export default function MapScreen() {
 								className="h-12 w-12 shrink-0 rounded-full items-center justify-center"
 								style={{ backgroundColor: colors.bgTertiary }}
 								accessibilityRole="button"
-								accessibilityLabel="Ver rota completa no mapa"
+								accessibilityLabel={t("MAP.VIEW_FULL_ROUTE_A11Y")}
 							>
 								<Ionicons name="map-outline" size={22} color={colors.text} />
 							</TouchableOpacity>
@@ -1010,7 +1052,7 @@ export default function MapScreen() {
 						>
 							<TouchableOpacity onPress={handlePausarOuContinuar} accessibilityRole="button" hitSlop={{ top: 8, bottom: 8, left: 12, right: 12 }}>
 								<Text className="text-base font-semibold" style={{ color: colors.text }}>
-									{navState === "paused" ? "Continuar" : "Pausar"}
+									{navState === "paused" ? t("MAP.CONTINUE") : t("MAP.PAUSE")}
 								</Text>
 							</TouchableOpacity>
 							{navState === "running" ? (
@@ -1020,7 +1062,7 @@ export default function MapScreen() {
 									hitSlop={{ top: 8, bottom: 8, left: 12, right: 12 }}
 								>
 									<Text className="text-base font-semibold" style={{ color: navFollowUser ? colors.textSecondary : colors.bgOctonary }}>
-										{navFollowUser ? "Navegação livre" : "Vincular ao carro"}
+										{navFollowUser ? t("MAP.FREE_NAVIGATION") : t("MAP.LINK_TO_CAR")}
 									</Text>
 								</TouchableOpacity>
 							) : null}

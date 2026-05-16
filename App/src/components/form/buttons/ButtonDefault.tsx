@@ -6,14 +6,23 @@ export type ButtonProps = {
 	loading?: boolean;
 	disabled?: boolean;
 	onPress: () => void;
+	size?: "small" | "medium" | "full";
 };
 
-export const ButtonDefault = ({ title, onPress, disabled, loading }: ButtonProps) => {
+const sizeWidthClass: Record<NonNullable<ButtonProps["size"]>, string> = {
+	full: "w-full",
+	medium: "w-1/2",
+	small: "w-[46%]",
+};
+
+const getSizeClass = (size: ButtonProps["size"] = "full") => sizeWidthClass[size];
+
+export const ButtonDefault = ({ title, onPress, disabled, loading, size = "full" }: ButtonProps) => {
 	const colors = useThemeColors();
 
 	return (
 		<TouchableOpacity
-			className={`py-3 w-full rounded-xl items-center ${disabled ? 'opacity-50' : ''}`}
+			className={`py-3 rounded-xl items-center ${getSizeClass(size)} ${disabled ? "opacity-50" : ""}`}
 			style={{ backgroundColor: colors.bgQuaternary }}
 			onPress={onPress}
 			disabled={disabled || loading}
@@ -25,13 +34,13 @@ export const ButtonDefault = ({ title, onPress, disabled, loading }: ButtonProps
 	);
 };
 
-export const ButtonNone = ({ title, onPress, disabled, loading }: ButtonProps) => {
+export const ButtonNone = ({ title, onPress, disabled, loading, size = "full" }: ButtonProps) => {
 	const colors = useThemeColors();
 
 	return (
 		<TouchableOpacity
 			style={{ borderColor: colors.bg, borderWidth: 1 }}
-			className="py-3 w-full rounded-lg items-center border border-gray-300"
+			className={`py-3 rounded-lg items-center border border-gray-300 ${getSizeClass(size)}`}
 			onPress={onPress}
 			disabled={disabled || loading}
 		>
@@ -46,10 +55,10 @@ export const ButtonNone = ({ title, onPress, disabled, loading }: ButtonProps) =
 	);
 };
 
-export const ButtonApproved = ({ title, onPress, disabled, loading }: ButtonProps) => {
+export const ButtonApproved = ({ title, onPress, disabled, loading, size = "full" }: ButtonProps) => {
 	return (
 		<TouchableOpacity
-			className="bg-green-500 py-3 w-full rounded-lg items-center"
+			className={`bg-green-500 py-3 rounded-lg items-center ${getSizeClass(size)}`}
 			onPress={onPress}
 			disabled={disabled || loading}
 		>
@@ -62,10 +71,10 @@ export const ButtonApproved = ({ title, onPress, disabled, loading }: ButtonProp
 	);
 };
 
-export const ButtonCancel = ({ title, onPress, disabled, loading }: ButtonProps) => {
+export const ButtonCancel = ({ title, onPress, disabled, loading, size = "full" }: ButtonProps) => {
 	return (
 		<TouchableOpacity
-			className="bg-red-500 py-3 w-full rounded-xl items-center"
+			className={`bg-red-500 py-3 rounded-xl items-center ${getSizeClass(size)}`}
 			onPress={onPress}
 			disabled={disabled || loading}
 		>
