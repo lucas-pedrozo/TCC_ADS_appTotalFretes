@@ -10,6 +10,7 @@ import { CardFreight } from "@/src/components/cards/CardFreight";
 import { InputSearch, ButtonFilter } from "@/src/components/form";
 import ModalFilter from "@/src/components/modal/ModalFilter";
 import { useGetAllFreigth } from "@/src/hooks/freight/useGetAllFreigth";
+import { useGetUser } from "@/src/hooks/user/useGetUser";
 import { getCurrentCoordinates } from "@/src/services/location";
 import { isUsableGps } from "@/src/utils/googleMapsDirections";
 import { filterAndSortFreights } from "@/src/utils/freightListQuery";
@@ -34,6 +35,7 @@ const Freight = () => {
 	const searchQuery = watch("search");
 
 	const { allFreigth, handleGetAllFreigth, loadMore, isLoading, isLoadingMore } = useGetAllFreigth();
+	const { userData, handleGetUser } = useGetUser();
 
 	const handleEndReached = useCallback(() => {
 		void loadMore();
@@ -50,8 +52,8 @@ const Freight = () => {
 	);
 
 	const displayedFreights = useMemo(
-		() => filterAndSortFreights(allFreigth, searchQuery, filters, userCoords),
-		[allFreigth, searchQuery, filters, userCoords],
+		() => filterAndSortFreights(allFreigth, searchQuery, filters, userCoords, userData?.cnhType_id ?? null),
+		[allFreigth, searchQuery, filters, userCoords, userData?.cnhType_id],
 	);
 
 	const regionDisplay =
@@ -131,7 +133,8 @@ const Freight = () => {
 
 	useEffect(() => {
 		void handleGetAllFreigth();
-	}, [handleGetAllFreigth]);
+		void handleGetUser();
+	}, [handleGetAllFreigth, handleGetUser]);
 
 	return (
 		<SafeAreaView style={{ flex: 1, paddingHorizontal: 16, backgroundColor: colors.bg, paddingTop: 10 }}>

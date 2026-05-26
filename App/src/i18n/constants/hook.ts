@@ -37,6 +37,12 @@ export const hookPT = {
     CAMERAPERMISSIONDENIED: "Permissão para usar a câmera foi negada.",
     WEATHERLOCATIONDENIED: "Permissão de localização negada. Ative o GPS para ver o clima.",
     WEATHERFETCHFAILED: "Não foi possível obter o clima.",
+    EDITVEHICLELOADING: "Editando veículo...",
+    EDITVEHICLESUCCESS: "Veículo editado com sucesso!",
+    DELETEVEHICLELOADING: "Excluindo veículo...",
+    DELETEVEHICLESUCCESS: "Veículo excluído com sucesso!",
+    CREATEPROPOSALSUCCESS: "Proposta enviada com sucesso!",
+    CANCELPROPOSALSUCCESS: "Proposta cancelada com sucesso!",
   },
 } as const;
 
@@ -73,5 +79,11 @@ export const hookEN = {
     CAMERAPERMISSIONDENIED: "Permission to use the camera was denied.",
     WEATHERLOCATIONDENIED: "Location permission denied. Enable GPS to see the weather.",
     WEATHERFETCHFAILED: "Could not fetch weather.",
+    EDITVEHICLELOADING: "Editing vehicle...",
+    EDITVEHICLESUCCESS: "Vehicle updated successfully!",
+    DELETEVEHICLELOADING: "Deleting vehicle...",
+    DELETEVEHICLESUCCESS: "Vehicle deleted successfully!",
+    CREATEPROPOSALSUCCESS: "Proposal sent successfully!",
+    CANCELPROPOSALSUCCESS: "Proposal cancelled successfully!",
   },
 } as const;

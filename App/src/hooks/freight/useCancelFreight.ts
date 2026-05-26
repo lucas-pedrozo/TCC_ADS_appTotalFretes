@@ -26,9 +26,7 @@ export function useCancelFreight() {
 				});
 			} catch (error) {
 				const message = (error as AxiosError<{ message: string }>).response?.data?.message ?? "";
-				if (message) {
-					await notify({ status: "error", message });
-				}
+				await notify({ status: "error", message });
 			} finally {
 				setIsLoading(false);
 			}

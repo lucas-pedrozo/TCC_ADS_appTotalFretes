@@ -7,6 +7,7 @@ export interface FreightAllMap {
 	id: number;
 	company_id: number;
 	cargoType_id: number;
+	cnhType_id?: number | null;
 	name: string;
 	status_id: number;
 	assignedDriver_id?: number | null;
@@ -85,43 +86,45 @@ export function useGetAllFreigth() {
 	const [nextPage, setNextPage] = useState(1);
 	const inFlightRef = useRef(false);
 
-	const fetchPage = useCallback(
-		async (page: number, mode: "replace" | "append") => {
-			if (inFlightRef.current) return;
-			inFlightRef.current = true;
+	const fetchPage = useCallback(async (page: number, mode: "replace" | "append") => {
+		if (inFlightRef.current) return;
+		inFlightRef.current = true;
+		try {
 			if (page === 1) setIsLoading(true);
 			else setIsLoadingMore(true);
-			try {
-				const { data } = await http.get<FreightListPageResponse | FreightAllMap[]>("freight", {
-					params: { page, limit: PAGE_SIZE },
-				});
 
-				if (Array.isArray(data)) {
-					if (mode === "replace") setAllFreigth(data);
-					else setAllFreigth((prev) => mergeUniqueById(prev, data));
-					setHasMore(false);
-					setNextPage(1);
-					return;
-				}
+			const { data } = await http.get("freight", {
+				params: { page, limit: PAGE_SIZE },
+			});
 
-				setHasMore(data.hasMore);
-				setNextPage(data.page + 1);
+			if (Array.isArray(data)) {
 				if (mode === "replace") {
-					setAllFreigth(data.items);
+					setAllFreigth(data);
 				} else {
-					setAllFreigth((prev) => mergeUniqueById(prev, data.items));
+					setAllFreigth((prev) => mergeUniqueById(prev, data));
 				}
-			} catch (error) {
-				const message = (error as AxiosError<{ message: string }>).response?.data?.message ?? "";
-				if (message) {
-					notify({ status: "error", message });
-				}
-			} finally {
-				inFlightRef.current = false;
-				setIsLoading(false);
-				setIsLoadingMore(false);
+				setHasMore(false);
+				setNextPage(1);
+				return;
 			}
-		},
+
+			setHasMore(data.hasMore);
+			setNextPage(data.page + 1);
+
+			if (mode === "replace") {
+				setAllFreigth(data.items);
+			} else {
+				setAllFreigth((prev) => mergeUniqueById(prev, data.items));
+			}
+		} catch (error) {
+			const message = (error as AxiosError<{ message: string }>).response?.data?.message ?? "";
+			notify({ status: "error", message });
+		} finally {
+			inFlightRef.current = false;
+			setIsLoading(false);
+			setIsLoadingMore(false);
+		}
+	},
 		[notify],
 	);
 

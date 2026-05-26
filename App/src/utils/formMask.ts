@@ -101,3 +101,14 @@ export function maskMoney(value: number | string): string {
 
   return `${formatted || '0'},${cents}`;
 }
+
+/**
+ * @description Converte um valor monetário formatado para número.
+ * @param value Valor formatado (ex.: "R$ 1.500,50" ou "1.500,50")
+ * @returns Valor numérico em reais
+ */
+export function parseMoneyToNumber(value: string): number {
+  const digits = value.replace(/\D/g, "");
+  if (!digits) return 0;
+  return Number(digits) / 100;
+}

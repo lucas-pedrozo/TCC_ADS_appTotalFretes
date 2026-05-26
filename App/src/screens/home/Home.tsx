@@ -52,6 +52,11 @@ function Home() {
 		navigation.navigate("MapScreen" as never);
 	};
 
+	const goToDetailVehicle = useCallback(() => {
+		if (!vehicleData) return;
+		(navigation as any).navigate("DetailVehicle", { vehicle: vehicleData });
+	}, [navigation, vehicleData]);
+
 	const handleRefresh = useCallback(async () => {
 		setIsRefreshing(true);
 		try {
@@ -119,7 +124,7 @@ function Home() {
 					<CardHistory />
 				</ScrollView>
 				<View className="px-4">
-					<CardVehicle vehicle={vehicleData} />
+					<CardVehicle vehicle={vehicleData} onPress={vehicleData ? goToDetailVehicle : undefined} />
 				</View>
 			</ScrollView>
 

@@ -1,4 +1,5 @@
 import { useCallback, useRef, useState } from "react";
+import * as turf from "@turf/turf";
 import http from "@/src/services/http";
 import axios, { AxiosError } from "axios";
 import { getCurrentCoordinates, type Coordinates } from "@/src/services/location";
@@ -8,6 +9,7 @@ import type { MapRotaResponse } from "@/src/interfaces/mapbox";
 export type GetMapBoxOptions = {
   rotaSimples?: boolean;
   coordenadasOrigem?: string;
+  coordenadasMotorista?: string;
 };
 
 export type RecalculateFromDriverParams = {
@@ -16,6 +18,18 @@ export type RecalculateFromDriverParams = {
 };
 
 const ROTA_HTTP_TIMEOUT_MS = 30_000;
+const PERF_TAG = "[MapPerf]";
+
+/** Geometria com mais de ~3 000 pontos é simplificada para manter performance. */
+const GEOMETRY_MAX_POINTS = 3_000;
+/** Tolerância Douglas-Peucker em graus (~5,5 m no equador). */
+const SIMPLIFY_TOLERANCE = 0.00005;
+
+function logRoutePerf(event: string, meta?: Record<string, unknown>) {
+  if (!__DEV__) return;
+  const payload = meta ? ` ${JSON.stringify(meta)}` : "";
+  console.log(`${PERF_TAG} ${event}${payload}`);
+}
 
 function isUsableGps(c: Coordinates): boolean {
   if (!Number.isFinite(c.latitude) || !Number.isFinite(c.longitude)) return false;
@@ -26,6 +40,33 @@ function isUsableGps(c: Coordinates): boolean {
 
 function normalizeAddress(value: string): string {
   return value.trim().replace(/\s+/g, " ");
+}
+
+function simplifyGeometry(data: MapRotaResponse): MapRotaResponse {
+  const coords = data.geometria?.coordinates;
+  if (!Array.isArray(coords) || coords.length <= GEOMETRY_MAX_POINTS) return data;
+
+  try {
+    const line = turf.lineString(coords as [number, number][]);
+    const simplified = turf.simplify(line, {
+      tolerance: SIMPLIFY_TOLERANCE,
+      highQuality: false,
+      mutate: false,
+    });
+    logRoutePerf("route_geometry_simplified", {
+      before: coords.length,
+      after: simplified.geometry.coordinates.length,
+    });
+    return {
+      ...data,
+      geometria: {
+        ...data.geometria,
+        coordinates: simplified.geometry.coordinates as [number, number][],
+      },
+    };
+  } catch {
+    return data;
+  }
 }
 
 function getRouteErrorMessage(
@@ -64,11 +105,13 @@ export function useGetMapBox() {
   const [rotaErro, setRotaErro] = useState<string | null>(null);
   const abortRef = useRef<AbortController | null>(null);
   const lastRequestKeyRef = useRef<string | null>(null);
+  const hasDataRef = useRef(false);
 
   const clearRota = useCallback(() => {
     abortRef.current?.abort();
     abortRef.current = null;
     lastRequestKeyRef.current = null;
+    hasDataRef.current = false;
     setRotaData(null);
     setRotaErro(null);
     setLoadingRota(false);
@@ -79,6 +122,7 @@ export function useGetMapBox() {
     moradaDestino: string,
     options?: GetMapBoxOptions
   ) => {
+    const startedAt = Date.now();
     const origemNormalizada = normalizeAddress(moradaCarga);
     const destinoNormalizado = normalizeAddress(moradaDestino);
 
@@ -91,20 +135,18 @@ export function useGetMapBox() {
 
     const rotaSimples = options?.rotaSimples === true;
     const coordenadasOrigem = options?.coordenadasOrigem?.trim();
+    const coordenadasMotorista = options?.coordenadasMotorista?.trim();
 
     abortRef.current?.abort();
     abortRef.current = new AbortController();
     const signal = abortRef.current.signal;
 
-    setLoadingRota(true);
-    setRotaErro(null);
     const params: Record<string, string> = {
       moradaDestino: destinoNormalizado,
     };
 
     if (coordenadasOrigem) {
       params.coordenadasOrigem = coordenadasOrigem;
-      // Compatível com backends que só aceitam moradaCarga + moradaDestino (geocoding aceita "lon,lat").
       if (!origemNormalizada) {
         params.moradaCarga = coordenadasOrigem;
       } else {
@@ -112,8 +154,15 @@ export function useGetMapBox() {
       }
     } else {
       params.moradaCarga = origemNormalizada;
-      if (!rotaSimples) {
+      if (coordenadasMotorista) {
+        params.coordenadasMotorista = coordenadasMotorista;
+      } else if (!rotaSimples) {
+        const gpsStartedAt = Date.now();
         const coords = await getCurrentCoordinates();
+        logRoutePerf("route_request_gps_lookup_done", {
+          elapsedMs: Date.now() - gpsStartedAt,
+          hasCoords: Boolean(coords),
+        });
         if (signal.aborted) {
           setLoadingRota(false);
           return;
@@ -121,10 +170,7 @@ export function useGetMapBox() {
         if (!coords) {
           const m =
             "Permissão de localização negada. O aplicativo precisa do GPS para traçar a rota.";
-          notify({
-            status: "error",
-            message: m,
-          });
+          notify({ status: "error", message: m });
           setRotaErro(m);
           setLoadingRota(false);
           return;
@@ -142,22 +188,37 @@ export function useGetMapBox() {
       params.coordenadasMotorista ?? "",
       rotaSimples ? "simples" : "completa",
     ].join("|");
-    if (requestKey === lastRequestKeyRef.current && rotaData) {
-      setLoadingRota(false);
+
+    if (requestKey === lastRequestKeyRef.current && hasDataRef.current) {
       return;
     }
     lastRequestKeyRef.current = requestKey;
 
+    logRoutePerf("route_request_start", {
+      rotaSimples,
+      hasCoordenadasOrigem: Boolean(coordenadasOrigem),
+      hasCoordenadasMotorista: Boolean(coordenadasMotorista),
+    });
+
+    setLoadingRota(true);
+    setRotaErro(null);
+
     try {
+      const apiStartedAt = Date.now();
       const response = await http.get<MapRotaResponse>(`mapbox/rota-frete`, {
         params,
         signal,
         timeout: ROTA_HTTP_TIMEOUT_MS,
       });
       if (signal.aborted) return;
+      logRoutePerf("route_request_api_done", {
+        elapsedMs: Date.now() - apiStartedAt,
+        rawPoints: response.data?.geometria?.coordinates?.length ?? 0,
+      });
 
-      const data = response.data;
-      setRotaData(data);
+      const simplified = simplifyGeometry(response.data);
+      hasDataRef.current = true;
+      setRotaData(simplified);
       setRotaErro(null);
     } catch (error) {
       if (signal.aborted) return;
@@ -166,15 +227,19 @@ export function useGetMapBox() {
       const err = error as AxiosError<{ error?: string; erro?: string; message?: string } | string>;
       const msg = getRouteErrorMessage(err);
 
-      setRotaErro(msg);
+      hasDataRef.current = false;
       lastRequestKeyRef.current = null;
+      setRotaErro(msg);
       notify({ status: "error", message: msg });
     } finally {
       if (!signal.aborted) {
         setLoadingRota(false);
+        logRoutePerf("route_request_total_done", {
+          elapsedMs: Date.now() - startedAt,
+        });
       }
     }
-  }, [notify, rotaData]);
+  }, [notify]);
 
   const recalculateFromDriverLocation = useCallback(
     async ({ moradaDestino, coordsMotorista }: RecalculateFromDriverParams) => {

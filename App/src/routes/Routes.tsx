@@ -24,6 +24,10 @@ import CancelAccount from "../screens/user/CancelAccount";
 import VerificationCode from "../screens/auth/VerificationCode";
 import AdvancedOptions from "../screens/user/AdvancedOptions";
 import DetailFreight from "../screens/freight/DetailFreight";
+import DetailVehicle from "../screens/freight/DetailVehicle";
+import EditVehicle from "../screens/freight/EditVehicle";
+import SendProposal from "../screens/freight/SendProposal";
+import ProposalDetail from "../screens/freight/ProposalDetail";
 
 import RenewPassword from "../screens/user/RenewPassword";
 import VehicleGroup from "../screens/freight/VehicleGroup";
@@ -35,6 +39,7 @@ import MapScreen from "../screens/MapBox/MapScreen";
 
 import type { FreightAllMap } from "@/src/hooks/freight/useGetAllFreigth";
 import type { FreightMap } from "@/src/hooks/freight/useGetFreightUser";
+import type { MapVehicle } from "@/src/interfaces";
 
 interface EditPerfilRouteParams {
 	editPerfilData: EditPerfilMap;
@@ -64,6 +69,10 @@ export type RootStackParamList = {
 	CancelAccount: undefined;
 	RenewPassword: undefined;
 	DetailFreight: { freight: FreightMap | FreightAllMap };
+	SendProposal: { freight: FreightMap | FreightAllMap };
+	ProposalDetail: { proposalId: number };
+	DetailVehicle: { vehicle: MapVehicle };
+	EditVehicle: { vehicle: MapVehicle };
 	VehicleGroup: undefined;
 	VehicleType: undefined;
 	VehicleData: undefined;
@@ -99,6 +108,22 @@ function PrivateRenewPassword() {
 
 function PrivateDetailFreight() {
 	return <PrivateRoute><DetailFreight /></PrivateRoute>;
+}
+
+function PrivateSendProposal() {
+	return <PrivateRoute><SendProposal /></PrivateRoute>;
+}
+
+function PrivateProposalDetail() {
+	return <PrivateRoute><ProposalDetail /></PrivateRoute>;
+}
+
+function PrivateDetailVehicle() {
+	return <PrivateRoute><DetailVehicle /></PrivateRoute>;
+}
+
+function PrivateEditVehicle() {
+	return <PrivateRoute><EditVehicle /></PrivateRoute>;
 }
 
 function PrivateVehicleGroup() {
@@ -151,8 +176,12 @@ export default function Routes() {
 				<Stack.Screen name="AdvancedOptions" component={PrivateAdvancedOptions} options={{ title: t("ROUTES.ADVANCEDOPTIONS") }} />
 				<Stack.Screen name="CancelAccount" component={PrivateCancelAccount} options={{ title: t("ROUTES.CANCELACCOUNT") }} />
 				<Stack.Screen name="RenewPassword" component={PrivateRenewPassword} options={{ title: t("ROUTES.RENEWPASSWORD") }} />
-				<Stack.Screen name="DetailFreight" component={PrivateDetailFreight} options={{ title: t("ROUTES.DETAILFREIGHT") }} />
-				<Stack.Screen name="VehicleGroup" component={PrivateVehicleGroup} options={{ title: t("ROUTES.VEHICLEGROUP") }} />
+			<Stack.Screen name="DetailFreight" component={PrivateDetailFreight} options={{ title: t("ROUTES.DETAILFREIGHT") }} />
+			<Stack.Screen name="SendProposal" component={PrivateSendProposal} options={{ title: t("ROUTES.SENDPROPOSAL") }} />
+			<Stack.Screen name="ProposalDetail" component={PrivateProposalDetail} options={{ title: t("ROUTES.PROPOSALDETAIL") }} />
+			<Stack.Screen name="DetailVehicle" component={PrivateDetailVehicle} options={{ title: t("ROUTES.DETAILVEHICLE") }} />
+			<Stack.Screen name="EditVehicle" component={PrivateEditVehicle} options={{ title: t("ROUTES.EDITVEHICLE") }} />
+			<Stack.Screen name="VehicleGroup" component={PrivateVehicleGroup} options={{ title: t("ROUTES.VEHICLEGROUP") }} />
 				<Stack.Screen name="VehicleType" component={PrivateVehicleType} options={{ title: t("ROUTES.VEHICLETYPE") }} />
 				<Stack.Screen name="VehicleData" component={PrivateVehicleData} options={{ title: t("ROUTES.VEHICLEDATA") }} />
 				<Stack.Screen name="Term" component={PrivateTerm} options={{ title: t("ROUTES.TERM") }} />

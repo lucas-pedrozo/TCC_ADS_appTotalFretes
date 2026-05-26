@@ -17,13 +17,14 @@ function distanceToOriginM(f: FreightAllMap, user: Coordinates): number {
 }
 
 /**
- * Busca textual + ordenação por distância (origem do frete) e/ou valor.
+ * Busca textual + filtro por CNH + ordenação por distância (origem do frete) e/ou valor.
  */
 export function filterAndSortFreights(
 	items: FreightAllMap[],
 	searchQuery: string,
 	filters: FreightFilterState,
 	user: Coordinates | null,
+	userCnhTypeId: number | null = null,
 ): FreightAllMap[] {
 	const q = searchQuery.trim().toLowerCase();
 	let list = q
@@ -32,6 +33,10 @@ export function filterAndSortFreights(
 				return haystack.includes(q);
 			})
 		: [...items];
+
+	if (userCnhTypeId != null) {
+		list = list.filter((f) => f.cnhType_id == null || f.cnhType_id <= userCnhTypeId);
+	}
 
 	const byDistance = (a: FreightAllMap, b: FreightAllMap): number => {
 		if (!user) return a.name.localeCompare(b.name, "pt-BR");

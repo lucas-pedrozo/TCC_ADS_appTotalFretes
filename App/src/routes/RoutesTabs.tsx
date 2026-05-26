@@ -1,5 +1,5 @@
 import { useCallback, useRef } from "react";
-import { BackHandler, Platform, Text, ToastAndroid, View } from "react-native";
+import { BackHandler, Platform, ToastAndroid } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useAuth } from "@/src/context/AuthContext";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -9,9 +9,10 @@ import Freight from "../screens/freight/Freight";
 import Perfil from "../screens/user/Perfil";
 import Home from "../screens/home/Home";
 
-import { useThemeColors, useThemeMode } from "@/src/context/ThemeContext";
+import { useThemeMode } from "@/src/context/ThemeContext";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import OngoingFreights from "../screens/freight/OngoingFreights";
+import MyProposals from "../screens/freight/MyProposals";
 import { useTranslation } from "react-i18next";
 
 export type TabParamList = {
@@ -23,16 +24,6 @@ export type TabParamList = {
 };
 
 const Tab = createBottomTabNavigator<TabParamList>();
-
-function PlaceholderScreen({ title }: { title: string }) {
-	const colors = useThemeColors();
-	return (
-		<View className="flex-1 items-center justify-center" style={{ backgroundColor: colors.bg }}>
-			<Text className="font-semibold text-lg" style={{ color: colors.text }}>{title}</Text>
-		</View>
-	);
-}
-
 
 const TAB_BAR_HEIGHT = 70;
 
@@ -142,7 +133,7 @@ export default function RoutesTabs() {
 			/>
 			<Tab.Screen
 				name="PropostaTab"
-				children={() => <PlaceholderScreen title={t("TABS.PROPOSAL")} />}
+				component={MyProposals}
 				options={{ tabBarLabel: t("TABS.PROPOSAL") }}
 				listeners={{ focus: () => { currentTab.current = "PropostaTab"; } }}
 			/>
