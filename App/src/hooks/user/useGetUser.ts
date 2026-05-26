@@ -4,6 +4,7 @@ import http from "@/src/services/http";
 import { useAuth } from "@/src/context/AuthContext";
 import type { MapUser } from "@/src/interfaces";
 import { useAlertDefault } from "@/src/context/AlertDefaultContext";
+import i18n from "@/src/i18n";
 
 export function useGetUser() {
 	const { id } = useAuth();
@@ -14,7 +15,7 @@ export function useGetUser() {
 		if (id == null) {
 			notify({
 				status: "error",
-				message: "Erro ao buscar usuário",
+				message: i18n.t("NOTIFICATIONS.GETUSERFAILED"),
 			});
 			return;
 		}

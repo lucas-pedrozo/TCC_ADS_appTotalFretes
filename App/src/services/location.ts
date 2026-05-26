@@ -57,6 +57,40 @@ export function clearCoordinatesCache(): void {
 	coordsCache = null;
 }
 
+export type NavigationLocationWatcher = {
+	remove: () => void;
+};
+
+/**
+ * Atualização contínua de GPS para navegação (alta frequência moderada).
+ * Deve ser removido ao sair da navegação para economizar bateria.
+ */
+export async function startNavigationLocationWatch(
+	onUpdate: (coords: Coordinates) => void,
+): Promise<NavigationLocationWatcher | null> {
+	if ((await requestLocationPermission()) !== 'granted') return null;
+
+	const sub = await Location.watchPositionAsync(
+		{
+			accuracy: Location.Accuracy.High,
+			timeInterval: 1000,
+			distanceInterval: 5,
+		},
+		(loc) => {
+			onUpdate({
+				latitude: loc.coords.latitude,
+				longitude: loc.coords.longitude,
+			});
+		},
+	);
+
+	return {
+		remove: () => {
+			sub.remove();
+		},
+	};
+}
+
 const NOMINATIM_USER_AGENT = 'TCC_CursoTADS_App/1.0';
 const CITY_CACHE_TTL_MS = 5 * 60 * 1000;
 const COORD_PRECISION = 2;

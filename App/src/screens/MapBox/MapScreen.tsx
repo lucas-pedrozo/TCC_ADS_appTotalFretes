@@ -1,9 +1,20 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { View, ActivityIndicator, TouchableOpacity, Text, StyleSheet, Linking } from "react-native";
+import {
+	View,
+	ActivityIndicator,
+	TouchableOpacity,
+	Text,
+	StyleSheet,
+	Linking,
+	LayoutAnimation,
+	Platform,
+	UIManager,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import Mapbox, { UserTrackingMode } from "@rnmapbox/maps";
+import Mapbox, { UserTrackingMode, type MapState } from "@rnmapbox/maps";
 import { Ionicons } from "@expo/vector-icons";
+import * as turf from "@turf/turf";
 
 import { useThemeMode, useThemeColors, useIconColor } from "@/src/context/ThemeContext";
 import {
@@ -12,13 +23,20 @@ import {
 	THEME_COLORS,
 } from "@/src/config/mapbox";
 import {
+	NAV_OFF_ROUTE_CONSECUTIVE_UPDATES,
+	NAV_OFF_ROUTE_THRESHOLD_M,
+	NAV_REROUTE_COOLDOWN_MS,
+	NAV_REROUTE_MIN_MOVE_M,
+	NAV_SNAP_MAX_DISTANCE_M,
+} from "@/src/config/navigation";
+import {
 	getCurrentCoordinates,
 	requestLocationPermission,
+	startNavigationLocationWatch,
 	type Coordinates,
 } from "@/src/services/location";
 import { useGetFreightUser } from "@/src/hooks/freight/useGetFreightUser";
 import { useGetMapBox } from "@/src/hooks/freight/useGetMapBox";
-import { getCameraFromGeometry } from "@/src/utils/mapboxUtils";
 import { buildGoogleMapsDirectionsUrl, isUsableGps } from "@/src/utils/googleMapsDirections";
 import { useTranslation } from "react-i18next";
 import { useNavigation } from "@react-navigation/native";
@@ -26,20 +44,71 @@ import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import type { RootStackParamList } from "@/src/routes/Routes";
 import { useAlertDefault } from "@/src/context/AlertDefaultContext";
 
-const DEFAULT_CENTER: [number, number] = [-47.9292, -15.7801]; // Brasília
+type LngLat = [number, number];
+
 const DEFAULT_ZOOM = 12;
 const USER_ZOOM = 15;
-const NAV_ZOOM = 16;
+const NAV_ZOOM = 17;
+const MAX_BACKWARD_PROGRESS_M = 12;
+const ROUTE_VIEW_PADDING: [number, number, number, number] = [120, 32, 220, 32];
 
-/** Fallback quando não há frete: GPS atual → centro de Maringá (geocoding no backend). */
-const FALLBACK_DESTINO_LABEL = "Centro, Maringá - PR";
+if (
+	Platform.OS === "android" &&
+	UIManager.setLayoutAnimationEnabledExperimental
+) {
+	UIManager.setLayoutAnimationEnabledExperimental(true);
+}
+
+const NAV_UI_LAYOUT_ANIM = LayoutAnimation.create(
+	180,
+	LayoutAnimation.Types.easeInEaseOut,
+	LayoutAnimation.Properties.opacity,
+);
+/**
+ * Duração da animação de câmera ao entrar na navegação.
+ * O painel de nav só aparece APÓS esse tempo, garantindo que a câmera
+ * já chegou na posição certa quando o usuário vê o painel.
+ */
+const NAV_CAMERA_ENTER_MS = 500	;
+/** Buffer extra após a câmera chegar antes de mostrar o painel (ms). */
+const NAV_PANEL_DELAY_AFTER_CAMERA_MS = 80;
+/** Delay total antes do painel aparecer. */
+const NAV_START_TOTAL_MS = NAV_CAMERA_ENTER_MS + NAV_PANEL_DELAY_AFTER_CAMERA_MS;
+const CAMERA_ZOOM_SYNC_THROTTLE_MS = 90;
+const CAMERA_ZOOM_SYNC_DELTA = 0.12;
+const MAP_CAMERA_FAST_ANIMATION_MS = 360;
+const NAV_DEFERRED_PROJECTION_DELAY_MS = 300;
+const NAV_INITIAL_PROJECTION_MAX_POINTS = 20_000;
+const PERF_TAG = "[MapPerf]";
+
+/** Com follow ativo, o puck fica no centro da área útil (mapa menos os insets). Mais paddingTop / menos paddingBottom desce o puck na tela. */
+const MAP_EDGE_PADDING_IDLE = {
+	paddingTop: 120,
+	paddingBottom: 100,
+	paddingLeft: 20,
+	paddingRight: 20,
+} as const;
+
+const MAP_EDGE_PADDING_NAV_FOLLOW = {
+	paddingTop: 320,
+	paddingBottom: 100,
+	paddingLeft: 20,
+	paddingRight: 20,
+} as const;
 
 function formatDriveDuration(totalMin: number): string {
 	if (!Number.isFinite(totalMin) || totalMin < 0) return "—";
-	if (totalMin < 60) return `${Math.max(1, Math.round(totalMin))} min`;
-	const h = Math.floor(totalMin / 60);
-	const m = Math.round(totalMin % 60);
-	return `${h}h ${m.toString().padStart(2, "0")}min`;
+	const rounded = Math.max(1, Math.round(totalMin));
+	if (rounded < 60) return `${rounded} min`;
+	const totalH = Math.floor(rounded / 60);
+	const m = rounded % 60;
+	if (totalH < 24) return m > 0 ? `${totalH}h ${m}min` : `${totalH}h`;
+	const d = Math.floor(totalH / 24);
+	const h = totalH % 24;
+	if (h === 0 && m === 0) return `${d}d`;
+	if (h === 0) return `${d}d ${m}min`;
+	if (m === 0) return `${d}d ${h}h`;
+	return `${d}d ${h}h ${m}min`;
 }
 
 function formatChegadaClock(totalMin: number): string {
@@ -51,32 +120,105 @@ function maneuverIconName(
 	mod?: string | null,
 	tipo?: string | null,
 ): React.ComponentProps<typeof Ionicons>["name"] {
-	const raw = `${mod ?? ""} ${tipo ?? ""}`.toLowerCase();
-	if (raw.includes("uturn") || raw.includes("u-turn")) return "return-up-back";
-	if (raw.includes("sharp left") || raw.includes("hard left")) return "arrow-undo";
-	if (raw.includes("slight left") || raw.includes("merge left")) return "arrow-back-outline";
-	if (raw.includes("left")) return "arrow-back";
-	if (raw.includes("sharp right") || raw.includes("hard right")) return "arrow-redo";
-	if (raw.includes("slight right") || raw.includes("merge right")) return "arrow-forward-outline";
-	if (raw.includes("right")) return "arrow-forward";
-	if (raw.includes("roundabout") || raw.includes("rotat")) return "sync";
-	if (raw.includes("arrive")) return "flag";
-	return "arrow-up";
+	const MANEUVER_ICONS: Record<string, React.ComponentProps<typeof Ionicons>["name"]> = {
+		uturn: "return-up-back",
+		"u-turn": "return-up-back",
+		"sharp left": "arrow-undo",
+		"hard left": "arrow-undo",
+		"slight left": "arrow-back-outline",
+		"merge left": "arrow-back-outline",
+		left: "arrow-back",
+		"sharp right": "arrow-redo",
+		"hard right": "arrow-redo",
+		"slight right": "arrow-forward-outline",
+		"merge right": "arrow-forward-outline",
+		right: "arrow-forward",
+		roundabout: "sync",
+		rotat: "sync",
+		arrive: "flag",
+	};
+	const raw = `${mod ?? ""} ${tipo ?? ""}`.toLowerCase().trim();
+	const match = Object.keys(MANEUVER_ICONS).find((k) => raw.includes(k));
+	return match ? MANEUVER_ICONS[match] : "arrow-up";
 }
 
-function boundsFromLineString(coords: [number, number][]): { ne: [number, number]; sw: [number, number] } {
-	let minLng = coords[0][0];
-	let maxLng = coords[0][0];
-	let minLat = coords[0][1];
-	let maxLat = coords[0][1];
-	for (const [lng, lat] of coords) {
-		minLng = Math.min(minLng, lng);
-		maxLng = Math.max(maxLng, lng);
-		minLat = Math.min(minLat, lat);
-		maxLat = Math.max(maxLat, lat);
+function distanceMeters(a: LngLat, b: LngLat): number {
+	return turf.distance(turf.point(a), turf.point(b), { units: "meters" });
+}
+
+function polylineLengthMeters(coords: LngLat[]): number {
+	if (coords.length < 2) return 0;
+	return turf.length(turf.lineString(coords), { units: "kilometers" }) * 1000;
+}
+
+function projectUserOntoPolyline(userLat: number, userLon: number, route: LngLat[]) {
+	const userPoint = turf.point([userLon, userLat]);
+	if (!route.length) {
+		return {
+			distanceAlongMeters: 0,
+			nearestOnRoute: [userLon, userLat] as LngLat,
+			distanceToRouteMeters: Number.POSITIVE_INFINITY,
+		};
 	}
-	const p = 0.006;
-	return { ne: [maxLng + p, maxLat + p], sw: [minLng - p, minLat - p] };
+	if (route.length === 1) {
+		return {
+			distanceAlongMeters: 0,
+			nearestOnRoute: route[0],
+			distanceToRouteMeters: distanceMeters(route[0], [userLon, userLat]),
+		};
+	}
+
+	const snapped = turf.nearestPointOnLine(turf.lineString(route), userPoint, {
+		units: "meters",
+	});
+	const props = snapped.properties as { dist?: number; location?: number };
+	return {
+		distanceAlongMeters: Number.isFinite(props.location) ? (props.location as number) : 0,
+		nearestOnRoute: snapped.geometry.coordinates as LngLat,
+		distanceToRouteMeters: Number.isFinite(props.dist)
+			? (props.dist as number)
+			: distanceMeters(snapped.geometry.coordinates as LngLat, [userLon, userLat]),
+	};
+}
+
+function splitRouteAtDistance(route: LngLat[], distanceAlongMeters: number) {
+	if (!route.length) {
+		return { completed: [] as LngLat[], remaining: [] as LngLat[] };
+	}
+	if (route.length === 1) {
+		return { completed: [...route], remaining: [] as LngLat[] };
+	}
+
+	const line = turf.lineString(route);
+	const totalKm = turf.length(line, { units: "kilometers" });
+	const progressKm = Math.max(0, Math.min(distanceAlongMeters / 1000, totalKm));
+
+	const completed = turf.lineSliceAlong(line, 0, progressKm, {
+		units: "kilometers",
+	}).geometry.coordinates as LngLat[];
+	const remaining = turf.lineSliceAlong(line, progressKm, totalKm, {
+		units: "kilometers",
+	}).geometry.coordinates as LngLat[];
+
+	return { completed, remaining };
+}
+
+function clampMonotonicProgress(previousAlongMeters: number, proposedAlongMeters: number): number {
+	return Math.max(previousAlongMeters - MAX_BACKWARD_PROGRESS_M, proposedAlongMeters);
+}
+
+function buildRouteSignature(route: LngLat[]): string | null {
+	if (!route.length) return null;
+	const first = route[0];
+	const middle = route[Math.floor(route.length / 2)];
+	const last = route[route.length - 1];
+	return `${route.length}:${first[0].toFixed(5)},${first[1].toFixed(5)}:${middle[0].toFixed(5)},${middle[1].toFixed(5)}:${last[0].toFixed(5)},${last[1].toFixed(5)}`;
+}
+
+function logPerf(event: string, meta?: Record<string, unknown>) {
+	if (!__DEV__) return;
+	const payload = meta ? ` ${JSON.stringify(meta)}` : "";
+	console.log(`${PERF_TAG} ${event}${payload}`);
 }
 
 type CameraRef = React.ComponentRef<typeof Mapbox.Camera>;
@@ -95,24 +237,59 @@ export default function MapScreen() {
 	const [currentZoom, setCurrentZoom] = useState(USER_ZOOM);
 	const [navState, setNavState] = useState<NavState>("idle");
 	const [navFollowUser, setNavFollowUser] = useState(true);
+	const [navigationCoords, setNavigationCoords] = useState<Coordinates | null>(null);
+	const [routeProgressAlongM, setRouteProgressAlongM] = useState(0);
+	const [isStartingNav, setIsStartingNav] = useState(false);
+	const [isDriverOnRoute, setIsDriverOnRoute] = useState(false);
 	const cameraRef = useRef<CameraRef>(null);
+	const startNavTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+	const deferredProjectionTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+	const navStartPerfRef = useRef<number | null>(null);
+	const lastZoomSyncAtRef = useRef(0);
+	const lastZoomSyncedValueRef = useRef(USER_ZOOM);
+	const initialCameraAppliedRef = useRef(false);
 	const lastFittedGeometryRef = useRef<string | null>(null);
+	const offRouteStreakRef = useRef(0);
+	const lastRerouteAtRef = useRef(0);
+	const lastRerouteCoordsRef = useRef<LngLat | null>(null);
+	const rerouteInFlightRef = useRef(false);
+	const prevGeometrySigRef = useRef<string | null>(null);
+	/** Evita desligar o follow logo após animação programática da câmera (gesto “fantasma”). */
+	const ignoreMapGestureUnfollowUntilRef = useRef(0);
 
 	const { freightUser, handleGetFreightUser } = useGetFreightUser();
-	const { rotaData, loadingRota, rotaErro, handleGetMapBox } = useGetMapBox();
+	const {
+		rotaData,
+		loadingRota,
+		rotaErro,
+		handleGetMapBox,
+		recalculateFromDriverLocation,
+		clearRota,
+	} = useGetMapBox();
 	const themeColor = mode === "dark" ? THEME_COLORS.dark : THEME_COLORS.light;
 
 	const isNavActive = navState === "running" || navState === "paused";
-	const followUserActive =
-		navState === "running" && Boolean(coords && !error && navFollowUser);
 
-	const styleURL = useMemo(() => {
-		if (isNavActive) return Mapbox.StyleURL.Dark;
-		return getMapStyleURL(mode === "dark");
-	}, [isNavActive, mode]);
-	const center: [number, number] = coords
-		? [coords.longitude, coords.latitude]
-		: DEFAULT_CENTER;
+	const activeCoords = useMemo((): Coordinates | null => {
+		if (navState === "running" || navState === "paused") {
+			return navigationCoords ?? coords;
+		}
+		return coords;
+	}, [navState, navigationCoords, coords]);
+
+	const followUserActive =
+		navState === "running" && Boolean(activeCoords && !error && navFollowUser);
+
+	const syncCurrentZoom = useCallback((nextZoom: number, force = false) => {
+		if (!Number.isFinite(nextZoom)) return;
+		lastZoomSyncedValueRef.current = nextZoom;
+		setCurrentZoom((prev) => {
+			if (!force && Math.abs(prev - nextZoom) < 0.01) return prev;
+			return nextZoom;
+		});
+	}, []);
+
+	const styleURL = useMemo(() => getMapStyleURL(mode === "dark"), [mode]);
 	const zoom = coords ? USER_ZOOM : DEFAULT_ZOOM;
 
 	const hasFreightRoute = Boolean(
@@ -126,14 +303,8 @@ export default function MapScreen() {
 				destino: freightUser.destination_label,
 			};
 		}
-		if (coords) {
-			return {
-				origem: "Minha localização",
-				destino: FALLBACK_DESTINO_LABEL,
-			};
-		}
 		return { origem: "—", destino: "—" };
-	}, [hasFreightRoute, freightUser, coords]);
+	}, [hasFreightRoute, freightUser]);
 
 	const destinationLabelForGoogle = freightUser?.destination_label?.trim() ?? "";
 	const stopLabelForGoogle = freightUser?.origin_label?.trim() ?? "";
@@ -169,16 +340,11 @@ export default function MapScreen() {
 
 	const lineCoordinates = rotaData?.geometria?.coordinates;
 
-	const routeCenterZoom = useMemo(() => {
-		if (!lineCoordinates?.length) return null;
-		return getCameraFromGeometry({ coordinates: lineCoordinates });
-	}, [lineCoordinates]);
-
 	const instrucaoTopo = useMemo(() => {
 		if (rotaData?.proxima_instrucao?.trim()) return rotaData.proxima_instrucao.trim();
 		const dest = routeSummary.destino;
-		return dest && dest !== "—" ? `Em direção a ${dest}` : "Siga na rota";
-	}, [rotaData?.proxima_instrucao, routeSummary.destino]);
+		return dest && dest !== "—" ? t("MAP.HEADING_TO", { dest }) : t("MAP.FOLLOW_ROUTE");
+	}, [rotaData?.proxima_instrucao, routeSummary.destino, t]);
 
 	const iconeManobra = useMemo(
 		() => maneuverIconName(rotaData?.manobra_modificador, rotaData?.manobra_tipo),
@@ -206,21 +372,76 @@ export default function MapScreen() {
 		[colors.bgOctonary, isNavActive],
 	);
 
-	const cameraCenterStatic = followUserActive
-		? undefined
-		: navState === "running" && !navFollowUser && routeCenterZoom?.center
-			? routeCenterZoom.center
-			: center;
+	const routeCompletedLayerStyle = useMemo(
+		() => ({
+			lineColor: colors.textSecondary,
+			lineWidth: 5,
+			lineOpacity: 0.38,
+			lineCap: "round" as const,
+			lineJoin: "round" as const,
+		}),
+		[colors.textSecondary],
+	);
 
-	const cameraZoomStatic = followUserActive
-		? undefined
-		: navState === "running" && !navFollowUser && routeCenterZoom
-			? Math.min(routeCenterZoom.zoom, 14)
-			: navState === "paused" && coords
-				? NAV_ZOOM
-				: currentZoom ?? zoom;
+	const routeLngLat = useMemo((): LngLat[] => {
+		if (!Array.isArray(lineCoordinates) || !lineCoordinates.length) return [];
+		return lineCoordinates as LngLat[];
+	}, [lineCoordinates]);
 
-	const cameraPitchStatic = followUserActive ? undefined : navState === "paused" ? 42 : 0;
+	const totalRouteMeters = useMemo(() => polylineLengthMeters(routeLngLat), [routeLngLat]);
+
+	const { completedRouteCoords, remainingRouteCoords } = useMemo(() => {
+		if (!routeLngLat.length) {
+			return { completedRouteCoords: [] as LngLat[], remainingRouteCoords: [] as LngLat[] };
+		}
+		if (!isNavActive || routeProgressAlongM < 1) {
+			return { completedRouteCoords: [] as LngLat[], remainingRouteCoords: routeLngLat };
+		}
+		const split = splitRouteAtDistance(routeLngLat, routeProgressAlongM);
+		const remaining =
+			split.remaining.length >= 2 ? split.remaining : routeLngLat;
+		return {
+			completedRouteCoords: split.completed.length >= 2 ? split.completed : ([] as LngLat[]),
+			remainingRouteCoords: remaining,
+		};
+	}, [routeLngLat, isNavActive, routeProgressAlongM]);
+
+	const remainingRouteFraction = useMemo(() => {
+		if (!isNavActive || totalRouteMeters < 5) return 1;
+		return Math.max(0, Math.min(1, 1 - routeProgressAlongM / totalRouteMeters));
+	}, [isNavActive, totalRouteMeters, routeProgressAlongM]);
+
+	const displayTempoTotalMin = useMemo(() => {
+		const base = rotaData?.tempo_total_min;
+		if (!Number.isFinite(base) || base == null) return 0;
+		return isNavActive ? base * remainingRouteFraction : base;
+	}, [rotaData?.tempo_total_min, isNavActive, remainingRouteFraction]);
+
+	const displayDistanciaTotalKm = useMemo(() => {
+		const base = rotaData?.distancia_total_km;
+		if (!Number.isFinite(base) || base == null) return null;
+		return isNavActive ? base * remainingRouteFraction : base;
+	}, [rotaData?.distancia_total_km, isNavActive, remainingRouteFraction]);
+
+	const geometrySignature = useMemo(
+		() => buildRouteSignature(routeLngLat),
+		[routeLngLat],
+	);
+
+	const fitCameraToRoute = useCallback(
+		(coordsList: LngLat[], animationDuration = CAMERA_ANIMATION_MS): boolean => {
+			if (coordsList.length < 2) return false;
+			const [minLng, minLat, maxLng, maxLat] = turf.bbox(turf.lineString(coordsList));
+			cameraRef.current?.fitBounds(
+				[maxLng, maxLat],
+				[minLng, minLat],
+				ROUTE_VIEW_PADDING,
+				animationDuration,
+			);
+			return true;
+		},
+		[],
+	);
 
 	const loadLocation = useCallback(async () => {
 		setLoading(true);
@@ -246,10 +467,24 @@ export default function MapScreen() {
 	}, [loadLocation, handleGetFreightUser]);
 
 	useEffect(() => {
-		if (!loading) setCurrentZoom(zoom);
-	}, [loading, zoom]);
+		if (!loading) syncCurrentZoom(zoom, true);
+	}, [loading, zoom, syncCurrentZoom]);
 
-	/** Carrega rota do frete (labels) ou rota de teste (GPS → Maringá). */
+	/** Posição inicial só por imperativo (evita reancorar no GPS a cada gesto/re-render). */
+	useEffect(() => {
+		if (loading || error || !coords || navState !== "idle") return;
+		if (initialCameraAppliedRef.current) return;
+		if (lineCoordinates && lineCoordinates.length >= 2) return;
+		initialCameraAppliedRef.current = true;
+		syncCurrentZoom(USER_ZOOM, true);
+		cameraRef.current?.setCamera({
+			centerCoordinate: [coords.longitude, coords.latitude],
+			zoomLevel: USER_ZOOM,
+			animationDuration: 0,
+		});
+	}, [loading, error, coords, navState, lineCoordinates, syncCurrentZoom]);
+
+	/** Carrega rota apenas quando há frete com origem e destino válidos. */
 	useEffect(() => {
 		if (loading) return;
 
@@ -257,18 +492,14 @@ export default function MapScreen() {
 			const useDriverLeg = Boolean(coords && !error);
 			void handleGetMapBox(freightUser.origin_label, freightUser.destination_label, {
 				rotaSimples: !useDriverLeg,
+				coordenadasMotorista:
+					useDriverLeg && coords
+						? `${coords.longitude},${coords.latitude}`
+						: undefined,
 			});
 			return;
 		}
-
-		/* Fallback: origem como "lon,lat" + destino por texto — funciona mesmo sem param coordenadasOrigem no backend. */
-		if (coords && !error) {
-			void handleGetMapBox(
-				`${coords.longitude},${coords.latitude}`,
-				FALLBACK_DESTINO_LABEL,
-				{ rotaSimples: true },
-			);
-		}
+		clearRota();
 	}, [
 		loading,
 		hasFreightRoute,
@@ -279,123 +510,367 @@ export default function MapScreen() {
 		coords?.longitude,
 		error,
 		handleGetMapBox,
+		clearRota,
+	]);
+
+	/** Nova geometria (ou primeira carga): reinicia progresso e ancora na posição atual se em navegação. */
+	useEffect(() => {
+		if (!geometrySignature) {
+			prevGeometrySigRef.current = null;
+			return;
+		}
+		if (prevGeometrySigRef.current === geometrySignature) return;
+		prevGeometrySigRef.current = geometrySignature;
+		offRouteStreakRef.current = 0;
+		const user = navigationCoords ?? coords;
+		if ((navState === "running" || navState === "paused") && user && routeLngLat.length) {
+			const p = projectUserOntoPolyline(user.latitude, user.longitude, routeLngLat);
+			setRouteProgressAlongM(p.distanceAlongMeters);
+		} else {
+			setRouteProgressAlongM(0);
+		}
+	}, [geometrySignature, routeLngLat, navState, navigationCoords, coords]);
+
+	/** GPS contínuo só com navegação ativa (economiza bateria). */
+	useEffect(() => {
+		if (navState !== "running") return;
+		let cancelled = false;
+		let watcher: { remove: () => void } | null = null;
+		void (async () => {
+			const w = await startNavigationLocationWatch((c) => {
+				if (!cancelled) setNavigationCoords(c);
+			});
+			if (!cancelled) watcher = w;
+		})();
+		return () => {
+			cancelled = true;
+			watcher?.remove();
+		};
+	}, [navState]);
+
+	useEffect(() => {
+		if (navState === "idle") {
+			setNavigationCoords(null);
+			setRouteProgressAlongM(0);
+			setIsStartingNav(false);
+			setIsDriverOnRoute(false);
+			offRouteStreakRef.current = 0;
+			lastRerouteCoordsRef.current = null;
+			rerouteInFlightRef.current = false;
+		}
+	}, [navState]);
+
+	useEffect(() => {
+		return () => {
+			if (startNavTimeoutRef.current) clearTimeout(startNavTimeoutRef.current);
+			if (deferredProjectionTimeoutRef.current) {
+				clearTimeout(deferredProjectionTimeoutRef.current);
+			}
+		};
+	}, []);
+
+	/** Progresso ao longo da rota + reroute por desvio (só em execução). */
+	useEffect(() => {
+		if (navState !== "running") return;
+		const user = navigationCoords ?? coords;
+		if (!user || !routeLngLat.length) return;
+
+		const proj = projectUserOntoPolyline(user.latitude, user.longitude, routeLngLat);
+		const onRoute = proj.distanceToRouteMeters <= NAV_OFF_ROUTE_THRESHOLD_M;
+
+		setIsDriverOnRoute(onRoute);
+
+		if (!onRoute) {
+			offRouteStreakRef.current += 1;
+			const now = Date.now();
+			const canTryReroute = !loadingRota && !rerouteInFlightRef.current;
+			const movedEnoughSinceLastReroute = (() => {
+				if (!lastRerouteCoordsRef.current) return true;
+				return (
+					distanceMeters(lastRerouteCoordsRef.current, [
+						user.longitude,
+						user.latitude,
+					]) >= NAV_REROUTE_MIN_MOVE_M
+				);
+			})();
+			if (
+				canTryReroute &&
+				movedEnoughSinceLastReroute &&
+				offRouteStreakRef.current >= NAV_OFF_ROUTE_CONSECUTIVE_UPDATES &&
+				now - lastRerouteAtRef.current > NAV_REROUTE_COOLDOWN_MS &&
+				freightUser &&
+				hasFreightRoute
+			) {
+				lastRerouteAtRef.current = now;
+				offRouteStreakRef.current = 0;
+				rerouteInFlightRef.current = true;
+				lastRerouteCoordsRef.current = [user.longitude, user.latitude];
+				void recalculateFromDriverLocation({
+					moradaDestino: freightUser.destination_label,
+					coordsMotorista: user,
+				}).finally(() => {
+					rerouteInFlightRef.current = false;
+				});
+			}
+			return;
+		}
+		offRouteStreakRef.current = 0;
+
+		if (proj.distanceToRouteMeters > NAV_SNAP_MAX_DISTANCE_M) return;
+
+		setRouteProgressAlongM((prev) =>
+			clampMonotonicProgress(prev, proj.distanceAlongMeters),
+		);
+	}, [
+		navState,
+		navigationCoords,
+		coords,
+		routeLngLat,
+		freightUser,
+		hasFreightRoute,
+		loadingRota,
+		recalculateFromDriverLocation,
 	]);
 
 	/** Em modo idle, enquadra a rota quando a geometria muda ou ao sair da navegação. */
 	useEffect(() => {
 		if (navState !== "idle") return;
 		const coordsList = rotaData?.geometria?.coordinates;
-		const geom = rotaData?.geometria;
-		if (!geom || !coordsList?.length) {
+		if (!coordsList?.length) {
 			lastFittedGeometryRef.current = null;
 			return;
 		}
-		const signature = JSON.stringify(coordsList);
+		const signature = buildRouteSignature(coordsList as LngLat[]);
+		if (!signature) {
+			lastFittedGeometryRef.current = null;
+			return;
+		}
 		if (lastFittedGeometryRef.current === signature) return;
 		lastFittedGeometryRef.current = signature;
-		const { center: c, zoom: z } = getCameraFromGeometry(geom);
-		setCurrentZoom(z);
+		void fitCameraToRoute(coordsList as LngLat[]);
+	}, [rotaData?.geometria, navState, fitCameraToRoute]);
+
+	const applyFollowVehicleCamera = useCallback(() => {
+		if (!activeCoords) return;
+		ignoreMapGestureUnfollowUntilRef.current = Date.now() + 900;
+		syncCurrentZoom(NAV_ZOOM, true);
 		cameraRef.current?.setCamera({
-			centerCoordinate: c,
-			zoomLevel: z,
-			animationDuration: CAMERA_ANIMATION_MS,
+			centerCoordinate: [activeCoords.longitude, activeCoords.latitude],
+			zoomLevel: NAV_ZOOM,
+			pitch: 45,
+			padding: { ...MAP_EDGE_PADDING_NAV_FOLLOW },
+			animationDuration: MAP_CAMERA_FAST_ANIMATION_MS,
 		});
-	}, [rotaData?.geometria, navState]);
+	}, [activeCoords, syncCurrentZoom]);
 
 	const handleCentralizarMinhaLocalizacao = useCallback(() => {
-		if (isNavActive) setNavFollowUser(true);
-		if (!coords) return;
-		setCurrentZoom(USER_ZOOM);
+		if (!activeCoords) return;
+		ignoreMapGestureUnfollowUntilRef.current = Date.now() + 1200;
+
+		if (navState === "running") {
+			setNavFollowUser(true);
+			applyFollowVehicleCamera();
+			return;
+		}
+
+		if (navState === "paused") {
+			setNavFollowUser(true);
+			syncCurrentZoom(NAV_ZOOM, true);
+			cameraRef.current?.setCamera({
+				centerCoordinate: [activeCoords.longitude, activeCoords.latitude],
+				zoomLevel: NAV_ZOOM,
+				pitch: 45,
+				padding: { ...MAP_EDGE_PADDING_NAV_FOLLOW },
+				animationDuration: MAP_CAMERA_FAST_ANIMATION_MS,
+			});
+			return;
+		}
+
+		syncCurrentZoom(USER_ZOOM, true);
 		cameraRef.current?.setCamera({
-			centerCoordinate: [coords.longitude, coords.latitude],
+			centerCoordinate: [activeCoords.longitude, activeCoords.latitude],
 			zoomLevel: USER_ZOOM,
-			animationDuration: CAMERA_ANIMATION_MS,
+			animationDuration: MAP_CAMERA_FAST_ANIMATION_MS,
 		});
-	}, [coords, isNavActive]);
+	}, [activeCoords, navState, applyFollowVehicleCamera, syncCurrentZoom]);
 
 	const handleZoomIn = useCallback(() => {
 		const next = Math.min((currentZoom ?? zoom) + 1, 20);
-		setCurrentZoom(next);
+		syncCurrentZoom(next, true);
 		cameraRef.current?.setCamera({
 			zoomLevel: next,
-			animationDuration: CAMERA_ANIMATION_MS,
+			animationDuration: MAP_CAMERA_FAST_ANIMATION_MS,
 		});
-	}, [currentZoom, zoom]);
+	}, [currentZoom, zoom, syncCurrentZoom]);
 
 	const handleZoomOut = useCallback(() => {
 		const next = Math.max((currentZoom ?? zoom) - 1, 2);
-		setCurrentZoom(next);
+		syncCurrentZoom(next, true);
 		cameraRef.current?.setCamera({
 			zoomLevel: next,
-			animationDuration: CAMERA_ANIMATION_MS,
+			animationDuration: MAP_CAMERA_FAST_ANIMATION_MS,
 		});
-	}, [currentZoom, zoom]);
+	}, [currentZoom, zoom, syncCurrentZoom]);
 
 	const handleIniciarNavegacao = useCallback(() => {
-		if (!rotaData || loadingRota) return;
+		if (!rotaData || loadingRota || isStartingNav) return;
+
+		setIsStartingNav(true);
+		navStartPerfRef.current = Date.now();
+		logPerf("nav_start_tap", {
+			hasCoords: Boolean(coords && !error),
+			routePoints: lineCoordinates?.length ?? 0,
+		});
+
+		ignoreMapGestureUnfollowUntilRef.current = Date.now() + NAV_START_TOTAL_MS + 800;
 		setNavFollowUser(true);
-		setNavState("running");
+
+		// Passo 1 — anima câmera imediatamente para a posição de navegação.
+		// O painel de nav só aparece APÓS a animação terminar (NAV_START_TOTAL_MS),
+		// então o usuário já vê a câmera posicionada antes de ver o painel.
 		if (coords && !error) {
-			setCurrentZoom(NAV_ZOOM);
+			syncCurrentZoom(NAV_ZOOM, true);
 			cameraRef.current?.setCamera({
 				centerCoordinate: [coords.longitude, coords.latitude],
 				zoomLevel: NAV_ZOOM,
-				animationDuration: CAMERA_ANIMATION_MS,
+				pitch: 45,
+				padding: { ...MAP_EDGE_PADDING_NAV_FOLLOW },
+				animationDuration: NAV_CAMERA_ENTER_MS,
 			});
-		} else if (rotaData.geometria) {
-			const { center: c, zoom: z } = getCameraFromGeometry(rotaData.geometria);
-			setCurrentZoom(z);
-			cameraRef.current?.setCamera({
-				centerCoordinate: c,
-				zoomLevel: z,
-				animationDuration: CAMERA_ANIMATION_MS,
-			});
+		} else if (lineCoordinates?.length) {
+			void fitCameraToRoute(lineCoordinates as LngLat[], NAV_CAMERA_ENTER_MS);
 		}
-	}, [rotaData, loadingRota, coords, error]);
+
+		logPerf("nav_camera_enter_started", {
+			elapsedMs: Date.now() - (navStartPerfRef.current ?? Date.now()),
+		});
+
+		// Passo 2 — aguarda câmera chegar e faz a transição do painel.
+		if (startNavTimeoutRef.current) clearTimeout(startNavTimeoutRef.current);
+		startNavTimeoutRef.current = setTimeout(() => {
+			startNavTimeoutRef.current = null;
+			LayoutAnimation.configureNext(NAV_UI_LAYOUT_ANIM);
+			setNavState("running");
+			setIsStartingNav(false);
+			logPerf("nav_running_state_set", {
+				elapsedMs: Date.now() - (navStartPerfRef.current ?? Date.now()),
+			});
+
+			// Passo 3 — projeção inicial adiada para não bloquear a transição do painel.
+			if (deferredProjectionTimeoutRef.current) {
+				clearTimeout(deferredProjectionTimeoutRef.current);
+			}
+			if (coords && !error && lineCoordinates?.length &&
+				lineCoordinates.length <= NAV_INITIAL_PROJECTION_MAX_POINTS) {
+				deferredProjectionTimeoutRef.current = setTimeout(() => {
+					deferredProjectionTimeoutRef.current = null;
+					const p = projectUserOntoPolyline(
+						coords.latitude,
+						coords.longitude,
+						lineCoordinates as LngLat[],
+					);
+					if (p.distanceToRouteMeters <= NAV_SNAP_MAX_DISTANCE_M + 80) {
+						setRouteProgressAlongM(p.distanceAlongMeters);
+					}
+					logPerf("nav_initial_projection_done", {
+						elapsedMs: Date.now() - (navStartPerfRef.current ?? Date.now()),
+						distanceToRouteM: Math.round(p.distanceToRouteMeters),
+					});
+				}, NAV_DEFERRED_PROJECTION_DELAY_MS);
+			}
+		}, NAV_START_TOTAL_MS);
+	}, [rotaData, loadingRota, isStartingNav, coords, error, lineCoordinates, fitCameraToRoute, syncCurrentZoom]);
 
 	const handleVerRotaCompleta = useCallback(() => {
 		if (!lineCoordinates?.length) return;
 		setNavFollowUser(false);
-		const b = boundsFromLineString(lineCoordinates as [number, number][]);
 		cameraRef.current?.setCamera({
-			bounds: b,
-			padding: {
-				paddingTop: 120,
-				paddingBottom: 220,
-				paddingLeft: 32,
-				paddingRight: 32,
-			},
 			pitch: 0,
 			animationDuration: 700,
 		});
-	}, [lineCoordinates]);
+		void fitCameraToRoute(lineCoordinates as LngLat[], 700);
+	}, [lineCoordinates, fitCameraToRoute]);
+
+	const handleMapCameraChanged = useCallback(
+		(state: MapState) => {
+			const nextZoom = state.properties?.zoom;
+			if (typeof nextZoom === "number" && Number.isFinite(nextZoom)) {
+				const now = Date.now();
+				const delta = Math.abs(nextZoom - lastZoomSyncedValueRef.current);
+				const shouldSyncZoom =
+					delta >= CAMERA_ZOOM_SYNC_DELTA &&
+					(now - lastZoomSyncAtRef.current >= CAMERA_ZOOM_SYNC_THROTTLE_MS || delta >= 0.35);
+				if (shouldSyncZoom) {
+					lastZoomSyncAtRef.current = now;
+					syncCurrentZoom(nextZoom);
+				}
+			}
+			if (navState !== "running") return;
+			if (Date.now() < ignoreMapGestureUnfollowUntilRef.current) return;
+			if (!state.gestures?.isGestureActive) return;
+			setNavFollowUser((prev) => (prev ? false : prev));
+		},
+		[navState, syncCurrentZoom],
+	);
 
 	const handlePausarOuContinuar = useCallback(() => {
 		if (navState === "running") {
+			LayoutAnimation.configureNext(NAV_UI_LAYOUT_ANIM);
 			setNavFollowUser(false);
 			setNavState("paused");
+			const snapshot = activeCoords;
+			requestAnimationFrame(() => {
+				if (!snapshot) return;
+				cameraRef.current?.setCamera({
+					centerCoordinate: [snapshot.longitude, snapshot.latitude],
+					zoomLevel: NAV_ZOOM,
+					pitch: 45,
+					padding: { ...MAP_EDGE_PADDING_NAV_FOLLOW },
+					animationDuration: MAP_CAMERA_FAST_ANIMATION_MS,
+				});
+			});
 			return;
 		}
 		if (navState === "paused") {
+			LayoutAnimation.configureNext(NAV_UI_LAYOUT_ANIM);
+			ignoreMapGestureUnfollowUntilRef.current = Date.now() + 600;
 			setNavFollowUser(true);
 			setNavState("running");
+			requestAnimationFrame(() => applyFollowVehicleCamera());
 		}
-	}, [navState]);
+	}, [navState, activeCoords, applyFollowVehicleCamera]);
+
+	const handleAlternarModoNavegacao = useCallback(() => {
+		if (navState !== "running") return;
+		setNavFollowUser((previous) => {
+			const next = !previous;
+			if (next) {
+				applyFollowVehicleCamera();
+			} else {
+				cameraRef.current?.setCamera({
+					pitch: 0,
+					animationDuration: CAMERA_ANIMATION_MS,
+				});
+			}
+			return next;
+		});
+	}, [navState, applyFollowVehicleCamera]);
 
 	const handleCancelarNavegacao = useCallback(() => {
+		LayoutAnimation.configureNext(NAV_UI_LAYOUT_ANIM);
 		setNavState("idle");
 		setNavFollowUser(true);
-		if (rotaData?.geometria) {
-			const { center: c, zoom: z } = getCameraFromGeometry(rotaData.geometria);
-			setCurrentZoom(z);
+		const routeCoords = lineCoordinates as LngLat[] | undefined;
+		requestAnimationFrame(() => {
 			cameraRef.current?.setCamera({
-				centerCoordinate: c,
-				zoomLevel: z,
 				pitch: 0,
 				animationDuration: CAMERA_ANIMATION_MS,
 			});
-		}
-	}, [rotaData]);
+			if (routeCoords?.length) {
+				void fitCameraToRoute(routeCoords);
+			}
+		});
+	}, [lineCoordinates, fitCameraToRoute]);
 
 	if (loading) {
 		return (
@@ -407,59 +882,77 @@ export default function MapScreen() {
 
 	return (
 		<View className="flex-1">
-			<Mapbox.MapView style={{ flex: 1 }} styleURL={styleURL}>
-				<Mapbox.Camera
-					ref={cameraRef}
-					animationMode="easeTo"
-					animationDuration={CAMERA_ANIMATION_MS}
-					followUserLocation={followUserActive}
-					followUserMode={UserTrackingMode.FollowWithCourse}
-					followZoomLevel={17}
-					followPitch={55}
-					followPadding={{
-						paddingTop: 120,
-						paddingBottom: isNavActive ? 300 : 100,
-						paddingLeft: 20,
-						paddingRight: 20,
-					}}
-					centerCoordinate={cameraCenterStatic}
-					zoomLevel={cameraZoomStatic}
-					pitch={cameraPitchStatic}
-					heading={followUserActive ? undefined : 0}
-				/>
-				<Mapbox.UserLocation visible={!error} />
+			<Mapbox.MapView
+				style={{ flex: 1 }}
+				styleURL={styleURL}
+				onCameraChanged={handleMapCameraChanged}
+			>
+			<Mapbox.Camera
+				ref={cameraRef}
+				animationMode="flyTo"
+				animationDuration={MAP_CAMERA_FAST_ANIMATION_MS}
+				followUserLocation={followUserActive}
+				followUserMode={UserTrackingMode.FollowWithCourse}
+				followZoomLevel={NAV_ZOOM}
+				followPitch={45}
+				followPadding={
+					followUserActive ? MAP_EDGE_PADDING_NAV_FOLLOW : MAP_EDGE_PADDING_IDLE
+				}
+			/>
+			<Mapbox.LocationPuck
+				visible={!error}
+				puckBearingEnabled={isNavActive}
+				puckBearing="course"
+			/>
 
-				{lineCoordinates?.length ? (
-					<Mapbox.ShapeSource
-						id="rotaSource"
-						shape={{
-							type: "Feature",
-							properties: {},
-							geometry: {
-								type: "LineString",
-								coordinates: lineCoordinates,
-							},
-						}}
-					>
-						<Mapbox.LineLayer id="rotaGlow" style={routeGlowLayerStyle} />
-						<Mapbox.LineLayer id="rotaLinha" style={routeLineLayerStyle} />
-					</Mapbox.ShapeSource>
+				{remainingRouteCoords.length >= 2 ? (
+					<>
+						{isNavActive && completedRouteCoords.length >= 2 ? (
+							<Mapbox.ShapeSource
+								id="rotaConcluidaSource"
+								shape={{
+									type: "Feature",
+									properties: {},
+									geometry: {
+										type: "LineString",
+										coordinates: completedRouteCoords,
+									},
+								}}
+							>
+								<Mapbox.LineLayer id="rotaConcluidaLinha" style={routeCompletedLayerStyle} />
+							</Mapbox.ShapeSource>
+						) : null}
+						<Mapbox.ShapeSource
+							id="rotaRestanteSource"
+							shape={{
+								type: "Feature",
+								properties: {},
+								geometry: {
+									type: "LineString",
+									coordinates: remainingRouteCoords,
+								},
+							}}
+						>
+							<Mapbox.LineLayer id="rotaRestanteGlow" style={routeGlowLayerStyle} />
+							<Mapbox.LineLayer id="rotaRestanteLinha" style={routeLineLayerStyle} />
+						</Mapbox.ShapeSource>
+					</>
 				) : null}
 
 				{!isNavActive && rotaData?.trecho_ate_carga != null && lineCoordinates?.[0] && (
-					<Mapbox.PointAnnotation id="marker-inicio" coordinate={lineCoordinates[0]} title="Início">
+					<Mapbox.PointAnnotation id="marker-inicio" coordinate={lineCoordinates[0]} title={t("MAP.MARKER_START")}>
 						<Ionicons name="person" size={24} color={themeColor} />
 					</Mapbox.PointAnnotation>
 				)}
 
 				{!isNavActive && rotaData?.coords_carga && (
-					<Mapbox.PointAnnotation id="marker-carga" coordinate={rotaData.coords_carga} title="Origem / carga">
+					<Mapbox.PointAnnotation id="marker-carga" coordinate={rotaData.coords_carga} title={t("MAP.MARKER_PICKUP")}>
 						<Ionicons name={hasFreightRoute ? "cube" : "navigate"} size={24} color={themeColor} />
 					</Mapbox.PointAnnotation>
 				)}
 
 				{rotaData?.coords_destino && (
-					<Mapbox.PointAnnotation id="marker-destino" coordinate={rotaData.coords_destino} title="Destino">
+					<Mapbox.PointAnnotation id="marker-destino" coordinate={rotaData.coords_destino} title={t("MAP.MARKER_DESTINATION")}>
 						<Ionicons name="flag" size={26} color={isNavActive ? colors.bgOctonary : themeColor} />
 					</Mapbox.PointAnnotation>
 				)}
@@ -473,7 +966,7 @@ export default function MapScreen() {
 				>
 					<ActivityIndicator size="small" color={iconColor} />
 					<Text className="text-sm" style={{ color: colors.textSecondary }}>
-						Calculando rota…
+						{t("MAP.CALCULATING_ROUTE")}
 					</Text>
 				</View>
 			) : null}
@@ -521,7 +1014,7 @@ export default function MapScreen() {
 				<TouchableOpacity
 					onPress={handleZoomIn}
 					accessibilityRole="button"
-					accessibilityLabel="Aumentar zoom"
+					accessibilityLabel={t("MAP.ZOOM_IN_A11Y")}
 					className="w-11 h-11 rounded-xl border items-center justify-center"
 					style={{ backgroundColor: colors.bg, borderColor: colors.bgNonary, borderWidth: 1 }}
 				>
@@ -532,7 +1025,7 @@ export default function MapScreen() {
 					style={{ backgroundColor: colors.bg, borderColor: colors.bgNonary, borderWidth: 1 }}
 					onPress={handleZoomOut}
 					accessibilityRole="button"
-					accessibilityLabel="Diminuir zoom"
+					accessibilityLabel={t("MAP.ZOOM_OUT_A11Y")}
 				>
 					<Ionicons name="remove" size={24} color={iconColor} />
 				</TouchableOpacity>
@@ -541,10 +1034,25 @@ export default function MapScreen() {
 					style={{ backgroundColor: colors.bg, borderColor: colors.bgNonary, borderWidth: 1 }}
 					onPress={handleCentralizarMinhaLocalizacao}
 					accessibilityRole="button"
-					accessibilityLabel="Centralizar na minha localização"
+					accessibilityLabel={t("MAP.CENTER_LOCATION_A11Y")}
 				>
 					<Ionicons name="locate" size={22} color={iconColor} />
 				</TouchableOpacity>
+				{navState === "running" ? (
+					<TouchableOpacity
+						className="h-11 rounded-xl border items-center justify-center px-3"
+						style={{ backgroundColor: colors.bg, borderColor: colors.bgNonary, borderWidth: 1 }}
+						onPress={handleAlternarModoNavegacao}
+						accessibilityRole="button"
+						accessibilityLabel={
+							navFollowUser ? t("MAP.ENABLE_FREE_NAV_A11Y") : t("MAP.LINK_MAP_TO_CAR_A11Y")
+						}
+					>
+						<Text className="text-xs font-semibold" style={{ color: navFollowUser ? colors.textSecondary : colors.bgOctonary }}>
+							{navFollowUser ? t("MAP.FREE") : t("MAP.CAR")}
+						</Text>
+					</TouchableOpacity>
+				) : null}
 			</SafeAreaView>
 
 			<SafeAreaView
@@ -552,7 +1060,7 @@ export default function MapScreen() {
 				edges={["bottom"]}
 				pointerEvents="box-none"
 			>
-				{rotaData && !isNavActive ? (
+				{rotaData && navState === "idle" ? (
 					<View
 						className="w-full rounded-3xl border overflow-hidden p-4 mb-1"
 						style={{
@@ -567,7 +1075,7 @@ export default function MapScreen() {
 						}}
 					>
 						<Text className="text-xs font-semibold uppercase tracking-wide mb-1" style={{ color: colors.textSecondary }}>
-							Prévia da rota
+							{t("MAP.ROUTE_PREVIEW")}
 						</Text>
 						<Text className="text-sm leading-5" style={{ color: colors.text }} numberOfLines={2}>
 							{routeSummary.origem} → {routeSummary.destino}
@@ -581,14 +1089,14 @@ export default function MapScreen() {
 									className="text-xs font-semibold uppercase tracking-wide"
 									style={{ color: colors.textSecondary }}
 								>
-									Até a saída (coleta)
+									{t("MAP.UNTIL_PICKUP")}
 								</Text>
 								<Text className="text-base font-semibold mt-1" style={{ color: colors.text }}>
 									{rotaData.trecho_ate_carga.distancia_km.toFixed(1)} km · ~
 									{Math.round(rotaData.trecho_ate_carga.tempo_min)} min
 								</Text>
 								<Text className="text-xs mt-1" style={{ color: colors.textSecondary }}>
-									Da sua posição até o ponto de embarque do frete
+									{t("MAP.UNTIL_PICKUP_HINT")}
 								</Text>
 							</View>
 						) : null}
@@ -598,7 +1106,7 @@ export default function MapScreen() {
 						>
 							<View className="flex-1 items-center">
 								<Text className="text-xs" style={{ color: colors.textSecondary }}>
-									Distância
+									{t("MAP.DISTANCE")}
 								</Text>
 								<Text className="text-xl font-semibold mt-1" style={{ color: colors.text }}>
 									{rotaData.distancia_total_km != null
@@ -609,31 +1117,43 @@ export default function MapScreen() {
 							<View style={{ width: StyleSheet.hairlineWidth, height: 44, backgroundColor: colors.bgNonary }} />
 							<View className="flex-1 items-center">
 								<Text className="text-xs" style={{ color: colors.textSecondary }}>
-									Tempo estimado
+									{t("MAP.ESTIMATED_TIME")}
 								</Text>
-								<Text className="text-xl font-semibold mt-1" style={{ color: colors.text }}>
-									{rotaData.tempo_total_min != null
-										? `~${Math.round(rotaData.tempo_total_min)} min`
-										: "—"}
-								</Text>
+							<Text className="text-xl font-semibold mt-1" style={{ color: colors.text }}>
+								{rotaData.tempo_total_min != null
+									? formatDriveDuration(rotaData.tempo_total_min)
+									: "—"}
+							</Text>
 							</View>
 						</View>
 
 						<View className="mt-4">
 							<TouchableOpacity
-								className="w-full py-3.5 rounded-2xl items-center"
+								className="w-full py-3.5 rounded-2xl items-center justify-center"
 								style={{
 									backgroundColor: colors.bgOctonary,
-									opacity: !rotaData || loadingRota ? 0.45 : 1,
+									opacity: !rotaData || loadingRota || isStartingNav ? 0.65 : 1,
 								}}
-								disabled={!rotaData || loadingRota}
+								disabled={!rotaData || loadingRota || isStartingNav}
 								onPress={handleIniciarNavegacao}
 								accessibilityRole="button"
-								accessibilityLabel="Iniciar navegação"
+								accessibilityLabel={
+									isStartingNav ? t("MAP.STARTING_NAV_A11Y") : t("MAP.START_NAV_A11Y")
+								}
+								accessibilityState={{ busy: isStartingNav }}
 							>
-								<Text className="text-base font-semibold" style={{ color: "#FFFFFF" }}>
-									Iniciar navegação
-								</Text>
+								{isStartingNav ? (
+									<View className="flex-row items-center gap-2">
+										<ActivityIndicator size="small" color="#FFFFFF" />
+										<Text className="text-base font-semibold" style={{ color: "#FFFFFF" }}>
+											{t("MAP.STARTING_NAV")}
+										</Text>
+									</View>
+								) : (
+									<Text className="text-base font-semibold" style={{ color: "#FFFFFF" }}>
+										{t("MAP.START_NAV")}
+									</Text>
+								)}
 							</TouchableOpacity>
 						</View>
 					</View>
@@ -659,7 +1179,7 @@ export default function MapScreen() {
 								className="h-12 w-12 shrink-0 rounded-full items-center justify-center"
 								style={{ backgroundColor: colors.bgTertiary }}
 								accessibilityRole="button"
-								accessibilityLabel="Encerrar navegação"
+								accessibilityLabel={t("MAP.END_NAV_A11Y")}
 							>
 								<Ionicons name="close" size={24} color={colors.text} />
 							</TouchableOpacity>
@@ -671,17 +1191,17 @@ export default function MapScreen() {
 									adjustsFontSizeToFit
 									minimumFontScale={0.65}
 								>
-									{formatDriveDuration(rotaData.tempo_total_min ?? 0)}
+									{formatDriveDuration(displayTempoTotalMin ?? 0)}
 								</Text>
 								<Text
 									className="mt-1.5 text-center text-sm"
 									style={{ color: colors.textSecondary }}
 									numberOfLines={1}
 								>
-									{rotaData.distancia_total_km != null
-										? `${Math.round(rotaData.distancia_total_km)} km`
+									{displayDistanciaTotalKm != null
+										? `${Math.round(displayDistanciaTotalKm)} km`
 										: "—"}{" "}
-									· {formatChegadaClock(rotaData.tempo_total_min ?? 0)}
+									· {formatChegadaClock(displayTempoTotalMin ?? 0)}
 								</Text>
 							</View>
 							<TouchableOpacity
@@ -689,7 +1209,7 @@ export default function MapScreen() {
 								className="h-12 w-12 shrink-0 rounded-full items-center justify-center"
 								style={{ backgroundColor: colors.bgTertiary }}
 								accessibilityRole="button"
-								accessibilityLabel="Ver rota completa no mapa"
+								accessibilityLabel={t("MAP.VIEW_FULL_ROUTE_A11Y")}
 							>
 								<Ionicons name="map-outline" size={22} color={colors.text} />
 							</TouchableOpacity>
@@ -700,13 +1220,17 @@ export default function MapScreen() {
 						>
 							<TouchableOpacity onPress={handlePausarOuContinuar} accessibilityRole="button" hitSlop={{ top: 8, bottom: 8, left: 12, right: 12 }}>
 								<Text className="text-base font-semibold" style={{ color: colors.text }}>
-									{navState === "paused" ? "Continuar" : "Pausar"}
+									{navState === "paused" ? t("MAP.CONTINUE") : t("MAP.PAUSE")}
 								</Text>
 							</TouchableOpacity>
-							{navState === "running" && !navFollowUser ? (
-								<TouchableOpacity onPress={() => setNavFollowUser(true)} accessibilityRole="button" hitSlop={{ top: 8, bottom: 8, left: 12, right: 12 }}>
-									<Text className="text-base font-semibold" style={{ color: colors.bgOctonary }}>
-										Seguir GPS
+							{navState === "running" ? (
+								<TouchableOpacity
+									onPress={handleAlternarModoNavegacao}
+									accessibilityRole="button"
+									hitSlop={{ top: 8, bottom: 8, left: 12, right: 12 }}
+								>
+									<Text className="text-base font-semibold" style={{ color: navFollowUser ? colors.textSecondary : colors.bgOctonary }}>
+										{navFollowUser ? t("MAP.FREE_NAVIGATION") : t("MAP.LINK_TO_CAR")}
 									</Text>
 								</TouchableOpacity>
 							) : null}

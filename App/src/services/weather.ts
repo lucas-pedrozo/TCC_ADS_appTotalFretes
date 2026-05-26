@@ -1,4 +1,5 @@
 import { getWeatherDescription } from "@/src/utils/weatherCodes";
+import http from "./http";
 
 const OPEN_METEO_BASE = "https://api.open-meteo.com/v1/forecast";
 
@@ -30,15 +31,9 @@ export async function fetchWeatherByCoordinates(
 	});
 
 	try {
-		const res = await fetch(`${OPEN_METEO_BASE}?${params.toString()}`, {
-			method: "GET",
-			headers: { Accept: "application/json" },
-		});
+		const res = await http.get<OpenMeteoResponse>(`${OPEN_METEO_BASE}?${params.toString()}`);
 
-		if (!res.ok) return null;
-
-		const data = (await res.json()) as OpenMeteoResponse;
-		const current = data?.current;
+		const current = res.data?.current;
 		if (!current) return null;
 
 		return {

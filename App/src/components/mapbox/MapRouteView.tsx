@@ -1,5 +1,6 @@
 import React, { useCallback, useRef } from "react";
 import { View, TouchableOpacity, Text } from "react-native";
+import { useTranslation } from "react-i18next";
 
 import Mapbox from "@rnmapbox/maps";
 import { Ionicons } from "@expo/vector-icons";
@@ -29,6 +30,7 @@ export const MapRouteView = React.memo(function MapRouteView({
   darkMode,
 }: MapRouteViewProps) {
   const colors = useThemeColors();
+  const { t } = useTranslation();
   const cameraRef = useRef<CameraRef>(null);
   const themeColor = darkMode ? THEME_COLORS.dark : THEME_COLORS.light;
   const styleURL = getMapStyleURL(darkMode);
@@ -66,7 +68,7 @@ export const MapRouteView = React.memo(function MapRouteView({
           <Mapbox.PointAnnotation
             id="marker-voce"
             coordinate={coordinates[0]}
-            title="Você está aqui"
+            title={t("MAP.MARKER_YOU_ARE_HERE")}
           >
             <Ionicons name="person" size={24} color={themeColor} />
           </Mapbox.PointAnnotation>
@@ -76,7 +78,7 @@ export const MapRouteView = React.memo(function MapRouteView({
           <Mapbox.PointAnnotation
             id="marker-carga"
             coordinate={rotaData.coords_carga}
-            title="Carga"
+            title={t("MAP.MARKER_CARGO")}
           >
             <Ionicons name="cube" size={24} color={themeColor} />
           </Mapbox.PointAnnotation>
@@ -86,7 +88,7 @@ export const MapRouteView = React.memo(function MapRouteView({
           <Mapbox.PointAnnotation
             id="marker-destino"
             coordinate={rotaData.coords_destino}
-            title="Destino"
+            title={t("MAP.MARKER_DESTINATION")}
           >
             <Ionicons name="flag" size={24} color={themeColor} />
           </Mapbox.PointAnnotation>
@@ -99,11 +101,11 @@ export const MapRouteView = React.memo(function MapRouteView({
         onPress={handleCentralizar}
         activeOpacity={0.8}
         accessibilityRole="button"
-        accessibilityLabel="Centralizar mapa na rota"
+        accessibilityLabel={t("MAP.CENTER_MAP_A11Y")}
       >
         <Ionicons name="locate" size={24} color={themeColor} />
         <Text className="text-sm font-semibold" style={{ color: colors.text }}>
-          Centralizar
+          {t("MAP.CENTER")}
         </Text>
       </TouchableOpacity>
     </View>

@@ -13,9 +13,6 @@ export interface MapUserImage {
   sizeBytes: number;
 }
 
-/**
- * GET /user/:id — include de CnhType e UserImage depende do backend.
- */
 export interface MapUser {
   id: number;
   name: string;

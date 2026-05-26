@@ -40,6 +40,54 @@ export function primeiraParte(texto: string, separador = ","): string {
     return parte?.trim() ?? texto.trim();
 }
 
+type AddressParts = {
+    city: string;
+    street: string;
+    number: string;
+};
+
+/**
+ * @description Separa um endereço em cidade, rua e número a partir do label vindo da API.
+ * @param label Endereço formatado
+ * @param emptyText Texto usado quando a informação não existir
+ */
+export function parseAddressLabel(label?: string | null, emptyText = "---"): AddressParts {
+    const cleanLabel = label?.trim();
+    if (!cleanLabel) {
+        return { city: emptyText, street: emptyText, number: emptyText };
+    }
+
+    const parts = cleanLabel.split(",").map((part) => part.trim()).filter(Boolean);
+    const numberMatch = cleanLabel.match(/\b\d+[A-Za-z]?\b/);
+
+    if (parts.length === 1) {
+        return {
+            city: parts[0],
+            street: emptyText,
+            number: numberMatch?.[0] ?? emptyText,
+        };
+    }
+
+    return {
+        city: parts[parts.length - 2] ?? parts[parts.length - 1] ?? cleanLabel,
+        street: parts[0] ?? emptyText,
+        number: numberMatch?.[0] ?? emptyText,
+    };
+}
+
+/**
+ * @description Formata peso com unidade para exibição.
+ * @param weight Peso em kg
+ * @param emptyText Texto usado quando o peso não existir
+ */
+export function formatWeight(weight?: number | null, emptyText = "---"): string {
+    if (weight == null) return emptyText;
+    const numeric = Number(weight);
+    if (!Number.isFinite(numeric)) return emptyText;
+    if (numeric >= 1000) return `${Number(numeric / 1000).toLocaleString("pt-BR")}T`;
+    return `${numeric.toLocaleString("pt-BR")} kg`;
+}
+
 /**
  * @description Mascara os últimos 5 dígitos do CPF para exibição (privacidade).
  * @param cpf CPF completo (com ou sem formatação: 12345678901 ou 123.456.789-01)

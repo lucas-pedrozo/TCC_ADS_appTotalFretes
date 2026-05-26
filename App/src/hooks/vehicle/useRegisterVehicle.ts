@@ -32,7 +32,7 @@ export function useRegisterVehicle() {
     if (!vehicleType?.id) {
       notify({
         status: "error",
-        message: "Selecione o tipo de veículo antes de continuar.",
+        message: i18n.t("NOTIFICATIONS.SELECTVEHICLETYPE"),
       });
       return;
     }
@@ -69,14 +69,14 @@ export function useRegisterVehicle() {
   };
 
   const rules = {
-    plate: { required: "Placa é obrigatória" },
-    chassisNumber: { required: "Chassi é obrigatório" },
-    model: { required: "Modelo é obrigatório" },
-    mark: { required: "Marca é obrigatória" },
-    country: { required: "País é obrigatório" },
-    state: { required: "Estado é obrigatório" },
-    city: { required: "Cidade é obrigatória" },
-    size: { required: "Tamanho é obrigatório" },
+    plate: { required: i18n.t("VALIDATION.REQUIREDPLATE") },
+    chassisNumber: { required: i18n.t("VALIDATION.REQUIREDCHASSIS") },
+    model: { required: i18n.t("VALIDATION.REQUIREDMODEL") },
+    mark: { required: i18n.t("VALIDATION.REQUIREDMARK") },
+    country: { required: i18n.t("VALIDATION.REQUIREDCOUNTRY") },
+    state: { required: i18n.t("VALIDATION.REQUIREDSTATE") },
+    city: { required: i18n.t("VALIDATION.REQUIREDCITY") },
+    size: { required: i18n.t("VALIDATION.REQUIREDSIZE") },
   };
 
   return {

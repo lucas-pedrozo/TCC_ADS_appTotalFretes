@@ -5,6 +5,7 @@ import {
 } from "@/src/services/location";
 import { fetchWeatherByCoordinates, WeatherData } from "@/src/services/weather";
 import { useAlertDefault } from "@/src/context/AlertDefaultContext";
+import i18n from "@/src/i18n";
 
 export interface WeatherDisplayData extends WeatherData {
   cidade?: string;
@@ -42,7 +43,7 @@ export function useWeather() {
     } catch {
       notify({
         status: "error",
-        message: "Não foi possível obter o clima.",
+        message: i18n.t("NOTIFICATIONS.WEATHERFETCHFAILED"),
       });
       setWeatherData(null);
     } finally {

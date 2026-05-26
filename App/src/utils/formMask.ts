@@ -77,3 +77,38 @@ export function maskEmailForDisplay(email: string): string {
 	const visible = local.length <= 2 ? local : local.slice(0, 2);
 	return `${visible}***${domain}`;
 }
+
+/**
+ * @description Máscara de formatação de dinheiro
+ * @param value Valor em reais (ex: 15000.50)
+ * @returns "15.000,50"
+ */
+export function maskMoney(value: number | string): string {
+  // Se for número, converte para centavos primeiro
+  const digits = typeof value === 'number'
+    ? String(Math.round(value * 100))
+    : value.replace(/\D/g, '');
+
+  if (!digits) return '';
+
+  const padded = digits.padStart(3, '0');
+  const cents = padded.slice(-2);
+  const integer = padded.slice(0, -2);
+
+  const formatted = integer
+    .replace(/^0+(?=\d)/, '')
+    .replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+
+  return `${formatted || '0'},${cents}`;
+}
+
+/**
+ * @description Converte um valor monetário formatado para número.
+ * @param value Valor formatado (ex.: "R$ 1.500,50" ou "1.500,50")
+ * @returns Valor numérico em reais
+ */
+export function parseMoneyToNumber(value: string): number {
+  const digits = value.replace(/\D/g, "");
+  if (!digits) return 0;
+  return Number(digits) / 100;
+}
