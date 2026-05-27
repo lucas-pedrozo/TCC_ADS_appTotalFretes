@@ -5,10 +5,11 @@ import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useTranslation } from "react-i18next";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import { ButtonCancel } from "@/src/components/form/buttons/ButtonDefault";
+import { ButtonApproved, ButtonCancel } from "@/src/components/form/buttons/ButtonDefault";
 import { DetailRow } from "@/src/components/info/DetailRow";
 import { useIconColor, useThemeColors } from "@/src/context/ThemeContext";
 import { getProposalFreight } from "@/src/hooks/proposal/useGetProposals";
+import { useConfirmProposal } from "@/src/hooks/proposal/useConfirmProposal";
 import { useProposalDetail } from "@/src/hooks/proposal/useProposalDetail";
 import type { RootStackParamList } from "@/src/routes/Routes";
 import { maskMoney } from "@/src/utils/formMask";
@@ -27,33 +28,78 @@ const formatDateLabel = (value?: string) => {
 	return date.toLocaleDateString("pt-BR");
 };
 
+const normalizeStatus = (value: string | null | undefined) =>
+	(value ?? "")
+		.normalize("NFD")
+		.replace(/[\u0300-\u036f]/g, "")
+		.trim()
+		.toLowerCase();
+
 const ProposalDetail = () => {
 	const route = useRoute<ProposalDetailRouteProp>();
 	const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 	const colors = useThemeColors();
 	const iconColor = useIconColor();
 	const { t } = useTranslation();
-	const { proposal, isLoading, isCancelling, handleGetProposal, handleCancelProposal } = useProposalDetail();
+	const { proposal, isLoading, isCancelling, handleGetProposal, handleCancelProposal } =
+		useProposalDetail();
+	const { handleConfirmProposal, handleDeclineProposal, isLoading: isConfirming } =
+		useConfirmProposal();
 
 	const proposalId = route.params.proposalId;
 	const freight = proposal ? getProposalFreight(proposal) : null;
 	const freightValue = freight?.finalValue ?? freight?.originalValue;
 	const statusName = proposal?.ProposalStatusType?.name ?? t("PROPOSAL.STATUS_UNKNOWN");
+	const statusKey = normalizeStatus(statusName);
+
+	const isAwaitingDriver = statusKey === "esperando caminhoneiro";
+	const isSent = statusKey === "enviada";
+	const isAccepted = statusKey.includes("aceit") || statusKey === "accepted";
 
 	const statusStyle = useMemo(() => {
-		const normalized = statusName.toLowerCase();
-		if (normalized.includes("aceit") || normalized.includes("accepted")) {
+		if (isAccepted) {
 			return { backgroundColor: "#D1F9E2", color: "#166534" };
 		}
-		if (normalized.includes("recus") || normalized.includes("selecionada")) {
+		if (isAwaitingDriver) {
+			return { backgroundColor: "#FEF3C7", color: "#92400E" };
+		}
+		if (statusKey.includes("recus") || statusKey.includes("selecionada")) {
 			return { backgroundColor: "#FEE2E2", color: "#B91C1C" };
 		}
-		return { backgroundColor: "#FEF3C7", color: "#92400E" };
-	}, [statusName]);
+		return { backgroundColor: "#E0E7FF", color: "#3730A3" };
+	}, [isAccepted, isAwaitingDriver, statusKey]);
 
 	useEffect(() => {
 		void handleGetProposal(proposalId);
 	}, [handleGetProposal, proposalId]);
+
+	const handleConfirm = useCallback(async () => {
+		const ok = await handleConfirmProposal(proposalId);
+		if (ok) {
+			await handleGetProposal(proposalId);
+			navigation.navigate("AndamentoTab" as never);
+		}
+	}, [handleConfirmProposal, handleGetProposal, navigation, proposalId]);
+
+	const handleDecline = useCallback(() => {
+		Alert.alert(
+			t("PROPOSAL.DECLINE_TITLE"),
+			t("PROPOSAL.DECLINE_MESSAGE"),
+			[
+				{ text: t("COMMON.CANCEL"), style: "cancel" },
+				{
+					text: t("PROPOSAL.DECLINE_ACTION"),
+					style: "destructive",
+					onPress: async () => {
+						const declined = await handleDeclineProposal(proposalId);
+						if (declined) {
+							navigation.goBack();
+						}
+					},
+				},
+			],
+		);
+	}, [handleDeclineProposal, navigation, proposalId, t]);
 
 	const handleCancel = useCallback(() => {
 		Alert.alert(
@@ -100,6 +146,17 @@ const ProposalDetail = () => {
 	return (
 		<SafeAreaView style={{ flex: 1, backgroundColor: colors.bg, paddingHorizontal: 16, paddingBottom: 16 }} edges={["left", "right", "bottom"]}>
 			<ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 24 }}>
+				{isAwaitingDriver ? (
+					<View
+						className="rounded-xl p-4 mb-4"
+						style={{ backgroundColor: "#FEF3C7", borderColor: "#F59E0B", borderWidth: 1 }}
+					>
+						<Text className="text-sm font-semibold" style={{ color: "#92400E" }}>
+							{t("PROPOSAL.AWAITING_DRIVER_HINT")}
+						</Text>
+					</View>
+				) : null}
+
 				<View className="rounded-2xl p-3 mb-5" style={{ backgroundColor: colors.bgNonary, borderColor: colors.bgTertiary, borderWidth: 1 }}>
 					<View className="flex-row justify-between items-start">
 						<View className="flex-1 pr-2">
@@ -156,12 +213,28 @@ const ProposalDetail = () => {
 				</View>
 			</ScrollView>
 
-			<ButtonCancel
-				title={t("PROPOSAL.CANCEL_ACTION")}
-				onPress={handleCancel}
-				loading={isCancelling}
-				disabled={isCancelling}
-			/>
+			{isAwaitingDriver ? (
+				<View className="gap-2">
+					<ButtonApproved
+						title={t("PROPOSAL.ACCEPT_FREIGHT")}
+						onPress={handleConfirm}
+						loading={isConfirming}
+						disabled={isConfirming}
+					/>
+					<ButtonCancel
+						title={t("PROPOSAL.DECLINE_ACTION")}
+						onPress={handleDecline}
+						disabled={isConfirming}
+					/>
+				</View>
+			) : isSent ? (
+				<ButtonCancel
+					title={t("PROPOSAL.CANCEL_ACTION")}
+					onPress={handleCancel}
+					loading={isCancelling}
+					disabled={isCancelling}
+				/>
+			) : null}
 		</SafeAreaView>
 	);
 };

@@ -50,7 +50,10 @@ export function useEditPerfil(options: UseEditPerfilOptions = {}) {
       let payload: EditPerfilMap & { userImage_id?: number } = { ...data };
 
       if (pendingImageUri) {
-        const userImage = await uploadUserImage(pendingImageUri);
+        if (id == null) {
+          throw new Error(i18n.t("NOTIFICATIONS.ERROR"));
+        }
+        const userImage = await uploadUserImage(pendingImageUri, Number(id));
         payload.userImage_id = userImage.id;
       }
 

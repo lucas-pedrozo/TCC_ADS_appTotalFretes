@@ -22,7 +22,6 @@ export type ProposalMap = {
 };
 
 const getProposalFreight = (proposal: ProposalMap) => proposal.Freight ?? proposal.freight ?? null;
-const isSentProposal = (proposal: ProposalMap) => proposal.ProposalStatusType?.name?.toLowerCase() === "enviada";
 
 export function useGetProposals() {
 	const { notify } = useAlertDefault();
@@ -33,13 +32,25 @@ export function useGetProposals() {
 		try {
 			setIsLoading(true);
 			const { data } = await http.get<ProposalMap[]>("proposal", {
-				params: { proposal_status: "enviada" },
+				params: { proposal_status: "todas" },
 			});
 			const proposalList = Array.isArray(data) ? data : [];
-			const sentProposals = proposalList.filter(isSentProposal);
+
+			const normalizeStatus = (name?: string | null) =>
+				(name ?? "")
+					.normalize("NFD")
+					.replace(/[\u0300-\u036f]/g, "")
+					.trim()
+					.toLowerCase();
+
+			const activeProposals = proposalList.filter((proposal) => {
+				const status = normalizeStatus(proposal.ProposalStatusType?.name);
+				if (status.includes("cancel")) return false;
+				return status === "enviada" || status === "esperando caminhoneiro";
+			});
 
 			const hydratedProposals = await Promise.all(
-				sentProposals.map(async (proposal) => {
+				activeProposals.map(async (proposal) => {
 					const currentFreight = getProposalFreight(proposal);
 					if (currentFreight?.cargo != null) return proposal;
 
@@ -50,6 +61,18 @@ export function useGetProposals() {
 						return proposal;
 					}
 				}),
+			);
+
+			const sortPriority = (name?: string | null) => {
+				const s = normalizeStatus(name);
+				if (s === "esperando caminhoneiro") return 0;
+				if (s === "enviada") return 1;
+				return 2;
+			};
+
+			hydratedProposals.sort(
+				(a, b) =>
+					sortPriority(a.ProposalStatusType?.name) - sortPriority(b.ProposalStatusType?.name),
 			);
 
 			setProposals(hydratedProposals);

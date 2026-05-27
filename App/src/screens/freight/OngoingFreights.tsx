@@ -3,6 +3,10 @@ import { Linking, RefreshControl, ScrollView, Text, TouchableOpacity, View } fro
 
 import { useCancelFreight } from "@/src/hooks/freight/useCancelFreight";
 import { useGetFreightUser } from "@/src/hooks/freight/useGetFreightUser";
+import {
+	useUpdateFreightStatus,
+	type DriverFreightStatusSlug,
+} from "@/src/hooks/freight/useUpdateFreightStatus";
 import { Ionicons } from "@expo/vector-icons";
 import { useIconColor, useThemeColors } from "@/src/context/ThemeContext";
 import { DetailRow } from "@/src/components/info/DetailRow";
@@ -16,7 +20,6 @@ import type { TabParamList } from "@/src/routes/RoutesTabs";
 import { getCurrentCoordinates, type Coordinates } from "@/src/services/location";
 import { buildGoogleMapsDirectionsUrl, isUsableGps } from "@/src/utils/googleMapsDirections";
 import { useAlertDefault } from "@/src/context/AlertDefaultContext";
-import { maskDate } from "@/src/utils/formMask";
 import { ButtonCancel, ButtonDefault } from "@/src/components/form";
 
 
@@ -31,6 +34,7 @@ function OngoingFreights() {
 
 	const { freightUser, handleGetFreightUser } = useGetFreightUser();
 	const { handleCancelFreight, isLoading: isCancelling } = useCancelFreight();
+	const { handleUpdateFreightStatus, isLoading: isUpdatingStatus } = useUpdateFreightStatus();
 
 	const handleRefresh = useCallback(async () => {
 		setIsRefreshing(true);
@@ -61,6 +65,43 @@ function OngoingFreights() {
 		await handleGetFreightUser();
 		setRefreshKey((prev) => prev + 1);
 	}, [freightUser?.id, handleCancelFreight, handleGetFreightUser]);
+
+	/**
+	 * Normaliza para comparar status com tolerância a acentos, espa\u00e7os e
+	 * diferen\u00e7as de capitaliza\u00e7\u00e3o que possam existir nos dados antigos.
+	 */
+	const normalizeStatus = (value: string | null | undefined) =>
+		(value ?? "")
+			.normalize("NFD")
+			.replace(/[\u0300-\u036f]/g, "")
+			.trim()
+			.toLowerCase();
+
+	/**
+	 * Próximo passo permitido para o motorista a partir do status atual.
+	 * Retorna `null` quando o motorista não tem mais ações (ex.: aguardando empresa concluir).
+	 */
+	const nextStatusAction = (() => {
+		const currentKey = normalizeStatus(freightUser?.status?.name);
+		const map: Record<string, { slug: DriverFreightStatusSlug; labelKey: string }> = {
+			vinculado: { slug: "Em Transito", labelKey: "FREIGHT.START_TRIP" },
+			"em transito": { slug: "Em Rota de Entrega", labelKey: "FREIGHT.ENROUTE_DELIVERY" },
+			"em rota de entrega": { slug: "Entregue", labelKey: "FREIGHT.MARK_DELIVERED" },
+		};
+		return currentKey ? map[currentKey] ?? null : null;
+	})();
+
+	const isAwaitingCompany = normalizeStatus(freightUser?.status?.name) === "entregue";
+
+	const handleAdvanceStatus = useCallback(async () => {
+		if (!freightUser?.id || !nextStatusAction) return;
+
+		const ok = await handleUpdateFreightStatus(freightUser.id, nextStatusAction.slug);
+		if (ok) {
+			await handleGetFreightUser();
+			setRefreshKey((prev) => prev + 1);
+		}
+	}, [freightUser?.id, handleGetFreightUser, handleUpdateFreightStatus, nextStatusAction]);
 
 	const openGoogleMaps = useCallback(async () => {
 		if (!destinationLabel) return;
@@ -167,14 +208,34 @@ function OngoingFreights() {
 				<DetailRow label={t("FREIGHT.ORIGIN")} value={freightUser?.origin_label ?? t("COMMON.EMPTY")} />
 				<DetailRow label={t("FREIGHT.DESTINATION")} value={freightUser?.destination_label ?? t("COMMON.EMPTY")} />
 				{freightUser?.id != null ? (
-					<View className="flex-row gap-2.5 w-full mt-5 justify-between">
-						<ButtonCancel
-							title={t("COMMON.CANCEL")}
-							onPress={handleCancel}
-							size="small"
-							disabled={isCancelling}
-						/>
-						<ButtonDefault title={t("COMMON.CONFIRM")} onPress={() => { }} size="small" />
+					<View className="w-full mt-5">
+						<View className="flex-row gap-2.5 w-full justify-between">
+							<ButtonCancel
+								title={t("COMMON.CANCEL")}
+								onPress={handleCancel}
+								size="small"
+								disabled={isCancelling || isUpdatingStatus}
+							/>
+							{nextStatusAction ? (
+								<ButtonDefault
+									title={t(nextStatusAction.labelKey)}
+									onPress={handleAdvanceStatus}
+									size="small"
+									disabled={isUpdatingStatus || isCancelling}
+									loading={isUpdatingStatus}
+								/>
+							) : (
+								<View className="w-[46%]" />
+							)}
+						</View>
+						{isAwaitingCompany ? (
+							<Text
+								className="text-center text-sm mt-3"
+								style={{ color: colors.text }}
+							>
+								{t("FREIGHT.WAITING_COMPANY_CONFIRMATION")}
+							</Text>
+						) : null}
 					</View>
 				) : null}
 			</ScrollView>

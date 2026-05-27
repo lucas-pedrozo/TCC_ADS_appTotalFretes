@@ -8,10 +8,9 @@ import { useThemeColors } from "@/src/context/ThemeContext";
 import { maskMoney } from "@/src/utils/formMask";
 import { IconBox } from "@/src/components/ui/IconBox";
 import { DetailRow } from "@/src/components/info/DetailRow";
-import { ButtonDefault, ButtonApproved, ButtonCancel } from "@/src/components/form/buttons/ButtonDefault";
+import { ButtonDefault, ButtonApproved } from "@/src/components/form/buttons/ButtonDefault";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useGetUser } from "@/src/hooks/user/useGetUser";
-import { useGetFreightUser } from "@/src/hooks/freight/useGetFreightUser";
 
 type DetailFreightRouteProp = RouteProp<RootStackParamList, "DetailFreight">;
 
@@ -23,15 +22,12 @@ const DetailFreight = () => {
     const freight = route.params.freight;
 
     const { userData, handleGetUser } = useGetUser();
-    const { freightUser, handleGetFreightUser } = useGetFreightUser();
 
     useEffect(() => {
         void handleGetUser();
-        void handleGetFreightUser();
-    }, [handleGetUser, handleGetFreightUser]);
+    }, [handleGetUser]);
 
     const hasVehicle = userData?.vehicle_id != null;
-    const hasOngoing = freightUser != null;
 
     const freightValue = freight.finalValue ?? freight.originalValue;
     const valueText = freightValue != null ? `R$ ${maskMoney(freightValue)}` : t("CARD.ACTIVITY.N_A");
@@ -123,16 +119,7 @@ const DetailFreight = () => {
                     </Text>
                 </View>
             )}
-            {hasOngoing && (
-                <View className="w-full justify-center items-center my-2.5 p-2 rounded-xl" style={{ backgroundColor: colors.bgSecondary }}>
-                    <Text className="text-sm font-semibold text-center" style={{ color: colors.textQuinary }}>
-                        {t("FREIGHT.VALIDATION.HAS_ONGOING")}
-                    </Text>
-                </View>
-            )}
-            {hasOngoing ? (
-                <ButtonCancel onPress={() => { }} title={t("FREIGHT.NEXT")} />
-            ) : !hasVehicle && userData != null ? (
+            {!hasVehicle && userData != null ? (
                 <ButtonDefault onPress={() => { }} title={t("FREIGHT.NEXT")} />
             ) : (
                 <ButtonApproved onPress={() => navigation.navigate("SendProposal", { freight })} title={t("FREIGHT.NEXT")} />

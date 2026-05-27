@@ -8,6 +8,19 @@ export function freightEffectiveValue(f: FreightAllMap): number {
 	return Number.isFinite(v) && v != null ? v : 0;
 }
 
+function normalizeStatusName(name?: string | null): string {
+	return (name ?? "")
+		.normalize("NFD")
+		.replace(/[\u0300-\u036f]/g, "")
+		.trim()
+		.toLowerCase();
+}
+
+/** Apenas fretes com status "Disponivel" (abertos para proposta). */
+export function isAvailableFreight(f: FreightAllMap): boolean {
+	return normalizeStatusName(f.status?.name) === "disponivel";
+}
+
 function distanceToOriginM(f: FreightAllMap, user: Coordinates): number {
 	return turf.distance(
 		turf.point([user.longitude, user.latitude]),
@@ -27,12 +40,14 @@ export function filterAndSortFreights(
 	userCnhTypeId: number | null = null,
 ): FreightAllMap[] {
 	const q = searchQuery.trim().toLowerCase();
-	let list = q
-		? items.filter((f) => {
+	let list = items.filter(isAvailableFreight);
+
+	list = q
+		? list.filter((f) => {
 				const haystack = `${f.name} ${f.origin_label} ${f.destination_label} ${f.cargo?.name ?? ""}`.toLowerCase();
 				return haystack.includes(q);
 			})
-		: [...items];
+		: list;
 
 	if (userCnhTypeId != null) {
 		list = list.filter((f) => f.cnhType_id == null || f.cnhType_id <= userCnhTypeId);

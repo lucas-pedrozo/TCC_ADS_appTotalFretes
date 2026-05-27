@@ -37,20 +37,20 @@ const getNameFromUri = (uri: string): string => {
 
 /**
  * Envia a imagem do usuário para o storage-service.
- * Backend espera multipart/form-data com campo `image`.
+ * Backend espera multipart/form-data com `image`, `ownerType` e `ownerId`.
  */
-export async function uploadUserImage(uri: string): Promise<UserImageResponse> {
+export async function uploadUserImage(uri: string, ownerId: number): Promise<UserImageResponse> {
   const formData = new FormData();
   formData.append("image", {
     uri,
     name: getNameFromUri(uri),
     type: getMimeTypeFromUri(uri),
   } as unknown as Blob);
+  formData.append("ownerType", "USER");
+  formData.append("ownerId", String(ownerId));
 
   const { data } = await http.post<UploadUserImageResponse>("/user-images/upload", formData, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
+    headers: { "Content-Type": "multipart/form-data" },
   });
 
   return data.userImage;
