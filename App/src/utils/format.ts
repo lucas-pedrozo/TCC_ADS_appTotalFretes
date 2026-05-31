@@ -75,6 +75,40 @@ export function parseAddressLabel(label?: string | null, emptyText = "---"): Add
     };
 }
 
+function stripStateFromCity(token: string): string {
+    return token.split(/\s-\s/)[0]?.trim() ?? token.trim();
+}
+
+/**
+ * @description Extrai apenas o nome da cidade a partir do label de endereço da API.
+ */
+export function extractCityFromAddressLabel(label?: string | null, emptyText = "---"): string {
+    const cleanLabel = label?.trim();
+    if (!cleanLabel) return emptyText;
+
+    const parts = cleanLabel.split(",").map((part) => part.trim()).filter(Boolean);
+
+    if (parts.length <= 2) {
+        return stripStateFromCity(parts[0] ?? cleanLabel);
+    }
+
+    const cityStatePart = parts.find(
+        (part) => /\s-\s/.test(part) && !/^\d+$/.test(part)
+    );
+    if (cityStatePart) {
+        return stripStateFromCity(cityStatePart);
+    }
+
+    const middlePart = parts.find(
+        (part, index) => index > 0 && index < parts.length - 1 && !/^\d+$/.test(part)
+    );
+    if (middlePart) {
+        return stripStateFromCity(middlePart);
+    }
+
+    return stripStateFromCity(parseAddressLabel(cleanLabel, emptyText).city);
+}
+
 /**
  * @description Formata peso com unidade para exibição.
  * @param weight Peso em kg

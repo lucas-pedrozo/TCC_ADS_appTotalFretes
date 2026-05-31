@@ -3,8 +3,8 @@ import http from "@/src/services/http";
 import { RootStackParamList } from "@/src/routes/Routes";
 import { useAlertDefault } from "@/src/context/AlertDefaultContext";
 import { NavigationProp, useNavigation } from "@react-navigation/native";
-import { AxiosError } from "axios";
 import i18n from "@/src/i18n";
+import { getApiErrorMessage } from "@/src/utils/apiError";
 
 export interface SingUpFormData {
   cnhNumber?: string;
@@ -57,10 +57,10 @@ export function useSignUp() {
 
       await navigation.navigate({ name: "Login", params: { startMode: "saved", focusPassword: true } });
     } catch (error) {
-      const message = (error as AxiosError<{ message: string }>).response?.data?.message ?? "";
-      if (message) {
-        notify({ status: "error", message });
-      }
+      notify({
+        status: "error",
+        message: getApiErrorMessage(error),
+      });
     }
   };
 

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context"
 import { Platform, RefreshControl, ScrollView, Text, View } from "react-native"
 import * as LocalAuthentication from "expo-local-authentication";
@@ -11,7 +11,7 @@ import { useThemeColors, useThemeMode } from "@/src/context/ThemeContext";
 import { useLanguage } from "@/src/context/LanguageContext";
 
 import { useAuth } from "@/src/context/AuthContext";
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { RootStackParamList } from "@/src/routes/Routes";
 import { HeaderPerfil } from "@/src/components/header/HeaderPerfil";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -102,15 +102,19 @@ const Perfil = () => {
     }
   }, [setBiometricsEnabledAsync, t]);
 
-  useEffect(() => {
-    handleGetUser();
-  }, [handleGetUser]);
+  useFocusEffect(
+    useCallback(() => {
+      void handleGetUser();
+    }, [handleGetUser]),
+  );
 
-  useEffect(() => {
-    if (userData?.vehicle_id) {
-      handleGetVehicle(userData.vehicle_id);
-    }
-  }, [handleGetVehicle, userData?.vehicle_id]);
+  useFocusEffect(
+    useCallback(() => {
+      if (userData?.vehicle_id) {
+        void handleGetVehicle(userData.vehicle_id);
+      }
+    }, [handleGetVehicle, userData?.vehicle_id]),
+  );
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.bg }}>

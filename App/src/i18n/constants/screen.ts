@@ -174,6 +174,8 @@ export const screenPT = {
     ENROUTE_DELIVERY: "Em rota de entrega",
     MARK_DELIVERED: "Marcar como entregue",
     WAITING_COMPANY_CONFIRMATION: "Aguardando confirmação da empresa",
+    COMPANY: "Empresa",
+    COMPANY_CITY: "Cidade",
     VALIDATION: {
       NO_VEHICLE: "Usuário não tem Veículo Cadastrado",
       HAS_ONGOING: "Usuário já tem um frete em andamento",
@@ -482,6 +484,8 @@ export const screenEN = {
     ENROUTE_DELIVERY: "En route to delivery",
     MARK_DELIVERED: "Mark as delivered",
     WAITING_COMPANY_CONFIRMATION: "Awaiting company confirmation",
+    COMPANY: "Company",
+    COMPANY_CITY: "City",
     VALIDATION: {
       NO_VEHICLE: "User has no registered Vehicle",
       HAS_ONGOING: "User already has an ongoing freight",

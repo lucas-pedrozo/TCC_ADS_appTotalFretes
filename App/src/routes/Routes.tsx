@@ -38,7 +38,7 @@ import Term from "../screens/advance/Term";
 import MapScreen from "../screens/MapBox/MapScreen";
 
 import type { FreightAllMap } from "@/src/hooks/freight/useGetAllFreigth";
-import type { FreightMap } from "@/src/hooks/freight/useGetFreightUser";
+import type { FreightMap } from "@/src/context/FreightUserContext";
 import type { MapVehicle } from "@/src/interfaces";
 
 interface EditPerfilRouteParams {

@@ -1,7 +1,7 @@
-import { AxiosError } from "axios";
 import { useCallback, useRef, useState } from "react";
 import { useAlertDefault } from "@/src/context/AlertDefaultContext";
 import http from "@/src/services/http";
+import { getApiErrorMessage } from "@/src/utils/apiError";
 
 export interface FreightAllMap {
 	id: number;
@@ -28,7 +28,14 @@ export interface FreightAllMap {
 
 	status: StatusFreightMap | null;
 	cargo: CargoMap | null;
+	Company?: CompanyMap | null;
 	proposals?: ProposalMap[];
+}
+
+interface CompanyMap {
+	id: number;
+	name: string;
+	city?: string | null;
 }
 
 interface CargoMap {
@@ -117,8 +124,10 @@ export function useGetAllFreigth() {
 				setAllFreigth((prev) => mergeUniqueById(prev, data.items));
 			}
 		} catch (error) {
-			const message = (error as AxiosError<{ message: string }>).response?.data?.message ?? "";
-			notify({ status: "error", message });
+			notify({
+				status: "error",
+				message: getApiErrorMessage(error),
+			});
 		} finally {
 			inFlightRef.current = false;
 			setIsLoading(false);

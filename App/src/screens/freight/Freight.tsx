@@ -15,7 +15,7 @@ import { getCurrentCoordinates } from "@/src/services/location";
 import { isUsableGps } from "@/src/utils/googleMapsDirections";
 import { filterAndSortFreights } from "@/src/utils/freightListQuery";
 import { DEFAULT_FREIGHT_FILTER_STATE, type FreightFilterState } from "@/src/types/freightFilter";
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import type { RootStackParamList } from "@/src/routes/Routes";
 
@@ -131,10 +131,12 @@ const Freight = () => {
 		setShowFilterModal(false);
 	}, []);
 
-	useEffect(() => {
-		void handleGetAllFreigth();
-		void handleGetUser();
-	}, [handleGetAllFreigth, handleGetUser]);
+	useFocusEffect(
+		useCallback(() => {
+			void handleGetAllFreigth();
+			void handleGetUser();
+		}, [handleGetAllFreigth, handleGetUser]),
+	);
 
 	return (
 		<SafeAreaView style={{ flex: 1, paddingHorizontal: 16, backgroundColor: colors.bg, paddingTop: 10 }}>

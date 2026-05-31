@@ -1,12 +1,14 @@
-import { AxiosError } from "axios";
 import { useCallback, useState } from "react";
 
 import { useAlertDefault } from "@/src/context/AlertDefaultContext";
 import http from "@/src/services/http";
 import i18n from "@/src/i18n";
+import { getApiErrorMessage } from "@/src/utils/apiError";
+import { useFreightUserContext } from "@/src/context/FreightUserContext";
 
 export function useConfirmProposal() {
 	const { notify } = useAlertDefault();
+	const { invalidateFreightUser } = useFreightUserContext();
 	const [isLoading, setIsLoading] = useState(false);
 
 	const handleConfirmProposal = useCallback(
@@ -27,19 +29,19 @@ export function useConfirmProposal() {
 					status: "success",
 					message: data.message ?? i18n.t("NOTIFICATIONS.CONFIRMPROPOSALSUCCESS"),
 				});
+				await invalidateFreightUser();
 				return true;
 			} catch (error) {
-				const message = (error as AxiosError<{ message: string }>).response?.data?.message ?? "";
 				await notify({
 					status: "error",
-					message: message || i18n.t("NOTIFICATIONS.ERROR"),
+					message: getApiErrorMessage(error),
 				});
 				return false;
 			} finally {
 				setIsLoading(false);
 			}
 		},
-		[notify],
+		[notify, invalidateFreightUser],
 	);
 
 	const handleDeclineProposal = useCallback(
@@ -62,10 +64,9 @@ export function useConfirmProposal() {
 				});
 				return true;
 			} catch (error) {
-				const message = (error as AxiosError<{ message: string }>).response?.data?.message ?? "";
 				await notify({
 					status: "error",
-					message: message || i18n.t("NOTIFICATIONS.ERROR"),
+					message: getApiErrorMessage(error),
 				});
 				return false;
 			} finally {

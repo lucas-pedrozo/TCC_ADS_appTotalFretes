@@ -1,9 +1,10 @@
 import { useCallback, useState } from "react";
-import { AxiosError } from "axios";
 
 import { useAlertDefault } from "@/src/context/AlertDefaultContext";
 import type { FreightAllMap } from "@/src/hooks/freight/useGetAllFreigth";
 import http from "@/src/services/http";
+import i18n from "@/src/i18n";
+import { getApiErrorMessage } from "@/src/utils/apiError";
 
 export type ProposalMap = {
 	id: number;
@@ -77,10 +78,10 @@ export function useGetProposals() {
 
 			setProposals(hydratedProposals);
 		} catch (error) {
-			const message = (error as AxiosError<{ message: string }>).response?.data?.message ?? "";
-			if (message) {
-				notify({ status: "error", message });
-			}
+			notify({
+				status: "error",
+				message: getApiErrorMessage(error),
+			});
 		} finally {
 			setIsLoading(false);
 		}
