@@ -1,7 +1,6 @@
 import { useCallback, useState } from "react";
-import { AxiosError } from "axios";
-
 import { useAlertDefault } from "@/src/context/AlertDefaultContext";
+import { getApiErrorMessage } from "@/src/utils/apiError";
 import type { FreightAllMap } from "@/src/hooks/freight/useGetAllFreigth";
 import http from "@/src/services/http";
 import i18n from "@/src/i18n";
@@ -36,10 +35,10 @@ export function useProposalDetail() {
 					return data;
 				}
 			} catch (error) {
-				const message = (error as AxiosError<{ message: string }>).response?.data?.message ?? "";
-				if (message) {
-					notify({ status: "error", message });
-				}
+				notify({
+					status: "error",
+					message: getApiErrorMessage(error),
+				});
 				setProposal(null);
 				return null;
 			} finally {
@@ -60,10 +59,10 @@ export function useProposalDetail() {
 				});
 				return true;
 			} catch (error) {
-				const message =
-					(error as AxiosError<{ message: string }>).response?.data?.message ??
-					i18n.t("NOTIFICATIONS.ERROR");
-				await notify({ status: "error", message });
+				await notify({
+					status: "error",
+					message: getApiErrorMessage(error),
+				});
 				return false;
 			} finally {
 				setIsCancelling(false);

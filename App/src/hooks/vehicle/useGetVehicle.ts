@@ -1,8 +1,9 @@
 import { useCallback, useState } from "react";
 import http from "@/src/services/http";
-import { AxiosError } from "axios";
 import { useAlertDefault } from "@/src/context/AlertDefaultContext";
 import { MapVehicle } from "@/src/interfaces";
+import i18n from "@/src/i18n";
+import { getApiErrorMessage } from "@/src/utils/apiError";
 
 
 
@@ -26,13 +27,10 @@ export function useGetVehicle() {
 
     } catch (error) {
       setVehicleData(null);
-      const message = (error as AxiosError<{ message: string }>).response?.data?.message ?? "";
-      if (message) {
-        notify({
-          status: "alert",
-          message,
-        });
-      }
+      notify({
+        status: "error",
+        message: getApiErrorMessage(error),
+      });
     } finally {
       setIsLoading(false);
     }

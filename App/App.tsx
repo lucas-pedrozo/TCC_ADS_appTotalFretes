@@ -11,6 +11,7 @@ import { RegisterVehicleProvider } from "./src/context/RegisterVehicleContext";
 import AlertNotification from "./src/components/alert/AlertDefault";
 import { useAlertDefault, AlertDefaultProvider } from "./src/context/AlertDefaultContext";
 import { LanguageProvider } from "./src/context/LanguageContext";
+import { FreightUserProvider } from "./src/context/FreightUserContext";
 
 const AlertNotificationGlobal = () => {
   const { alert, hideAlert } = useAlertDefault();
@@ -33,6 +34,7 @@ function App() {
         <LanguageProvider>
           <AuthProvider>
             <AlertDefaultProvider>
+            <FreightUserProvider>
               <KeyboardProvider>
                 <SingUpProvider>
                   <RegisterVehicleProvider>
@@ -41,6 +43,7 @@ function App() {
                   </RegisterVehicleProvider>
                 </SingUpProvider>
               </KeyboardProvider>
+            </FreightUserProvider>
             </AlertDefaultProvider>
           </AuthProvider>
         </LanguageProvider>

@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
-import { AxiosError } from "axios";
 import http from "@/src/services/http";
+import { getApiErrorMessage } from "@/src/utils/apiError";
 import { useAuth } from "@/src/context/AuthContext";
 import { useAlertDefault } from "@/src/context/AlertDefaultContext";
 import i18n from "@/src/i18n";
@@ -30,10 +30,10 @@ export function useDeleteUser() {
 			handleRemoveSavedAccount();
 			logout();
 		} catch (error) {
-			const message = (error as AxiosError<{ message: string }>).response?.data?.message ?? "";
-			if (message) {
-				await notify({ status: "error", message });
-			}
+			await notify({
+				status: "error",
+				message: getApiErrorMessage(error),
+			});
 		} finally {
 			setIsdisabled(false);
 		}

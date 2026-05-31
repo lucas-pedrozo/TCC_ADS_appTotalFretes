@@ -1,11 +1,13 @@
-import { AxiosError } from "axios";
 import { useCallback, useState } from "react";
 import i18n from "@/src/i18n";
 import { useAlertDefault } from "@/src/context/AlertDefaultContext";
 import http from "@/src/services/http";
+import { getApiErrorMessage } from "@/src/utils/apiError";
+import { useFreightUserContext } from "@/src/context/FreightUserContext";
 
 export function useCancelFreight() {
 	const { notify } = useAlertDefault();
+	const { invalidateFreightUser } = useFreightUserContext();
 	const [isLoading, setIsLoading] = useState(false);
 
 	const handleCancelFreight = useCallback(
@@ -24,14 +26,17 @@ export function useCancelFreight() {
 					status: "success",
 					message: i18n.t("NOTIFICATIONS.CANCELFREIGHTSUCCESS"),
 				});
+				await invalidateFreightUser();
 			} catch (error) {
-				const message = (error as AxiosError<{ message: string }>).response?.data?.message ?? "";
-				await notify({ status: "error", message });
+				await notify({
+					status: "error",
+					message: getApiErrorMessage(error, i18n.t("NOTIFICATIONS.ERROR")),
+				});
 			} finally {
 				setIsLoading(false);
 			}
 		},
-		[notify],
+		[notify, invalidateFreightUser],
 	);
 
 	return {

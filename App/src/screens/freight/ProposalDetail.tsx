@@ -77,7 +77,10 @@ const ProposalDetail = () => {
 		const ok = await handleConfirmProposal(proposalId);
 		if (ok) {
 			await handleGetProposal(proposalId);
-			navigation.navigate("AndamentoTab" as never);
+			navigation.reset({
+				index: 0,
+				routes: [{ name: "Home", params: { screen: "AndamentoTab" } }],
+			});
 		}
 	}, [handleConfirmProposal, handleGetProposal, navigation, proposalId]);
 

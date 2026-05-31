@@ -2,8 +2,8 @@ import http from "@/src/services/http";
 import { useRegisterVehicleContext, VehicleGroupType } from "@/src/context/RegisterVehicleContext";
 import { useForm } from "react-hook-form";
 import { useAlertDefault } from "@/src/context/AlertDefaultContext";
-import { AxiosError } from "axios";
 import i18n from "@/src/i18n";
+import { getApiErrorMessage } from "@/src/utils/apiError";
 import { useNavigation, NavigationProp } from "@react-navigation/native";
 import { RootStackParamList } from "@/src/routes/Routes";
 
@@ -61,10 +61,10 @@ export function useRegisterVehicle() {
 
       navigation.navigate("Home");
     } catch (error) {
-      const message = (error as AxiosError<{ message: string }>).response?.data?.message ?? "";
-      if (message) {
-        notify({ status: "error", message });
-      }
+      notify({
+        status: "error",
+        message: getApiErrorMessage(error),
+      });
     }
   };
 

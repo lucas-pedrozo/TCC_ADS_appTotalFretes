@@ -488,6 +488,8 @@ export default function MapScreen() {
 	useEffect(() => {
 		if (loading) return;
 
+		let cancelled = false;
+
 		if (hasFreightRoute && freightUser) {
 			const useDriverLeg = Boolean(coords && !error);
 			void handleGetMapBox(freightUser.origin_label, freightUser.destination_label, {
@@ -496,8 +498,12 @@ export default function MapScreen() {
 					useDriverLeg && coords
 						? `${coords.longitude},${coords.latitude}`
 						: undefined,
+			}).finally(() => {
+				if (cancelled) clearRota();
 			});
-			return;
+			return () => {
+				cancelled = true;
+			};
 		}
 		clearRota();
 	}, [

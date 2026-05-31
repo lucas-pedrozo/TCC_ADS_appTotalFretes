@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { RefreshControl, ScrollView, Text, View } from "react-native";
 
@@ -12,11 +12,10 @@ import { useGetUser } from "@/src/hooks/user/useGetUser";
 import { HeaderHome } from "@/src/components/header/HeaderHome";
 import ModalNotificacoes from "@/src/components/modal/ModalNotificacoes";
 
-import { TabParamList } from "@/src/routes/RoutesTabs";
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { CardVehicle } from "@/src/components/cards/CardVehicle";
 import { useGetVehicle } from "@/src/hooks/vehicle/useGetVehicle";
-import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
+import type { HomeTabNavigationProp } from "@/src/routes/navigationTypes";
 import { CardActivityHome } from "@/src/components/cards/CardActivityHome";
 import { useGetFreightUser } from "@/src/hooks/freight/useGetFreightUser";
 import { CardMap } from "@/src/components/cards/CardMap";
@@ -30,7 +29,7 @@ function Home() {
 	const currentHour = new Date().getHours();
 	const [refreshKey, setRefreshKey] = useState(0);
 	const [isRefreshing, setIsRefreshing] = useState(false);
-	const navigation = useNavigation<BottomTabNavigationProp<TabParamList>>();
+	const navigation = useNavigation<HomeTabNavigationProp>();
 	const [isModalNotificacoesVisible, setIsModalNotificacoesVisible] = useState(false);
 
 	const { userData, handleGetUser } = useGetUser();
@@ -49,31 +48,46 @@ function Home() {
 	};
 
 	const goToMap = () => {
-		navigation.navigate("MapScreen" as never);
+		navigation.navigate("MapScreen");
 	};
 
 	const goToDetailVehicle = useCallback(() => {
 		if (!vehicleData) return;
-		(navigation as any).navigate("DetailVehicle", { vehicle: vehicleData });
+		navigation.navigate("DetailVehicle", { vehicle: vehicleData });
 	}, [navigation, vehicleData]);
 
 	const handleRefresh = useCallback(async () => {
 		setIsRefreshing(true);
 		try {
-			await Promise.all([handleGetUser(), refetchWeather(), handleGetFreightUser()]);
+			const tasks: Promise<unknown>[] = [
+				handleGetUser(),
+				refetchWeather(),
+				handleGetFreightUser(),
+			];
+			if (userData?.vehicle_id) {
+				tasks.push(handleGetVehicle(userData.vehicle_id));
+			}
+			await Promise.all(tasks);
 			setRefreshKey((prev) => prev + 1);
 		} finally {
 			setIsRefreshing(false);
 		}
-	}, [handleGetUser, refetchWeather, handleGetFreightUser]);
+	}, [handleGetUser, handleGetFreightUser, handleGetVehicle, refetchWeather, userData?.vehicle_id]);
 
-	useEffect(() => {
-		handleGetUser();
-		if (userData?.vehicle_id) {
-			handleGetVehicle(userData?.vehicle_id);
-		}
-		handleGetFreightUser();
-	}, [handleGetUser, handleGetFreightUser, handleGetVehicle, userData?.vehicle_id]);
+	useFocusEffect(
+		useCallback(() => {
+			void handleGetUser();
+			void handleGetFreightUser();
+		}, [handleGetUser, handleGetFreightUser]),
+	);
+
+	useFocusEffect(
+		useCallback(() => {
+			if (userData?.vehicle_id) {
+				void handleGetVehicle(userData.vehicle_id);
+			}
+		}, [handleGetVehicle, userData?.vehicle_id]),
+	);
 
 	return (
 		<SafeAreaView style={{ flex: 1, backgroundColor: colors.bg }}>

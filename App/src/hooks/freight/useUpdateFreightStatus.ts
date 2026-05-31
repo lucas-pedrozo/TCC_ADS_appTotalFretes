@@ -1,9 +1,10 @@
-import { AxiosError } from "axios";
 import { useCallback, useState } from "react";
 
 import { useAlertDefault } from "@/src/context/AlertDefaultContext";
+import { useFreightUserContext } from "@/src/context/FreightUserContext";
 import http from "@/src/services/http";
 import i18n from "@/src/i18n";
+import { getApiErrorMessage } from "@/src/utils/apiError";
 
 /**
  * Slugs (campo `name` no backend) que o motorista pode acionar.
@@ -33,6 +34,7 @@ async function resolveStatusIdBySlug(slug: DriverFreightStatusSlug): Promise<num
 
 export function useUpdateFreightStatus() {
 	const { notify } = useAlertDefault();
+	const { invalidateFreightUser } = useFreightUserContext();
 	const [isLoading, setIsLoading] = useState(false);
 
 	const handleUpdateFreightStatus = useCallback(
@@ -60,19 +62,19 @@ export function useUpdateFreightStatus() {
 					status: "success",
 					message: i18n.t("NOTIFICATIONS.UPDATEFREIGHTSTATUSSUCCESS"),
 				});
+				await invalidateFreightUser();
 				return true;
 			} catch (error) {
-				const message = (error as AxiosError<{ message: string }>).response?.data?.message ?? "";
 				await notify({
 					status: "error",
-					message: message || i18n.t("NOTIFICATIONS.UPDATEFREIGHTSTATUSFAILED"),
+					message: getApiErrorMessage(error, i18n.t("NOTIFICATIONS.UPDATEFREIGHTSTATUSFAILED")),
 				});
 				return false;
 			} finally {
 				setIsLoading(false);
 			}
 		},
-		[notify],
+		[notify, invalidateFreightUser],
 	);
 
 	return {

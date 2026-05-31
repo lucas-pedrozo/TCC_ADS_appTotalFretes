@@ -1,4 +1,3 @@
-import { AxiosError } from "axios";
 import { useCallback } from "react";
 import http from "@/src/services/http";
 import { useForm } from "react-hook-form";
@@ -6,6 +5,7 @@ import { useAuth } from "@/src/context/AuthContext";
 import { getValidationRules } from "@/src/utils/formValidations";
 import { useAlertDefault } from "@/src/context/AlertDefaultContext";
 import i18n from "@/src/i18n";
+import { getApiErrorMessage } from "@/src/utils/apiError";
 
 import { RootStackParamList } from "@/src/routes/Routes";
 import { RouteProp, useRoute } from "@react-navigation/native";
@@ -47,8 +47,10 @@ export function useEditCnh() {
         message: i18n.t("NOTIFICATIONS.EDITCNHSUCCESS"),
       });
     } catch (error) {
-      const message = (error as AxiosError<{ message: string }>).response?.data?.message ?? "";
-      notify({ status: "error", message });
+      notify({
+        status: "error",
+        message: getApiErrorMessage(error),
+      });
     }
   }, [notify, id]);
 

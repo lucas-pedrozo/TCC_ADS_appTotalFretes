@@ -17,14 +17,10 @@ export function useSignUpCnh(options?: UseSignUpCnhOptions) {
   });
 
   const handleNext = useCallback(() => {
-    try {
-      handleSubmit((data) => {
-        setCnh(data);
-        options?.onNext?.();
-      })();
-    } catch (error) {
-      console.log(error);
-    }
+    handleSubmit((data) => {
+      setCnh(data);
+      options?.onNext?.();
+    })();
   }, [handleSubmit, options, setCnh]);
 
   const validationRules = getValidationRules();

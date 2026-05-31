@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { Linking, RefreshControl, ScrollView, Text, TouchableOpacity, View } from "react-native";
 
 import { useCancelFreight } from "@/src/hooks/freight/useCancelFreight";
@@ -14,9 +14,8 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { CardFreight } from "@/src/components/cards/CardFreight";
 import { CardActivityHome } from "@/src/components/cards/CardActivityHome";
 import { useTranslation } from "react-i18next";
-import { useNavigation } from "@react-navigation/native";
-import type { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
-import type { TabParamList } from "@/src/routes/RoutesTabs";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import type { AndamentoTabNavigationProp } from "@/src/routes/navigationTypes";
 import { getCurrentCoordinates, type Coordinates } from "@/src/services/location";
 import { buildGoogleMapsDirectionsUrl, isUsableGps } from "@/src/utils/googleMapsDirections";
 import { useAlertDefault } from "@/src/context/AlertDefaultContext";
@@ -29,7 +28,7 @@ function OngoingFreights() {
 	const [refreshKey, setRefreshKey] = useState(0);
 	const [isRefreshing, setIsRefreshing] = useState(false);
 	const { t } = useTranslation();
-	const navigation = useNavigation<BottomTabNavigationProp<TabParamList>>();
+	const navigation = useNavigation<AndamentoTabNavigationProp>();
 	const { notify } = useAlertDefault();
 
 	const { freightUser, handleGetFreightUser } = useGetFreightUser();
@@ -46,25 +45,26 @@ function OngoingFreights() {
 		}
 	}, [handleGetFreightUser]);
 
-	useEffect(() => {
-		handleGetFreightUser();
-	}, [handleGetFreightUser]);
+	useFocusEffect(
+		useCallback(() => {
+			void handleGetFreightUser();
+		}, [handleGetFreightUser]),
+	);
 
 	const destinationLabel = freightUser?.destination_label?.trim() ?? "";
 	const stopLabel = freightUser?.origin_label?.trim() ?? "";
 	const canOpenGoogle = Boolean(destinationLabel);
 
 	const goToMapScreen = useCallback(() => {
-		navigation.navigate("MapScreen" as never);
+		navigation.navigate("MapScreen");
 	}, [navigation]);
 
 	const handleCancel = useCallback(async () => {
 		if (!freightUser?.id) return;
 
 		await handleCancelFreight(freightUser.id);
-		await handleGetFreightUser();
 		setRefreshKey((prev) => prev + 1);
-	}, [freightUser?.id, handleCancelFreight, handleGetFreightUser]);
+	}, [freightUser?.id, handleCancelFreight]);
 
 	/**
 	 * Normaliza para comparar status com tolerância a acentos, espa\u00e7os e
@@ -98,10 +98,9 @@ function OngoingFreights() {
 
 		const ok = await handleUpdateFreightStatus(freightUser.id, nextStatusAction.slug);
 		if (ok) {
-			await handleGetFreightUser();
 			setRefreshKey((prev) => prev + 1);
 		}
-	}, [freightUser?.id, handleGetFreightUser, handleUpdateFreightStatus, nextStatusAction]);
+	}, [freightUser?.id, handleUpdateFreightStatus, nextStatusAction]);
 
 	const openGoogleMaps = useCallback(async () => {
 		if (!destinationLabel) return;
