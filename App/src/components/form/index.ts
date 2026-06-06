@@ -8,6 +8,7 @@ export { InputDate } from "./inputs/InputDate";
 export { InputPhone } from "./inputs/InputPhone";
 export { InputPlate } from "./inputs/InputPlate";
 export { InputGroup } from "./inputs/InputGroup";
+export { InputSelect, type SelectOption } from "./inputs/InputSelect";
 export { InputSearch } from "./inputs/InputSearch";
 
 export { Option } from "./Option";

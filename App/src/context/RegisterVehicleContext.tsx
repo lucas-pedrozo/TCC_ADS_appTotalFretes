@@ -1,6 +1,6 @@
 import React, { createContext, useCallback, useContext, useMemo, useState } from "react";
 
-export type VehicleGroupType = "caminhao" | "carreta" | "bitrem";
+export type VehicleGroupType = "caminhao" | "carreta" | "bitrem" | "liquidos";
 
 export type VehicleTypeData = {
 	id: number;

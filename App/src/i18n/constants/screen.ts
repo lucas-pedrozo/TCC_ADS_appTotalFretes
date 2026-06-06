@@ -4,7 +4,7 @@
 
 export const screenPT = {
   COMMON: {
-    APPNAME: "Total Frete",
+    APPNAME: "Total Fretes",
     NOTINFORMED: "Não informado",
     NONE: "Nenhum",
     N_A: "N/A",
@@ -108,7 +108,7 @@ export const screenPT = {
       CNHLABEL: "CNH",
       CNHPLACEHOLDER: "00000000000",
       ISSUINGAGENCYLABEL: "Órgão Emissor",
-      ISSUINGAGENCYPLACEHOLDER: "Órgão Emissor",
+      ISSUINGAGENCYPLACEHOLDER: "Selecione o estado",
       CATEGORYLABEL: "Categoria da CNH",
       USEGLASSESLABEL: "Usa óculos?",
       YES: "Sim",
@@ -314,7 +314,7 @@ export const screenPT = {
 
 export const screenEN = {
   COMMON: {
-    APPNAME: "Total Freight",
+    APPNAME: "Total Freights",
     NOTINFORMED: "Not informed",
     NONE: "None",
     N_A: "N/A",
@@ -417,7 +417,7 @@ export const screenEN = {
       CNHLABEL: "Driver License",
       CNHPLACEHOLDER: "00000000000",
       ISSUINGAGENCYLABEL: "Issuing Agency",
-      ISSUINGAGENCYPLACEHOLDER: "Issuing Agency",
+      ISSUINGAGENCYPLACEHOLDER: "Select state",
       CATEGORYLABEL: "License Category",
       USEGLASSESLABEL: "Do you wear glasses?",
       YES: "Yes",

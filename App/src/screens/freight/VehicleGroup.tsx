@@ -18,6 +18,7 @@ const nomeToKey: Record<string, VehicleGroupType> = {
   Caminhão: "caminhao",
   Carreta: "carreta",
   Bitrem: "bitrem",
+  "Para carga de líquidos": "liquidos",
 };
 
 const CardVehicleGroup = ({ title, onPress }: { title: string; onPress: () => void }) => {

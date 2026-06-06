@@ -68,7 +68,7 @@ export function useLogin(options: UseLoginOptions = {}) {
     } catch (error) {
       notify({
         status: "error",
-        message: (error as AxiosError<{ message: string }>).response?.data?.message ?? i18n.t("NOTIFICATIONS.ERROR"),
+        message: (error as AxiosError<{ message: string }>).response?.data?.message ?? "Erro ao fazer login",
       });
     } finally {
       setIsDisabled(false);

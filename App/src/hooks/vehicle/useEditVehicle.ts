@@ -51,7 +51,7 @@ export function useEditVehicle({ vehicleId, defaultValues, onSuccess }: UseEditV
 				country: data.country.trim(),
 			};
 
-			await http.patch(`vehicle/${vehicleId}`, payload);
+			await http.put(`vehicle/${vehicleId}`, payload);
 
 			await notify({
 				status: "success",
@@ -61,6 +61,7 @@ export function useEditVehicle({ vehicleId, defaultValues, onSuccess }: UseEditV
 			onSuccess?.();
 			navigation.goBack();
 		} catch (error) {
+			console.log(error);
 			const message = (error as AxiosError<{ message: string }>).response?.data?.message ?? "";
 			notify({
 				status: "error",
