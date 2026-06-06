@@ -10,12 +10,13 @@ export type HeaderHomeProps = {
   greeting: string;
   userData?: MapUser | null;
   notInformedLabel: string;
+  unreadCount?: number;
   onLogout: () => void;
   onProfilePress: () => void;
   onNotificationsPress: () => void;
 };
 
-export const HeaderHome = ({ userData, greeting, notInformedLabel, onProfilePress, onNotificationsPress, onLogout }: HeaderHomeProps) => {
+export const HeaderHome = ({ userData, greeting, notInformedLabel, unreadCount = 0, onProfilePress, onNotificationsPress, onLogout }: HeaderHomeProps) => {
   const colors = useThemeColors();
   const iconColor = useIconColor();
   const profileImageUrl = userData?.UserImage?.path ? `${ENV_BASE_URL}${userData.UserImage.path}` : undefined;
@@ -40,8 +41,18 @@ export const HeaderHome = ({ userData, greeting, notInformedLabel, onProfilePres
       </View>
 
       <View className="flex-row items-center gap-2.5">
-        <TouchableOpacity onPress={onNotificationsPress} className="p-2.5 rounded-xl" style={{ backgroundColor: colors.bgNonary }}>
+        <TouchableOpacity onPress={onNotificationsPress} className="p-2.5 rounded-xl relative" style={{ backgroundColor: colors.bgNonary }}>
           <Ionicons name="notifications-outline" size={24} color={iconColor} />
+          {unreadCount > 0 ? (
+            <View
+              className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] rounded-full items-center justify-center px-1"
+              style={{ backgroundColor: "#EF4444" }}
+            >
+              <Text className="text-[10px] font-bold text-white">
+                {unreadCount > 99 ? "99+" : unreadCount}
+              </Text>
+            </View>
+          ) : null}
         </TouchableOpacity>
 
         <TouchableOpacity onPress={onLogout} className="p-2.5 rounded-xl" style={{ backgroundColor: colors.bgNonary }}>
