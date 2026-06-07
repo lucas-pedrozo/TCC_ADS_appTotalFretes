@@ -302,6 +302,7 @@ export const screenPT = {
   MODALNOTIFICACOES: {
     TITLE: "Notificações",
     EMPTY: "Nenhuma notificação disponível.",
+    CLEAR: "Limpar",
   },
   FORGOTPASSWORDCODE: {
     CODEREQUIRED: "Código é obrigatório",
@@ -612,6 +613,7 @@ export const screenEN = {
   MODALNOTIFICACOES: {
     TITLE: "Notifications",
     EMPTY: "No notifications available.",
+    CLEAR: "Clear",
   },
   FORGOTPASSWORDCODE: {
     CODEREQUIRED: "Code is required",

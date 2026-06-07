@@ -11,6 +11,9 @@ import { CardClime } from "@/src/components/cards/CardClime";
 import { useGetUser } from "@/src/hooks/user/useGetUser";
 import { HeaderHome } from "@/src/components/header/HeaderHome";
 import ModalNotificacoes from "@/src/components/modal/ModalNotificacoes";
+import { useNotifications } from "@/src/hooks/useNotifications";
+import type { AppNotification } from "@/src/hooks/useNotifications";
+import { navigateFromNotification } from "@/src/utils/notificationNavigation";
 
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { CardVehicle } from "@/src/components/cards/CardVehicle";
@@ -31,6 +34,7 @@ function Home() {
 	const [isRefreshing, setIsRefreshing] = useState(false);
 	const navigation = useNavigation<HomeTabNavigationProp>();
 	const [isModalNotificacoesVisible, setIsModalNotificacoesVisible] = useState(false);
+	const { notifications, unreadCount, markAsRead, clearAll } = useNotifications();
 
 	const { userData, handleGetUser } = useGetUser();
 	const { vehicleData, handleGetVehicle } = useGetVehicle();
@@ -89,6 +93,12 @@ function Home() {
 		}, [handleGetVehicle, userData?.vehicle_id]),
 	);
 
+	const handleNotificationPress = useCallback(async (notification: AppNotification) => {
+		await markAsRead(notification.id);
+		setIsModalNotificacoesVisible(false);
+		navigateFromNotification(notification, navigation);
+	}, [markAsRead, navigation]);
+
 	return (
 		<SafeAreaView style={{ flex: 1, backgroundColor: colors.bg }}>
 			<ScrollView
@@ -109,6 +119,7 @@ function Home() {
 						greeting={greeting}
 						onProfilePress={goToProfile}
 						notInformedLabel="-----"
+						unreadCount={unreadCount}
 						onNotificationsPress={() => setIsModalNotificacoesVisible(true)}
 						onLogout={logout}
 					/>
@@ -145,7 +156,9 @@ function Home() {
 			<ModalNotificacoes
 				visible={isModalNotificacoesVisible}
 				onClose={() => setIsModalNotificacoesVisible(false)}
-				notifications={[]}
+				notifications={notifications}
+				onClear={clearAll}
+				onNotificationPress={(notification) => { void handleNotificationPress(notification); }}
 			/>
 
 		</SafeAreaView>
