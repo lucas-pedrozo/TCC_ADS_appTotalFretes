@@ -11,6 +11,7 @@ import {
 import { useAlertDefault } from "@/src/context/AlertDefaultContext";
 import { useAuth } from "@/src/context/AuthContext";
 import http from "@/src/services/http";
+import { useFreightTelemetryPublisher } from "@/src/hooks/freight/useFreightTelemetryPublisher";
 import { getApiErrorMessage } from "@/src/utils/apiError";
 
 export interface CompanyMap {
@@ -113,8 +114,14 @@ export function FreightUserProvider({ children }: { children: ReactNode }) {
 	useEffect(() => {
 		if (isAuthenticated !== true) {
 			setFreightUser(null);
+			return;
 		}
-	}, [isAuthenticated]);
+		if (id) {
+			void handleGetFreightUser();
+		}
+	}, [isAuthenticated, id, handleGetFreightUser]);
+
+	useFreightTelemetryPublisher({ freightUser, isAuthenticated: isAuthenticated === true });
 
 	const value = useMemo(
 		() => ({
