@@ -1,4 +1,4 @@
-import { View } from "react-native";
+import { View, Text } from "react-native";
 import { useTranslation } from "react-i18next";
 
 import { InputDefault, ButtonDefault } from "@/src/components/form";
@@ -31,6 +31,9 @@ const SingUpPassword = () => {
 					secureTextEntry
 					rules={rules.password}
 				/>
+				<Text className="text-sm text-gray-500 pl-2.5 -mt-2">
+					{t("SIGNUP.PASSWORD.PASSWORDHINT")}
+				</Text>
 
 				<InputDefault
 					name="confirmPassword"

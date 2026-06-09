@@ -78,7 +78,7 @@ export function useLogin(options: UseLoginOptions = {}) {
   const validationRules = getValidationRules();
   const rules = {
     email: validationRules.email,
-    password: validationRules.password,
+    password: validationRules.loginPassword,
   };
 
   return {

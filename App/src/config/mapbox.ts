@@ -1,5 +1,5 @@
-import Mapbox from "@rnmapbox/maps";
 import { MAPBOX_PUBLIC_TOKEN } from "@env";
+import Mapbox from "@rnmapbox/maps";
 
 Mapbox.setAccessToken(MAPBOX_PUBLIC_TOKEN);
 

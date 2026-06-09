@@ -36,6 +36,9 @@ export const mapPT = {
     PAUSE: "Pausar",
     FREE_NAVIGATION: "Navegação livre",
     LINK_TO_CAR: "Vincular ao carro",
+    SPEED: "Velocidade",
+    SPEED_UNIT_KMH: "km/h",
+    SPEED_A11Y: "Velocidade atual",
   },
 } as const;
 
@@ -73,5 +76,8 @@ export const mapEN = {
     PAUSE: "Pause",
     FREE_NAVIGATION: "Free navigation",
     LINK_TO_CAR: "Link to vehicle",
+    SPEED: "Speed",
+    SPEED_UNIT_KMH: "km/h",
+    SPEED_A11Y: "Current speed",
   },
 } as const;

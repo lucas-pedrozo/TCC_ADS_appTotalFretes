@@ -28,21 +28,27 @@ import {
 	NAV_REROUTE_COOLDOWN_MS,
 	NAV_REROUTE_MIN_MOVE_M,
 	NAV_SNAP_MAX_DISTANCE_M,
+	NAV_MOVING_SPEED_THRESHOLD_KMH,
+	NAV_NEAR_DESTINATION_THRESHOLD_M,
 } from "@/src/config/navigation";
 import {
 	getCurrentCoordinates,
 	requestLocationPermission,
 	startNavigationLocationWatch,
 	type Coordinates,
+	type NavigationLocationUpdate,
 } from "@/src/services/location";
 import { useGetFreightUser } from "@/src/hooks/freight/useGetFreightUser";
 import { useGetMapBox } from "@/src/hooks/freight/useGetMapBox";
+import { useUpdateFreightStatus } from "@/src/hooks/freight/useUpdateFreightStatus";
 import { buildGoogleMapsDirectionsUrl, isUsableGps } from "@/src/utils/googleMapsDirections";
+import { normalizeFreightStatusName } from "@/src/utils/freightStatus";
 import { useTranslation } from "react-i18next";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import type { RootStackParamList } from "@/src/routes/Routes";
 import { useAlertDefault } from "@/src/context/AlertDefaultContext";
+import NavigationSpeedBadge from "@/src/components/mapbox/NavigationSpeedBadge";
 
 type LngLat = [number, number];
 
@@ -237,7 +243,7 @@ export default function MapScreen() {
 	const [currentZoom, setCurrentZoom] = useState(USER_ZOOM);
 	const [navState, setNavState] = useState<NavState>("idle");
 	const [navFollowUser, setNavFollowUser] = useState(true);
-	const [navigationCoords, setNavigationCoords] = useState<Coordinates | null>(null);
+	const [navigationLocation, setNavigationLocation] = useState<NavigationLocationUpdate | null>(null);
 	const [routeProgressAlongM, setRouteProgressAlongM] = useState(0);
 	const [isStartingNav, setIsStartingNav] = useState(false);
 	const [isDriverOnRoute, setIsDriverOnRoute] = useState(false);
@@ -256,6 +262,7 @@ export default function MapScreen() {
 	const prevGeometrySigRef = useRef<string | null>(null);
 	/** Evita desligar o follow logo após animação programática da câmera (gesto “fantasma”). */
 	const ignoreMapGestureUnfollowUntilRef = useRef(0);
+	const hasAttemptedDeliveryStatusRef = useRef(false);
 
 	const { freightUser, handleGetFreightUser } = useGetFreightUser();
 	const {
@@ -266,16 +273,26 @@ export default function MapScreen() {
 		recalculateFromDriverLocation,
 		clearRota,
 	} = useGetMapBox();
+	const { handleUpdateFreightStatus } = useUpdateFreightStatus();
 	const themeColor = mode === "dark" ? THEME_COLORS.dark : THEME_COLORS.light;
 
 	const isNavActive = navState === "running" || navState === "paused";
 
 	const activeCoords = useMemo((): Coordinates | null => {
 		if (navState === "running" || navState === "paused") {
-			return navigationCoords ?? coords;
+			return navigationLocation
+				? { latitude: navigationLocation.latitude, longitude: navigationLocation.longitude }
+				: coords;
 		}
 		return coords;
-	}, [navState, navigationCoords, coords]);
+	}, [navState, navigationLocation, coords]);
+
+	const speedKmh = navigationLocation?.speedKmh ?? 0;
+	const isMoving = isNavActive && speedKmh >= NAV_MOVING_SPEED_THRESHOLD_KMH;
+	const puckBearing = isMoving ? "course" : "heading";
+	const dynamicFollowUserMode = isMoving
+		? UserTrackingMode.FollowWithCourse
+		: UserTrackingMode.FollowWithHeading;
 
 	const followUserActive =
 		navState === "running" && Boolean(activeCoords && !error && navFollowUser);
@@ -528,14 +545,16 @@ export default function MapScreen() {
 		if (prevGeometrySigRef.current === geometrySignature) return;
 		prevGeometrySigRef.current = geometrySignature;
 		offRouteStreakRef.current = 0;
-		const user = navigationCoords ?? coords;
+		const user = navigationLocation
+			? { latitude: navigationLocation.latitude, longitude: navigationLocation.longitude }
+			: coords;
 		if ((navState === "running" || navState === "paused") && user && routeLngLat.length) {
 			const p = projectUserOntoPolyline(user.latitude, user.longitude, routeLngLat);
 			setRouteProgressAlongM(p.distanceAlongMeters);
 		} else {
 			setRouteProgressAlongM(0);
 		}
-	}, [geometrySignature, routeLngLat, navState, navigationCoords, coords]);
+	}, [geometrySignature, routeLngLat, navState, navigationLocation, coords]);
 
 	/** GPS contínuo só com navegação ativa (economiza bateria). */
 	useEffect(() => {
@@ -543,8 +562,8 @@ export default function MapScreen() {
 		let cancelled = false;
 		let watcher: { remove: () => void } | null = null;
 		void (async () => {
-			const w = await startNavigationLocationWatch((c) => {
-				if (!cancelled) setNavigationCoords(c);
+			const w = await startNavigationLocationWatch((update) => {
+				if (!cancelled) setNavigationLocation(update);
 			});
 			if (!cancelled) watcher = w;
 		})();
@@ -556,7 +575,7 @@ export default function MapScreen() {
 
 	useEffect(() => {
 		if (navState === "idle") {
-			setNavigationCoords(null);
+			setNavigationLocation(null);
 			setRouteProgressAlongM(0);
 			setIsStartingNav(false);
 			setIsDriverOnRoute(false);
@@ -578,7 +597,9 @@ export default function MapScreen() {
 	/** Progresso ao longo da rota + reroute por desvio (só em execução). */
 	useEffect(() => {
 		if (navState !== "running") return;
-		const user = navigationCoords ?? coords;
+		const user = navigationLocation
+			? { latitude: navigationLocation.latitude, longitude: navigationLocation.longitude }
+			: coords;
 		if (!user || !routeLngLat.length) return;
 
 		const proj = projectUserOntoPolyline(user.latitude, user.longitude, routeLngLat);
@@ -629,13 +650,48 @@ export default function MapScreen() {
 		);
 	}, [
 		navState,
-		navigationCoords,
+		navigationLocation,
 		coords,
 		routeLngLat,
 		freightUser,
 		hasFreightRoute,
 		loadingRota,
 		recalculateFromDriverLocation,
+	]);
+
+	/** Verifica proximidade ao destino e atualiza status para "Em Rota de Entrega" automaticamente. */
+	useEffect(() => {
+		if (navState !== "running") {
+			hasAttemptedDeliveryStatusRef.current = false;
+			return;
+		}
+
+		if (hasAttemptedDeliveryStatusRef.current) return;
+		if (!freightUser || !rotaData?.coords_destino) return;
+
+		const currentStatus = normalizeFreightStatusName(freightUser.status?.name);
+		if (currentStatus !== "em transito") return;
+
+		const userCoords = navigationLocation
+			? { latitude: navigationLocation.latitude, longitude: navigationLocation.longitude }
+			: coords;
+		if (!userCoords) return;
+
+		const destination: LngLat = rotaData.coords_destino;
+		const userLngLat: LngLat = [userCoords.longitude, userCoords.latitude];
+		const distanceToDestinationM = distanceMeters(userLngLat, destination);
+
+		if (distanceToDestinationM <= NAV_NEAR_DESTINATION_THRESHOLD_M) {
+			hasAttemptedDeliveryStatusRef.current = true;
+			void handleUpdateFreightStatus(freightUser.id, "Em Rota de Entrega");
+		}
+	}, [
+		navState,
+		navigationLocation,
+		coords,
+		freightUser,
+		rotaData,
+		handleUpdateFreightStatus,
 	]);
 
 	/** Em modo idle, enquadra a rota quando a geometria muda ou ao sair da navegação. */
@@ -898,7 +954,7 @@ export default function MapScreen() {
 				animationMode="flyTo"
 				animationDuration={MAP_CAMERA_FAST_ANIMATION_MS}
 				followUserLocation={followUserActive}
-				followUserMode={UserTrackingMode.FollowWithCourse}
+				followUserMode={dynamicFollowUserMode}
 				followZoomLevel={NAV_ZOOM}
 				followPitch={45}
 				followPadding={
@@ -908,7 +964,7 @@ export default function MapScreen() {
 			<Mapbox.LocationPuck
 				visible={!error}
 				puckBearingEnabled={isNavActive}
-				puckBearing="course"
+				puckBearing={puckBearing}
 			/>
 
 				{remainingRouteCoords.length >= 2 ? (
@@ -1162,6 +1218,12 @@ export default function MapScreen() {
 								)}
 							</TouchableOpacity>
 						</View>
+					</View>
+				) : null}
+
+				{isNavActive ? (
+					<View className="self-start" style={{ marginBottom: 0 }} pointerEvents="none">
+						<NavigationSpeedBadge speedKmh={speedKmh} visible={isNavActive} />
 					</View>
 				) : null}
 

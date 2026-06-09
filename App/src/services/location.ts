@@ -6,6 +6,14 @@ export interface Coordinates {
 	longitude: number;
 }
 
+export interface NavigationLocationUpdate {
+	latitude: number;
+	longitude: number;
+	speedMs: number | null;
+	speedKmh: number | null;
+	heading: number | null;
+}
+
 /**
  * @returns 'granted' se a permissão foi concedida, 'denied' caso contrário
  * @description Solicita permissão para usar o GPS do dispositivo
@@ -66,7 +74,7 @@ export type NavigationLocationWatcher = {
  * Deve ser removido ao sair da navegação para economizar bateria.
  */
 export async function startNavigationLocationWatch(
-	onUpdate: (coords: Coordinates) => void,
+	onUpdate: (update: NavigationLocationUpdate) => void,
 ): Promise<NavigationLocationWatcher | null> {
 	if ((await requestLocationPermission()) !== 'granted') return null;
 
@@ -77,9 +85,17 @@ export async function startNavigationLocationWatch(
 			distanceInterval: 5,
 		},
 		(loc) => {
+			const speedMs = loc.coords.speed;
+			const speedKmh =
+				speedMs != null && Number.isFinite(speedMs) ? Math.max(0, speedMs * 3.6) : null;
+			const heading = loc.coords.heading;
+
 			onUpdate({
 				latitude: loc.coords.latitude,
 				longitude: loc.coords.longitude,
+				speedMs,
+				speedKmh,
+				heading: heading != null && Number.isFinite(heading) ? heading : null,
 			});
 		},
 	);

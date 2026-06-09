@@ -1,4 +1,4 @@
-import { View } from "react-native";
+import { View, Text } from "react-native";
 import { useTranslation } from "react-i18next";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 
@@ -24,6 +24,9 @@ const NewPassword = () => {
 					secureTextEntry
 					rules={rules.password}
 				/>
+				<Text className="text-sm text-gray-500 pl-2.5 -mt-2">
+					{t("SIGNUP.PASSWORD.PASSWORDHINT")}
+				</Text>
 
 				<InputDefault
 					name="confirmPassword"

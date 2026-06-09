@@ -23,7 +23,7 @@ const RenewPassword = () => {
 					placeholder={t("SIGNUP.PASSWORD.OLDPPASSWORDPLACEHOLDER")}
 					label={t("SIGNUP.PASSWORD.OLDPWPASSWORDLABEL")}
 					secureTextEntry
-					rules={rules.password}
+					rules={rules.oldPassword}
 				/>
 				<InputDefault
 					name="password"

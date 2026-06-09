@@ -118,6 +118,7 @@ export const screenPT = {
     PASSWORD: {
       PASSWORDLABEL: "Senha",
       PASSWORDPLACEHOLDER: "Senha",
+      PASSWORDHINT: "Use pelo menos 8 caracteres, com letras maiúsculas e minúsculas.",
       CONFIRMPASSWORDLABEL: "Confirmar Senha",
       CONFIRMPASSWORDPLACEHOLDER: "Confirmar Senha",
       FINISH: "Finalizar",
@@ -428,6 +429,7 @@ export const screenEN = {
     PASSWORD: {
       PASSWORDLABEL: "Password",
       PASSWORDPLACEHOLDER: "Password",
+      PASSWORDHINT: "Use at least 8 characters, with uppercase and lowercase letters.",
       CONFIRMPASSWORDLABEL: "Confirm Password",
       CONFIRMPASSWORDPLACEHOLDER: "Confirm Password",
       FINISH: "Finish",
