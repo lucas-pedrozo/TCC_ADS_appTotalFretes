@@ -47,7 +47,9 @@ export function useEditPerfil(options: UseEditPerfilOptions = {}) {
         message: i18n.t("NOTIFICATIONS.EDITPERFILLOADING"),
       });
 
-      let payload: EditPerfilMap & { userImage_id?: number } = { ...data };
+      const editableData = { ...data };
+      delete editableData.cpf;
+      let payload: Omit<EditPerfilMap, "cpf"> & { userImage_id?: number } = editableData;
 
       if (pendingImageUri) {
         if (id == null) {
