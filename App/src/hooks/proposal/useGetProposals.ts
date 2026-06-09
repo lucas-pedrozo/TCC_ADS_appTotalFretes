@@ -3,8 +3,16 @@ import { useCallback, useState } from "react";
 import { useAlertDefault } from "@/src/context/AlertDefaultContext";
 import type { FreightAllMap } from "@/src/hooks/freight/useGetAllFreigth";
 import http from "@/src/services/http";
-import i18n from "@/src/i18n";
+import {
+	DEFAULT_PROPOSAL_STATUS_FILTER,
+	type ProposalStatusFilter,
+} from "@/src/types/proposalFilter";
 import { getApiErrorMessage } from "@/src/utils/apiError";
+import {
+	filterProposalsByStatus,
+	resolveProposalStatusApiParam,
+	sortProposalsByPriority,
+} from "@/src/utils/proposalListQuery";
 
 export type ProposalMap = {
 	id: number;
@@ -24,7 +32,9 @@ export type ProposalMap = {
 
 const getProposalFreight = (proposal: ProposalMap) => proposal.Freight ?? proposal.freight ?? null;
 
-export function useGetProposals() {
+export function useGetProposals(
+	statusFilter: ProposalStatusFilter = DEFAULT_PROPOSAL_STATUS_FILTER,
+) {
 	const { notify } = useAlertDefault();
 	const [isLoading, setIsLoading] = useState(false);
 	const [proposals, setProposals] = useState<ProposalMap[]>([]);
@@ -33,25 +43,13 @@ export function useGetProposals() {
 		try {
 			setIsLoading(true);
 			const { data } = await http.get<ProposalMap[]>("proposal", {
-				params: { proposal_status: "todas" },
+				params: { proposal_status: resolveProposalStatusApiParam(statusFilter) },
 			});
 			const proposalList = Array.isArray(data) ? data : [];
-
-			const normalizeStatus = (name?: string | null) =>
-				(name ?? "")
-					.normalize("NFD")
-					.replace(/[\u0300-\u036f]/g, "")
-					.trim()
-					.toLowerCase();
-
-			const activeProposals = proposalList.filter((proposal) => {
-				const status = normalizeStatus(proposal.ProposalStatusType?.name);
-				if (status.includes("cancel")) return false;
-				return status === "enviada" || status === "esperando caminhoneiro";
-			});
+			const filteredProposals = filterProposalsByStatus(proposalList, statusFilter);
 
 			const hydratedProposals = await Promise.all(
-				activeProposals.map(async (proposal) => {
+				filteredProposals.map(async (proposal) => {
 					const currentFreight = getProposalFreight(proposal);
 					if (currentFreight?.cargo != null) return proposal;
 
@@ -64,19 +62,7 @@ export function useGetProposals() {
 				}),
 			);
 
-			const sortPriority = (name?: string | null) => {
-				const s = normalizeStatus(name);
-				if (s === "esperando caminhoneiro") return 0;
-				if (s === "enviada") return 1;
-				return 2;
-			};
-
-			hydratedProposals.sort(
-				(a, b) =>
-					sortPriority(a.ProposalStatusType?.name) - sortPriority(b.ProposalStatusType?.name),
-			);
-
-			setProposals(hydratedProposals);
+			setProposals(sortProposalsByPriority(hydratedProposals));
 		} catch (error) {
 			notify({
 				status: "error",
@@ -85,7 +71,7 @@ export function useGetProposals() {
 		} finally {
 			setIsLoading(false);
 		}
-	}, [notify]);
+	}, [notify, statusFilter]);
 
 	return {
 		proposals,

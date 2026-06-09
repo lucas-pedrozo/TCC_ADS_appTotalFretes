@@ -44,8 +44,8 @@ export async function getCurrentCoordinates(): Promise<Coordinates | null> {
 	try {
 		const location = await Promise.race([
 			Location.getCurrentPositionAsync({
-				accuracy: Location.Accuracy.Balanced,
-				timeInterval: 10_000,
+				accuracy: Location.Accuracy.BestForNavigation,
+				timeInterval: 5_000,
 			}),
 			timeout(GPS_TIMEOUT_MS),
 		]);
@@ -69,6 +69,45 @@ export type NavigationLocationWatcher = {
 	remove: () => void;
 };
 
+type SpeedFix = {
+	latitude: number;
+	longitude: number;
+	recordedAt: number;
+};
+
+function haversineMeters(a: Coordinates, b: Coordinates): number {
+	const toRad = (deg: number) => (deg * Math.PI) / 180;
+	const earthRadiusM = 6_371_000;
+	const dLat = toRad(b.latitude - a.latitude);
+	const dLon = toRad(b.longitude - a.longitude);
+	const lat1 = toRad(a.latitude);
+	const lat2 = toRad(b.latitude);
+	const h =
+		Math.sin(dLat / 2) ** 2 +
+		Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) ** 2;
+	return 2 * earthRadiusM * Math.asin(Math.min(1, Math.sqrt(h)));
+}
+
+function resolveSpeedKmh(
+	speedMs: number | null | undefined,
+	previousFix: SpeedFix | null,
+	currentFix: SpeedFix,
+): number | null {
+	if (speedMs != null && Number.isFinite(speedMs) && speedMs >= 0) {
+		return Math.max(0, speedMs * 3.6);
+	}
+
+	if (!previousFix) return null;
+
+	const elapsedSec = (currentFix.recordedAt - previousFix.recordedAt) / 1000;
+	if (elapsedSec < 0.4) return null;
+
+	const distanceM = haversineMeters(previousFix, currentFix);
+	if (distanceM < 0.5) return 0;
+
+	return Math.min(220, (distanceM / elapsedSec) * 3.6);
+}
+
 /**
  * Atualização contínua de GPS para navegação (alta frequência moderada).
  * Deve ser removido ao sair da navegação para economizar bateria.
@@ -78,24 +117,32 @@ export async function startNavigationLocationWatch(
 ): Promise<NavigationLocationWatcher | null> {
 	if ((await requestLocationPermission()) !== 'granted') return null;
 
+	let previousFix: SpeedFix | null = null;
+
 	const sub = await Location.watchPositionAsync(
 		{
-			accuracy: Location.Accuracy.High,
-			timeInterval: 1000,
-			distanceInterval: 5,
+			accuracy: Location.Accuracy.BestForNavigation,
+			timeInterval: 800,
+			distanceInterval: 3,
 		},
 		(loc) => {
-			const speedMs = loc.coords.speed;
-			const speedKmh =
-				speedMs != null && Number.isFinite(speedMs) ? Math.max(0, speedMs * 3.6) : null;
-			const heading = loc.coords.heading;
-
-			onUpdate({
+			const currentFix: SpeedFix = {
 				latitude: loc.coords.latitude,
 				longitude: loc.coords.longitude,
-				speedMs,
+				recordedAt: loc.timestamp ?? Date.now(),
+			};
+			const speedMs = loc.coords.speed;
+			const speedKmh = resolveSpeedKmh(speedMs, previousFix, currentFix);
+			const heading = loc.coords.heading;
+
+			previousFix = currentFix;
+
+			onUpdate({
+				latitude: currentFix.latitude,
+				longitude: currentFix.longitude,
+				speedMs: speedKmh != null ? speedKmh / 3.6 : null,
 				speedKmh,
-				heading: heading != null && Number.isFinite(heading) ? heading : null,
+				heading: heading != null && Number.isFinite(heading) && heading >= 0 ? heading : null,
 			});
 		},
 	);
@@ -103,6 +150,7 @@ export async function startNavigationLocationWatch(
 	return {
 		remove: () => {
 			sub.remove();
+			previousFix = null;
 		},
 	};
 }

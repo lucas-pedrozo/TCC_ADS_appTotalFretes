@@ -12,7 +12,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import Mapbox, { UserTrackingMode, type MapState } from "@rnmapbox/maps";
+import Mapbox, { type MapState } from "@rnmapbox/maps";
 import { Ionicons } from "@expo/vector-icons";
 import * as turf from "@turf/turf";
 
@@ -39,22 +39,25 @@ import {
 	type NavigationLocationUpdate,
 } from "@/src/services/location";
 import { useGetFreightUser } from "@/src/hooks/freight/useGetFreightUser";
+import { publishDriverLocation } from "@/src/services/telemetry";
 import { useGetMapBox } from "@/src/hooks/freight/useGetMapBox";
 import { useUpdateFreightStatus } from "@/src/hooks/freight/useUpdateFreightStatus";
 import { buildGoogleMapsDirectionsUrl, isUsableGps } from "@/src/utils/googleMapsDirections";
 import { normalizeFreightStatusName } from "@/src/utils/freightStatus";
+import { getMapControlTheme } from "@/src/utils/mapControlTheme";
 import { useTranslation } from "react-i18next";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import type { RootStackParamList } from "@/src/routes/Routes";
 import { useAlertDefault } from "@/src/context/AlertDefaultContext";
 import NavigationSpeedBadge from "@/src/components/mapbox/NavigationSpeedBadge";
+import { NavigationDriverMarker } from "@/src/components/mapbox/NavigationDriverMarker";
 
 type LngLat = [number, number];
 
 const DEFAULT_ZOOM = 12;
 const USER_ZOOM = 15;
-const NAV_ZOOM = 17;
+const NAV_ZOOM = 18;
 const MAX_BACKWARD_PROGRESS_M = 12;
 const ROUTE_VIEW_PADDING: [number, number, number, number] = [120, 32, 220, 32];
 
@@ -213,6 +216,22 @@ function clampMonotonicProgress(previousAlongMeters: number, proposedAlongMeters
 	return Math.max(previousAlongMeters - MAX_BACKWARD_PROGRESS_M, proposedAlongMeters);
 }
 
+function bearingAlongRouteAtDistance(route: LngLat[], distanceAlongMeters: number): number | null {
+	if (route.length < 2) return null;
+
+	const line = turf.lineString(route);
+	const totalKm = turf.length(line, { units: "kilometers" });
+	const progressKm = Math.max(0, Math.min(distanceAlongMeters / 1000, totalKm));
+	const lookAheadKm = Math.min(totalKm, progressKm + 0.02);
+	const lookBehindKm = Math.max(0, progressKm - 0.002);
+
+	if (lookAheadKm <= lookBehindKm) return null;
+
+	const fromPoint = turf.along(line, lookBehindKm, { units: "kilometers" });
+	const toPoint = turf.along(line, lookAheadKm, { units: "kilometers" });
+	return turf.bearing(fromPoint, toPoint);
+}
+
 function buildRouteSignature(route: LngLat[]): string | null {
 	if (!route.length) return null;
 	const first = route[0];
@@ -264,7 +283,7 @@ export default function MapScreen() {
 	const ignoreMapGestureUnfollowUntilRef = useRef(0);
 	const hasAttemptedDeliveryStatusRef = useRef(false);
 
-	const { freightUser, handleGetFreightUser } = useGetFreightUser();
+	const { freightUser, handleGetFreightUser, invalidateFreightUser } = useGetFreightUser();
 	const {
 		rotaData,
 		loadingRota,
@@ -276,26 +295,19 @@ export default function MapScreen() {
 	const { handleUpdateFreightStatus } = useUpdateFreightStatus();
 	const themeColor = mode === "dark" ? THEME_COLORS.dark : THEME_COLORS.light;
 
+	const mapControlTheme = useMemo(() => getMapControlTheme(mode, colors), [mode, colors]);
+	const mapButtonStyle = mapControlTheme.button;
+	const mapButtonTextColor = mapControlTheme.foreground;
+	const mapButtonIconColor = mapControlTheme.foreground;
+
 	const isNavActive = navState === "running" || navState === "paused";
 
-	const activeCoords = useMemo((): Coordinates | null => {
-		if (navState === "running" || navState === "paused") {
-			return navigationLocation
-				? { latitude: navigationLocation.latitude, longitude: navigationLocation.longitude }
-				: coords;
-		}
-		return coords;
-	}, [navState, navigationLocation, coords]);
-
-	const speedKmh = navigationLocation?.speedKmh ?? 0;
-	const isMoving = isNavActive && speedKmh >= NAV_MOVING_SPEED_THRESHOLD_KMH;
-	const puckBearing = isMoving ? "course" : "heading";
-	const dynamicFollowUserMode = isMoving
-		? UserTrackingMode.FollowWithCourse
-		: UserTrackingMode.FollowWithHeading;
-
-	const followUserActive =
-		navState === "running" && Boolean(activeCoords && !error && navFollowUser);
+	const speedKmh = navigationLocation?.speedKmh ?? null;
+	const isMoving =
+		isNavActive &&
+		speedKmh != null &&
+		Number.isFinite(speedKmh) &&
+		speedKmh >= NAV_MOVING_SPEED_THRESHOLD_KMH;
 
 	const syncCurrentZoom = useCallback((nextZoom: number, force = false) => {
 		if (!Number.isFinite(nextZoom)) return;
@@ -404,6 +416,57 @@ export default function MapScreen() {
 		if (!Array.isArray(lineCoordinates) || !lineCoordinates.length) return [];
 		return lineCoordinates as LngLat[];
 	}, [lineCoordinates]);
+
+	const snappedDriverPosition = useMemo(() => {
+		if (!isNavActive || !navigationLocation || !routeLngLat.length) return null;
+
+		const projection = projectUserOntoPolyline(
+			navigationLocation.latitude,
+			navigationLocation.longitude,
+			routeLngLat,
+		);
+
+		if (projection.distanceToRouteMeters <= NAV_SNAP_MAX_DISTANCE_M) {
+			const [longitude, latitude] = projection.nearestOnRoute;
+			const routeBearing = bearingAlongRouteAtDistance(
+				routeLngLat,
+				projection.distanceAlongMeters,
+			);
+			return {
+				latitude,
+				longitude,
+				onRoute: true,
+				bearing: routeBearing ?? navigationLocation.heading ?? 0,
+			};
+		}
+
+		return {
+			latitude: navigationLocation.latitude,
+			longitude: navigationLocation.longitude,
+			onRoute: false,
+			bearing: navigationLocation.heading ?? 0,
+		};
+	}, [isNavActive, navigationLocation, routeLngLat]);
+
+	const driverBearing = snappedDriverPosition?.bearing ?? navigationLocation?.heading ?? 0;
+
+	const activeCoords = useMemo((): Coordinates | null => {
+		if (navState === "running" || navState === "paused") {
+			if (snappedDriverPosition) {
+				return {
+					latitude: snappedDriverPosition.latitude,
+					longitude: snappedDriverPosition.longitude,
+				};
+			}
+			return navigationLocation
+				? { latitude: navigationLocation.latitude, longitude: navigationLocation.longitude }
+				: coords;
+		}
+		return coords;
+	}, [navState, navigationLocation, coords, snappedDriverPosition]);
+
+	const followDriverOnRoute =
+		navState === "running" && Boolean(activeCoords && !error && navFollowUser);
 
 	const totalRouteMeters = useMemo(() => polylineLengthMeters(routeLngLat), [routeLngLat]);
 
@@ -555,6 +618,47 @@ export default function MapScreen() {
 			setRouteProgressAlongM(0);
 		}
 	}, [geometrySignature, routeLngLat, navState, navigationLocation, coords]);
+
+	/** Segue o marcador ajustado à rota (em vez do puck nativo do GPS). */
+	useEffect(() => {
+		if (!followDriverOnRoute || !activeCoords) return;
+		if (Date.now() < ignoreMapGestureUnfollowUntilRef.current) return;
+
+		cameraRef.current?.setCamera({
+			centerCoordinate: [activeCoords.longitude, activeCoords.latitude],
+			zoomLevel: NAV_ZOOM,
+			heading: driverBearing,
+			pitch: 45,
+			padding: { ...MAP_EDGE_PADDING_NAV_FOLLOW },
+			animationDuration: isMoving ? 260 : 420,
+		});
+	}, [
+		followDriverOnRoute,
+		activeCoords?.latitude,
+		activeCoords?.longitude,
+		driverBearing,
+		isMoving,
+	]);
+
+	/** Publica telemetria durante a navegação in-app (independente do watcher global). */
+	useEffect(() => {
+		if (navState !== "running" || !navigationLocation || !freightUser?.id) return;
+
+		void publishDriverLocation({
+			freightId: freightUser.id,
+			latitude: navigationLocation.latitude,
+			longitude: navigationLocation.longitude,
+			speed: navigationLocation.speedKmh,
+			heading: navigationLocation.heading,
+		});
+	}, [
+		navState,
+		freightUser?.id,
+		navigationLocation?.latitude,
+		navigationLocation?.longitude,
+		navigationLocation?.speedKmh,
+		navigationLocation?.heading,
+	]);
 
 	/** GPS contínuo só com navegação ativa (economiza bateria). */
 	useEffect(() => {
@@ -719,11 +823,12 @@ export default function MapScreen() {
 		cameraRef.current?.setCamera({
 			centerCoordinate: [activeCoords.longitude, activeCoords.latitude],
 			zoomLevel: NAV_ZOOM,
+			heading: driverBearing,
 			pitch: 45,
 			padding: { ...MAP_EDGE_PADDING_NAV_FOLLOW },
 			animationDuration: MAP_CAMERA_FAST_ANIMATION_MS,
 		});
-	}, [activeCoords, syncCurrentZoom]);
+	}, [activeCoords, driverBearing, syncCurrentZoom]);
 
 	const handleCentralizarMinhaLocalizacao = useCallback(() => {
 		if (!activeCoords) return;
@@ -784,6 +889,13 @@ export default function MapScreen() {
 			routePoints: lineCoordinates?.length ?? 0,
 		});
 
+		const currentStatus = normalizeFreightStatusName(freightUser?.status?.name);
+		if (currentStatus === "vinculado" && freightUser?.id) {
+			void handleUpdateFreightStatus(freightUser.id, "Em Transito").then((ok) => {
+				if (ok) void invalidateFreightUser();
+			});
+		}
+
 		ignoreMapGestureUnfollowUntilRef.current = Date.now() + NAV_START_TOTAL_MS + 800;
 		setNavFollowUser(true);
 
@@ -841,7 +953,20 @@ export default function MapScreen() {
 				}, NAV_DEFERRED_PROJECTION_DELAY_MS);
 			}
 		}, NAV_START_TOTAL_MS);
-	}, [rotaData, loadingRota, isStartingNav, coords, error, lineCoordinates, fitCameraToRoute, syncCurrentZoom]);
+	}, [
+		rotaData,
+		loadingRota,
+		isStartingNav,
+		coords,
+		error,
+		lineCoordinates,
+		freightUser?.id,
+		freightUser?.status?.name,
+		handleUpdateFreightStatus,
+		invalidateFreightUser,
+		fitCameraToRoute,
+		syncCurrentZoom,
+	]);
 
 	const handleVerRotaCompleta = useCallback(() => {
 		if (!lineCoordinates?.length) return;
@@ -953,19 +1078,21 @@ export default function MapScreen() {
 				ref={cameraRef}
 				animationMode="flyTo"
 				animationDuration={MAP_CAMERA_FAST_ANIMATION_MS}
-				followUserLocation={followUserActive}
-				followUserMode={dynamicFollowUserMode}
+				followUserLocation={false}
 				followZoomLevel={NAV_ZOOM}
 				followPitch={45}
-				followPadding={
-					followUserActive ? MAP_EDGE_PADDING_NAV_FOLLOW : MAP_EDGE_PADDING_IDLE
-				}
 			/>
-			<Mapbox.LocationPuck
-				visible={!error}
-				puckBearingEnabled={isNavActive}
-				puckBearing={puckBearing}
-			/>
+				{activeCoords && !error ? (
+					<Mapbox.PointAnnotation
+						id="driver-location-arrow"
+						coordinate={[activeCoords.longitude, activeCoords.latitude]}
+						anchor={{ x: 0.5, y: 0.5 }}
+					>
+						<NavigationDriverMarker
+							bearing={isNavActive && followDriverOnRoute ? 0 : driverBearing}
+						/>
+					</Mapbox.PointAnnotation>
+				) : null}
 
 				{remainingRouteCoords.length >= 2 ? (
 					<>
@@ -1078,39 +1205,39 @@ export default function MapScreen() {
 					accessibilityRole="button"
 					accessibilityLabel={t("MAP.ZOOM_IN_A11Y")}
 					className="w-11 h-11 rounded-xl border items-center justify-center"
-					style={{ backgroundColor: colors.bg, borderColor: colors.bgNonary, borderWidth: 1 }}
+					style={mapButtonStyle}
 				>
-					<Ionicons name="add" size={24} color={iconColor} />
+					<Ionicons name="add" size={24} color={mapButtonIconColor} />
 				</TouchableOpacity>
 				<TouchableOpacity
 					className="w-11 h-11 rounded-xl border items-center justify-center"
-					style={{ backgroundColor: colors.bg, borderColor: colors.bgNonary, borderWidth: 1 }}
+					style={mapButtonStyle}
 					onPress={handleZoomOut}
 					accessibilityRole="button"
 					accessibilityLabel={t("MAP.ZOOM_OUT_A11Y")}
 				>
-					<Ionicons name="remove" size={24} color={iconColor} />
+					<Ionicons name="remove" size={24} color={mapButtonIconColor} />
 				</TouchableOpacity>
 				<TouchableOpacity
 					className="w-11 h-11 rounded-xl border items-center justify-center"
-					style={{ backgroundColor: colors.bg, borderColor: colors.bgNonary, borderWidth: 1 }}
+					style={mapButtonStyle}
 					onPress={handleCentralizarMinhaLocalizacao}
 					accessibilityRole="button"
 					accessibilityLabel={t("MAP.CENTER_LOCATION_A11Y")}
 				>
-					<Ionicons name="locate" size={22} color={iconColor} />
+					<Ionicons name="locate" size={22} color={mapButtonIconColor} />
 				</TouchableOpacity>
 				{navState === "running" ? (
 					<TouchableOpacity
 						className="h-11 rounded-xl border items-center justify-center px-3"
-						style={{ backgroundColor: colors.bg, borderColor: colors.bgNonary, borderWidth: 1 }}
+						style={mapButtonStyle}
 						onPress={handleAlternarModoNavegacao}
 						accessibilityRole="button"
 						accessibilityLabel={
 							navFollowUser ? t("MAP.ENABLE_FREE_NAV_A11Y") : t("MAP.LINK_MAP_TO_CAR_A11Y")
 						}
 					>
-						<Text className="text-xs font-semibold" style={{ color: navFollowUser ? colors.textSecondary : colors.bgOctonary }}>
+						<Text className="text-xs font-semibold" style={{ color: mapButtonTextColor }}>
 							{navFollowUser ? t("MAP.FREE") : t("MAP.CAR")}
 						</Text>
 					</TouchableOpacity>
@@ -1191,9 +1318,9 @@ export default function MapScreen() {
 
 						<View className="mt-4">
 							<TouchableOpacity
-								className="w-full py-3.5 rounded-2xl items-center justify-center"
+								className="w-full py-3.5 rounded-2xl items-center justify-center border"
 								style={{
-									backgroundColor: colors.bgOctonary,
+									...mapButtonStyle,
 									opacity: !rotaData || loadingRota || isStartingNav ? 0.65 : 1,
 								}}
 								disabled={!rotaData || loadingRota || isStartingNav}
@@ -1206,13 +1333,13 @@ export default function MapScreen() {
 							>
 								{isStartingNav ? (
 									<View className="flex-row items-center gap-2">
-										<ActivityIndicator size="small" color="#FFFFFF" />
-										<Text className="text-base font-semibold" style={{ color: "#FFFFFF" }}>
+										<ActivityIndicator size="small" color={mapButtonTextColor} />
+										<Text className="text-base font-semibold" style={{ color: mapButtonTextColor }}>
 											{t("MAP.STARTING_NAV")}
 										</Text>
 									</View>
 								) : (
-									<Text className="text-base font-semibold" style={{ color: "#FFFFFF" }}>
+									<Text className="text-base font-semibold" style={{ color: mapButtonTextColor }}>
 										{t("MAP.START_NAV")}
 									</Text>
 								)}
@@ -1231,12 +1358,10 @@ export default function MapScreen() {
 					<View
 						className="w-full overflow-hidden rounded-3xl px-3 pt-4 pb-3"
 						style={{
-							backgroundColor: colors.bgSecondary,
-							borderWidth: 1,
-							borderColor: colors.bgNonary,
+							...mapControlTheme.panel,
 							shadowColor: "#000",
 							shadowOffset: { width: 0, height: 4 },
-							shadowOpacity: 0.22,
+							shadowOpacity: mode === "dark" ? 0.22 : 0.12,
 							shadowRadius: 12,
 							elevation: 12,
 						}}
@@ -1244,12 +1369,12 @@ export default function MapScreen() {
 						<View className="flex-row items-center justify-between">
 							<TouchableOpacity
 								onPress={handleCancelarNavegacao}
-								className="h-12 w-12 shrink-0 rounded-full items-center justify-center"
-								style={{ backgroundColor: colors.bgTertiary }}
+								className="h-12 w-12 shrink-0 rounded-full items-center justify-center border"
+								style={mapButtonStyle}
 								accessibilityRole="button"
 								accessibilityLabel={t("MAP.END_NAV_A11Y")}
 							>
-								<Ionicons name="close" size={24} color={colors.text} />
+								<Ionicons name="close" size={24} color={mapButtonIconColor} />
 							</TouchableOpacity>
 							<View className="min-w-0 flex-1 items-center px-2">
 								<Text
@@ -1274,12 +1399,12 @@ export default function MapScreen() {
 							</View>
 							<TouchableOpacity
 								onPress={handleVerRotaCompleta}
-								className="h-12 w-12 shrink-0 rounded-full items-center justify-center"
-								style={{ backgroundColor: colors.bgTertiary }}
+								className="h-12 w-12 shrink-0 rounded-full items-center justify-center border"
+								style={mapButtonStyle}
 								accessibilityRole="button"
 								accessibilityLabel={t("MAP.VIEW_FULL_ROUTE_A11Y")}
 							>
-								<Ionicons name="map-outline" size={22} color={colors.text} />
+								<Ionicons name="map-outline" size={22} color={mapButtonIconColor} />
 							</TouchableOpacity>
 						</View>
 						<View
@@ -1287,7 +1412,7 @@ export default function MapScreen() {
 							style={{ borderTopColor: colors.bgNonary, borderTopWidth: StyleSheet.hairlineWidth }}
 						>
 							<TouchableOpacity onPress={handlePausarOuContinuar} accessibilityRole="button" hitSlop={{ top: 8, bottom: 8, left: 12, right: 12 }}>
-								<Text className="text-base font-semibold" style={{ color: colors.text }}>
+								<Text className="text-base font-semibold" style={{ color: mapButtonTextColor }}>
 									{navState === "paused" ? t("MAP.CONTINUE") : t("MAP.PAUSE")}
 								</Text>
 							</TouchableOpacity>
@@ -1297,7 +1422,7 @@ export default function MapScreen() {
 									accessibilityRole="button"
 									hitSlop={{ top: 8, bottom: 8, left: 12, right: 12 }}
 								>
-									<Text className="text-base font-semibold" style={{ color: navFollowUser ? colors.textSecondary : colors.bgOctonary }}>
+									<Text className="text-base font-semibold" style={{ color: mapButtonTextColor }}>
 										{navFollowUser ? t("MAP.FREE_NAVIGATION") : t("MAP.LINK_TO_CAR")}
 									</Text>
 								</TouchableOpacity>
@@ -1311,9 +1436,7 @@ export default function MapScreen() {
 						<TouchableOpacity
 							className="flex-1 flex-row items-center justify-center gap-2 rounded-xl border py-3 px-2"
 							style={{
-								backgroundColor: colors.bg,
-								borderColor: colors.bgNonary,
-								borderWidth: 1,
+								...mapButtonStyle,
 								opacity: canOpenGoogleMaps ? 1 : 0.45,
 							}}
 							disabled={!canOpenGoogleMaps}
@@ -1321,20 +1444,20 @@ export default function MapScreen() {
 							accessibilityRole="button"
 							accessibilityLabel={t("FREIGHT.OPENGOOGLEMAPS_A11Y")}
 						>
-							<Ionicons name="logo-google" size={22} color={iconColor} />
-							<Text className="text-base font-semibold text-center" style={{ color: colors.text }} numberOfLines={2}>
+							<Ionicons name="logo-google" size={22} color={mapButtonIconColor} />
+							<Text className="text-base font-semibold text-center" style={{ color: mapButtonTextColor }} numberOfLines={2}>
 								{t("FREIGHT.OPENGOOGLEMAPS")}
 							</Text>
 						</TouchableOpacity>
 						<TouchableOpacity
 							className="flex-1 flex-row items-center justify-center gap-2 rounded-xl border py-3 px-2"
-							style={{ backgroundColor: colors.bg, borderColor: colors.bgNonary, borderWidth: 1 }}
+							style={mapButtonStyle}
 							onPress={goToFreightDetailsTab}
 							accessibilityRole="button"
 							accessibilityLabel={t("FREIGHT.VIEW_FREIGHT_DETAILS")}
 						>
-							<Ionicons name="document-text-outline" size={22} color={iconColor} />
-							<Text className="text-base font-semibold text-center" style={{ color: colors.text }} numberOfLines={2}>
+							<Ionicons name="document-text-outline" size={22} color={mapButtonIconColor} />
+							<Text className="text-base font-semibold text-center" style={{ color: mapButtonTextColor }} numberOfLines={2}>
 								{t("FREIGHT.VIEW_FREIGHT_DETAILS")}
 							</Text>
 						</TouchableOpacity>

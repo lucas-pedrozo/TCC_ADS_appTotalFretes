@@ -1,5 +1,5 @@
 /** Distância máxima para snap do progresso na polyline (filtro de ruído GPS). */
-export const NAV_SNAP_MAX_DISTANCE_M = 55;
+export const NAV_SNAP_MAX_DISTANCE_M = 35;
 
 /** Acima desse valor o GPS é considerado fora da rota no app. */
 export const NAV_OFF_ROUTE_THRESHOLD_M = 52;

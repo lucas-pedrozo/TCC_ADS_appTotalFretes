@@ -16,6 +16,6 @@
 - Soft blur/drop shadow effect
 - Opacity 50-70%
 
-## Note
-These placeholder assets need to be replaced with actual PNG files.
-You can create them using design tools like Figma, Sketch, or Adobe Illustrator.
+## Usage
+Loaded by `NavigationLocationPuck` when the driver is not in active turn-by-turn navigation.
+During navigation, `NavigationDriverMarker` renders the Google Maps-style arrow on the route.

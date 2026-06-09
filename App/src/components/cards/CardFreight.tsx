@@ -35,7 +35,9 @@ export const CardFreight = ({ navigateTo, freight }: CardFreightProps) => {
           <Text className="text-sm" style={{ color: colors.textSecondary }} numberOfLines={1}>
             {t("CARD.FREIGHT.DESTINATION")}: {freight?.destination_label ?? t("CARD.ACTIVITY.NONE")}
           </Text>
-          <Image source={require("@/src/assets/Logos.png")} className="max-w-auto h-auto pb-1" resizeMode="contain" />
+          <Text className="text-sm" style={{ color: colors.textSecondary }} numberOfLines={1}>
+            {freight?.status?.name ?? t("CARD.ACTIVITY.NONE")}
+          </Text>
           <Text className="font-semibold text-sm" style={{ color: colors.text }}>
             {t("CARD.FREIGHT.FREIGHT")}: {freight?.finalValue ? maskMoney(freight.finalValue) : freight?.originalValue ? maskMoney(freight.originalValue) : t("CARD.ACTIVITY.N_A")}
           </Text>

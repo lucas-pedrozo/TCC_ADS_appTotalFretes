@@ -34,18 +34,7 @@ export function useSignUp() {
       });
       console.log(data);
       await http.post<SingUpFormData>("user/end-account", {
-        name: data.name,
-        email: data.email,
-        birthDate: data.birthDate,
-        phoneNumber: data.phoneNumber,
-        cpf: data.cpf,
-        sex: data.sex,
-        useGlasses: data.useGlasses,
-        isDeficient: data.isDeficient,
-        cnhNumber: data.cnhNumber,
-        issuingAgencyCnh: data.issuingAgencyCnh,
-        cnhType_id: data.cnhType_id,
-        password: data.password,
+        ...data,
         account_type_id: 1,
       }
       );

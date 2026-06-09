@@ -9,8 +9,20 @@ export function normalizeFreightStatusName(value: string | null | undefined): st
 
 const IN_TRANSIT_STATUS_KEYS = new Set(["em transito", "em rota de entrega"]);
 
-/** True quando o motorista deve transmitir GPS ao painel da empresa. */
+const TELEMETRY_STATUS_KEYS = new Set([
+	"vinculado",
+	"em transito",
+	"em rota de entrega",
+]);
+
+/** True quando o frete está em deslocamento operacional (sem incluir vinculado). */
 export function isFreightInTransitStatus(statusName: string | null | undefined): boolean {
 	const key = normalizeFreightStatusName(statusName);
 	return IN_TRANSIT_STATUS_KEYS.has(key);
+}
+
+/** True quando o app deve transmitir GPS ao painel da empresa. */
+export function isFreightTelemetryStatus(statusName: string | null | undefined): boolean {
+	const key = normalizeFreightStatusName(statusName);
+	return TELEMETRY_STATUS_KEYS.has(key);
 }

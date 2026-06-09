@@ -5,7 +5,7 @@ import { useFreightUserContext } from "@/src/context/FreightUserContext";
 import http from "@/src/services/http";
 import { getCurrentCoordinates } from "@/src/services/location";
 import { publishDriverLocation } from "@/src/services/telemetry";
-import { isFreightInTransitStatus } from "@/src/utils/freightStatus";
+import { isFreightTelemetryStatus } from "@/src/utils/freightStatus";
 import i18n from "@/src/i18n";
 import { getApiErrorMessage } from "@/src/utils/apiError";
 
@@ -61,7 +61,7 @@ export function useUpdateFreightStatus() {
 
 				await http.put(`freight/${freightId}`, { status_id: statusId });
 
-				if (isFreightInTransitStatus(nextSlug)) {
+				if (isFreightTelemetryStatus(nextSlug)) {
 					const coords = await getCurrentCoordinates();
 					if (coords) {
 						await publishDriverLocation({

@@ -3,7 +3,7 @@ import Mapbox from "@rnmapbox/maps";
 
 Mapbox.setAccessToken(MAPBOX_PUBLIC_TOKEN);
 
-export const CAMERA_ANIMATION_MS = 500;
+export const CAMERA_ANIMATION_MS = 600;
 
 export const ROTA_LINE_STYLE = {
 	lineColor: "#2ECC71",

@@ -1,7 +1,8 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { useTranslation } from "react-i18next";
-import { useThemeColors } from "@/src/context/ThemeContext";
+import { useThemeColors, useThemeMode } from "@/src/context/ThemeContext";
+import { getMapControlTheme } from "@/src/utils/mapControlTheme";
 
 interface NavigationSpeedBadgeProps {
 	speedKmh: number | null;
@@ -13,28 +14,30 @@ export default function NavigationSpeedBadge({
 	visible = true,
 }: NavigationSpeedBadgeProps) {
 	const { t } = useTranslation();
+	const { mode } = useThemeMode();
 	const colors = useThemeColors();
+	const mapControlTheme = getMapControlTheme(mode, colors);
 
 	if (!visible) return null;
 
-	const displaySpeed = speedKmh != null && Number.isFinite(speedKmh)
-		? Math.round(speedKmh)
-		: 0;
+	const hasSpeed = speedKmh != null && Number.isFinite(speedKmh);
+	const displaySpeed = hasSpeed ? Math.round(Math.max(0, speedKmh)) : null;
 
 	return (
 		<View
 			style={[
 				styles.container,
-				{
-					backgroundColor: colors.bg,
-					borderColor: colors.bgTertiary,
-				},
+				mapControlTheme.button,
 			]}
 			accessibilityRole="text"
-			accessibilityLabel={`${t("MAP.SPEED_A11Y")}: ${displaySpeed} ${t("MAP.SPEED_UNIT_KMH")}`}
+			accessibilityLabel={
+				displaySpeed != null
+					? `${t("MAP.SPEED_A11Y")}: ${displaySpeed} ${t("MAP.SPEED_UNIT_KMH")}`
+					: t("MAP.SPEED_A11Y")
+			}
 		>
-			<Text style={[styles.speedText, { color: colors.text }]} numberOfLines={1}>
-				{displaySpeed} {t("MAP.SPEED_UNIT_KMH")}
+			<Text style={[styles.speedText, { color: mapControlTheme.foreground }]} numberOfLines={1}>
+				{displaySpeed != null ? `${displaySpeed} ${t("MAP.SPEED_UNIT_KMH")}` : "—"}
 			</Text>
 		</View>
 	);

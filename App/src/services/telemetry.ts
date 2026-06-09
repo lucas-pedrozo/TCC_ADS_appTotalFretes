@@ -2,7 +2,7 @@ import * as Location from 'expo-location';
 
 import http from '@/src/services/http';
 
-const MIN_PUBLISH_INTERVAL_MS = 10_000;
+const MIN_PUBLISH_INTERVAL_MS = 5_000;
 
 let lastPublishAt = 0;
 let publishInFlight = false;
@@ -25,16 +25,11 @@ export async function publishDriverLocation(input: TelemetryPublishInput): Promi
 	lastPublishAt = now;
 
 	try {
-		await http.post('mapbox/telemetry/location', {
-			freightId: input.freightId,
-			latitude: input.latitude,
-			longitude: input.longitude,
-			speed: input.speed ?? null,
-			heading: input.heading ?? null,
+		await http.post<TelemetryPublishInput>('mapbox/telemetry/location', {
+			...input,
 			recordedAt: new Date().toISOString(),
 		});
 	} catch {
-		/* falha silenciosa — próxima tentativa no próximo tick GPS */
 	} finally {
 		publishInFlight = false;
 	}
@@ -53,9 +48,9 @@ export async function startFreightTelemetryWatch(
 
 	const sub = await Location.watchPositionAsync(
 		{
-			accuracy: Location.Accuracy.High,
-			timeInterval: 10_000,
-			distanceInterval: 10,
+			accuracy: Location.Accuracy.BestForNavigation,
+			timeInterval: 5_000,
+			distanceInterval: 5,
 		},
 		(loc) => {
 			const speedMs = loc.coords.speed;

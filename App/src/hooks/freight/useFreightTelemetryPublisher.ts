@@ -6,7 +6,7 @@ import {
 	startFreightTelemetryWatch,
 } from "@/src/services/telemetry";
 import { getCurrentCoordinates } from "@/src/services/location";
-import { isFreightInTransitStatus } from "@/src/utils/freightStatus";
+import { isFreightTelemetryStatus } from "@/src/utils/freightStatus";
 
 type Params = {
 	freightUser: FreightMap | null;
@@ -14,8 +14,8 @@ type Params = {
 };
 
 /**
- * Publica GPS enquanto o frete ativo estiver em trânsito ou em rota de entrega.
- * Não depende de abrir o mapa nem iniciar navegação.
+ * Publica GPS enquanto o frete ativo estiver vinculado, em trânsito ou em rota de entrega.
+ * Funciona com o app em primeiro plano, sem depender de abrir o mapa.
  */
 export function useFreightTelemetryPublisher({ freightUser, isAuthenticated }: Params) {
 	const freightId = freightUser?.id;
@@ -23,7 +23,7 @@ export function useFreightTelemetryPublisher({ freightUser, isAuthenticated }: P
 	const shouldPublish =
 		isAuthenticated === true &&
 		freightId != null &&
-		isFreightInTransitStatus(statusName);
+		isFreightTelemetryStatus(statusName);
 
 	useEffect(() => {
 		if (!shouldPublish || freightId == null) return;

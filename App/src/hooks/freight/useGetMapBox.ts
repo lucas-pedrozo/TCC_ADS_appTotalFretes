@@ -20,10 +20,8 @@ export type RecalculateFromDriverParams = {
 const ROTA_HTTP_TIMEOUT_MS = 30_000;
 const PERF_TAG = "[MapPerf]";
 
-/** Geometria com mais de ~3 000 pontos é simplificada para manter performance. */
-const GEOMETRY_MAX_POINTS = 3_000;
-/** Tolerância Douglas-Peucker em graus (~5,5 m no equador). */
-const SIMPLIFY_TOLERANCE = 0.00005;
+const GEOMETRY_MAX_POINTS = 8_000;
+const SIMPLIFY_TOLERANCE = 0.000015;
 
 function logRoutePerf(event: string, meta?: Record<string, unknown>) {
   if (!__DEV__) return;
