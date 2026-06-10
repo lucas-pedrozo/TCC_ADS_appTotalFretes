@@ -2,7 +2,8 @@ import * as Location from 'expo-location';
 
 import http from '@/src/services/http';
 
-const MIN_PUBLISH_INTERVAL_MS = 5_000;
+/** Intervalo entre envios de telemetria ao backend (5 s). */
+export const TELEMETRY_PUBLISH_INTERVAL_MS = 5_000;
 
 let lastPublishAt = 0;
 let publishInFlight = false;
@@ -17,7 +18,7 @@ export type TelemetryPublishInput = {
 
 export async function publishDriverLocation(input: TelemetryPublishInput): Promise<void> {
 	const now = Date.now();
-	if (publishInFlight || now - lastPublishAt < MIN_PUBLISH_INTERVAL_MS) {
+	if (publishInFlight || now - lastPublishAt < TELEMETRY_PUBLISH_INTERVAL_MS) {
 		return;
 	}
 
@@ -49,7 +50,7 @@ export async function startFreightTelemetryWatch(
 	const sub = await Location.watchPositionAsync(
 		{
 			accuracy: Location.Accuracy.BestForNavigation,
-			timeInterval: 5_000,
+			timeInterval: TELEMETRY_PUBLISH_INTERVAL_MS,
 			distanceInterval: 5,
 		},
 		(loc) => {

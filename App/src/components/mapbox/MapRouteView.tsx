@@ -9,9 +9,11 @@ import { useThemeColors, useThemeMode } from "@/src/context/ThemeContext";
 import { getMapControlTheme } from "@/src/utils/mapControlTheme";
 import {
   CAMERA_ANIMATION_MS,
+  CAMERA_ANIMATION_MODE,
   ROTA_LINE_STYLE,
   THEME_COLORS,
   getMapStyleURL,
+  withCameraEase,
 } from "@/src/config/mapbox";
 import type { MapRotaResponse } from "@/src/interfaces/mapbox";
 
@@ -39,11 +41,15 @@ export const MapRouteView = React.memo(function MapRouteView({
   const styleURL = getMapStyleURL(darkMode);
 
   const handleCentralizar = useCallback(() => {
-    cameraRef.current?.setCamera({
-      centerCoordinate: cameraCenter,
-      zoomLevel: cameraZoom,
-      animationDuration: CAMERA_ANIMATION_MS,
-    });
+    cameraRef.current?.setCamera(
+      withCameraEase(
+        {
+          centerCoordinate: cameraCenter,
+          zoomLevel: cameraZoom,
+        },
+        CAMERA_ANIMATION_MS,
+      ),
+    );
   }, [cameraCenter, cameraZoom]);
 
   const coordinates = rotaData?.geometria?.coordinates;
@@ -55,6 +61,7 @@ export const MapRouteView = React.memo(function MapRouteView({
           ref={cameraRef}
           zoomLevel={cameraZoom}
           centerCoordinate={cameraCenter}
+          animationMode={CAMERA_ANIMATION_MODE}
           animationDuration={CAMERA_ANIMATION_MS}
         />
 

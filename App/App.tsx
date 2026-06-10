@@ -1,5 +1,6 @@
 import "./global.css";
 import "./src/i18n";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Routes from "./src/routes/Routes";
 import { ThemeProvider } from "./src/context/ThemeContext";
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -29,6 +30,7 @@ const AlertNotificationGlobal = () => {
 
 function App() {
   return (
+    <GestureHandlerRootView style={{ flex: 1 }}>
     <SafeAreaProvider>
       <ThemeProvider>
         <LanguageProvider>
@@ -49,6 +51,7 @@ function App() {
         </LanguageProvider>
       </ThemeProvider>
     </SafeAreaProvider>
+    </GestureHandlerRootView>
   );
 }
 

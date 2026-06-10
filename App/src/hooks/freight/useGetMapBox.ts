@@ -1,9 +1,10 @@
 import { useCallback, useRef, useState } from "react";
 import * as turf from "@turf/turf";
 import http from "@/src/services/http";
-import axios, { AxiosError } from "axios";
+import axios from "axios";
 import { getCurrentCoordinates, type Coordinates } from "@/src/services/location";
 import { useAlertDefault } from "@/src/context/AlertDefaultContext";
+import { getApiErrorMessage } from "@/src/utils/apiError";
 import type { MapRotaResponse } from "@/src/interfaces/mapbox";
 
 export type GetMapBoxOptions = {
@@ -18,16 +19,9 @@ export type RecalculateFromDriverParams = {
 };
 
 const ROTA_HTTP_TIMEOUT_MS = 30_000;
-const PERF_TAG = "[MapPerf]";
 
 const GEOMETRY_MAX_POINTS = 8_000;
 const SIMPLIFY_TOLERANCE = 0.000015;
-
-function logRoutePerf(event: string, meta?: Record<string, unknown>) {
-  if (!__DEV__) return;
-  const payload = meta ? ` ${JSON.stringify(meta)}` : "";
-  console.log(`${PERF_TAG} ${event}${payload}`);
-}
 
 function isUsableGps(c: Coordinates): boolean {
   if (!Number.isFinite(c.latitude) || !Number.isFinite(c.longitude)) return false;
@@ -51,10 +45,6 @@ function simplifyGeometry(data: MapRotaResponse): MapRotaResponse {
       highQuality: false,
       mutate: false,
     });
-    logRoutePerf("route_geometry_simplified", {
-      before: coords.length,
-      after: simplified.geometry.coordinates.length,
-    });
     return {
       ...data,
       geometria: {
@@ -67,34 +57,7 @@ function simplifyGeometry(data: MapRotaResponse): MapRotaResponse {
   }
 }
 
-function getRouteErrorMessage(
-  err: AxiosError<{ error?: string; erro?: string; message?: string } | string>,
-): string {
-  const raw = err.response?.data;
-  let msg = "Não foi possível carregar a rota.";
-
-  if (typeof raw === "string" && raw.trim()) {
-    msg = raw.trim();
-  } else if (raw && typeof raw === "object") {
-    const o = raw as { message?: string; error?: string; erro?: string };
-    if (typeof o.message === "string" && o.message.trim()) msg = o.message.trim();
-    else if (typeof o.error === "string" && o.error.trim()) msg = o.error.trim();
-    else if (typeof o.erro === "string" && o.erro.trim()) msg = o.erro.trim();
-  }
-
-  if (msg === "Não foi possível carregar a rota." && err.message?.trim()) {
-    msg = err.message.trim();
-  }
-
-  if (err.code === "ECONNABORTED" || err.message?.toLowerCase().includes("timeout")) {
-    return "Tempo esgotado ao buscar a rota. Verifique a conexão ou tente de novo.";
-  }
-  if (err.code === "ERR_NETWORK" || !err.response) {
-    return "Sem conexão com o servidor. Confira o Wi‑Fi/dados e se a API está acessível.";
-  }
-
-  return msg;
-}
+const ROUTE_ERROR_FALLBACK = "Não foi possível carregar a rota.";
 
 export function useGetMapBox() {
   const { notify } = useAlertDefault();
@@ -120,7 +83,6 @@ export function useGetMapBox() {
     moradaDestino: string,
     options?: GetMapBoxOptions
   ) => {
-    const startedAt = Date.now();
     const origemNormalizada = normalizeAddress(moradaCarga);
     const destinoNormalizado = normalizeAddress(moradaDestino);
 
@@ -155,12 +117,7 @@ export function useGetMapBox() {
       if (coordenadasMotorista) {
         params.coordenadasMotorista = coordenadasMotorista;
       } else if (!rotaSimples) {
-        const gpsStartedAt = Date.now();
         const coords = await getCurrentCoordinates();
-        logRoutePerf("route_request_gps_lookup_done", {
-          elapsedMs: Date.now() - gpsStartedAt,
-          hasCoords: Boolean(coords),
-        });
         if (signal.aborted) {
           setLoadingRota(false);
           return;
@@ -192,27 +149,16 @@ export function useGetMapBox() {
     }
     lastRequestKeyRef.current = requestKey;
 
-    logRoutePerf("route_request_start", {
-      rotaSimples,
-      hasCoordenadasOrigem: Boolean(coordenadasOrigem),
-      hasCoordenadasMotorista: Boolean(coordenadasMotorista),
-    });
-
     setLoadingRota(true);
     setRotaErro(null);
 
     try {
-      const apiStartedAt = Date.now();
       const response = await http.get<MapRotaResponse>(`mapbox/rota-frete`, {
         params,
         signal,
         timeout: ROTA_HTTP_TIMEOUT_MS,
       });
       if (signal.aborted) return;
-      logRoutePerf("route_request_api_done", {
-        elapsedMs: Date.now() - apiStartedAt,
-        rawPoints: response.data?.geometria?.coordinates?.length ?? 0,
-      });
 
       const simplified = simplifyGeometry(response.data);
       hasDataRef.current = true;
@@ -222,8 +168,12 @@ export function useGetMapBox() {
       if (signal.aborted) return;
       if (axios.isAxiosError(error) && error.code === "ERR_CANCELED") return;
 
-      const err = error as AxiosError<{ error?: string; erro?: string; message?: string } | string>;
-      const msg = getRouteErrorMessage(err);
+      const msg = getApiErrorMessage(error, ROUTE_ERROR_FALLBACK, {
+        timeoutMessage:
+          "Tempo esgotado ao buscar a rota. Verifique a conexão ou tente de novo.",
+        networkMessage:
+          "Sem conexão com o servidor. Confira o Wi‑Fi/dados e se a API está acessível.",
+      });
 
       hasDataRef.current = false;
       lastRequestKeyRef.current = null;
@@ -232,9 +182,6 @@ export function useGetMapBox() {
     } finally {
       if (!signal.aborted) {
         setLoadingRota(false);
-        logRoutePerf("route_request_total_done", {
-          elapsedMs: Date.now() - startedAt,
-        });
       }
     }
   }, [notify]);

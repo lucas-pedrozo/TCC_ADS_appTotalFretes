@@ -1,5 +1,5 @@
 import React, { memo } from "react";
-import { StyleSheet, View } from "react-native";
+import { View } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 
 const GOOGLE_NAV_BLUE = "#1A73E8";
@@ -23,7 +23,8 @@ export const NavigationArrowIcon = memo(function NavigationArrowIcon({
 
 	return (
 		<View
-			style={[styles.root, { width: size, height: size }]}
+			className="items-center justify-center bg-transparent"
+			style={{ width: size, height: size }}
 			pointerEvents="none"
 			collapsable={false}
 		>
@@ -38,12 +39,4 @@ export const NavigationArrowIcon = memo(function NavigationArrowIcon({
 			</View>
 		</View>
 	);
-});
-
-const styles = StyleSheet.create({
-	root: {
-		alignItems: "center",
-		justifyContent: "center",
-		backgroundColor: "transparent",
-	},
 });

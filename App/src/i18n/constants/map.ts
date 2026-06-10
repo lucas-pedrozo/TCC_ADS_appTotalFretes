@@ -39,6 +39,13 @@ export const mapPT = {
     SPEED: "Velocidade",
     SPEED_UNIT_KMH: "km/h",
     SPEED_A11Y: "Velocidade atual",
+    ROUTE_TITLE: "Rota",
+    RECENTER: "Recentralizar",
+    RECENTER_A11Y: "Recentralizar no mapa",
+    GOOGLE_MAP: "Google Map",
+    GOOGLE_MAP_A11Y: "Abrir rota no Google Map",
+    VIEW_FREIGHTS: "Ver Frete",
+    VIEW_FREIGHTS_A11Y: "Ver fretes em andamento",
   },
 } as const;
 
@@ -79,5 +86,12 @@ export const mapEN = {
     SPEED: "Speed",
     SPEED_UNIT_KMH: "km/h",
     SPEED_A11Y: "Current speed",
+    ROUTE_TITLE: "Route",
+    RECENTER: "Recenter",
+    RECENTER_A11Y: "Recenter map",
+    GOOGLE_MAP: "Google Map",
+    GOOGLE_MAP_A11Y: "Open route in Google Map",
+    VIEW_FREIGHTS: "View Freights",
+    VIEW_FREIGHTS_A11Y: "View ongoing freights",
   },
 } as const;

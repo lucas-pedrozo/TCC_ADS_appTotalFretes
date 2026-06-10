@@ -1,6 +1,10 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import type { FreightMap } from "@/src/context/FreightUserContext";
+import {
+	isMapNavigationActive,
+	subscribeMapNavigationActive,
+} from "@/src/services/navigationLocationSession";
 import {
 	publishDriverLocation,
 	startFreightTelemetryWatch,
@@ -24,9 +28,14 @@ export function useFreightTelemetryPublisher({ freightUser, isAuthenticated }: P
 		isAuthenticated === true &&
 		freightId != null &&
 		isFreightTelemetryStatus(statusName);
+	const [mapNavActive, setMapNavActive] = useState(isMapNavigationActive);
+
+	useEffect(() => subscribeMapNavigationActive(() => {
+		setMapNavActive(isMapNavigationActive());
+	}), []);
 
 	useEffect(() => {
-		if (!shouldPublish || freightId == null) return;
+		if (!shouldPublish || freightId == null || mapNavActive) return;
 
 		let cancelled = false;
 		let watcher: { remove: () => void } | null = null;
@@ -49,5 +58,5 @@ export function useFreightTelemetryPublisher({ freightUser, isAuthenticated }: P
 			cancelled = true;
 			watcher?.remove();
 		};
-	}, [shouldPublish, freightId, statusName]);
+	}, [shouldPublish, freightId, statusName, mapNavActive]);
 }

@@ -1,8 +1,7 @@
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, Text } from "react-native";
 import { useTranslation } from "react-i18next";
-import { useThemeColors, useThemeMode } from "@/src/context/ThemeContext";
-import { getMapControlTheme } from "@/src/utils/mapControlTheme";
+import { useMapNavUI } from "@/src/utils/mapControlTheme";
 
 interface NavigationSpeedBadgeProps {
 	speedKmh: number | null;
@@ -14,10 +13,7 @@ export default function NavigationSpeedBadge({
 	visible = true,
 }: NavigationSpeedBadgeProps) {
 	const { t } = useTranslation();
-	const { mode } = useThemeMode();
-	const colors = useThemeColors();
-	const mapControlTheme = getMapControlTheme(mode, colors);
-
+	const navUi = useMapNavUI();
 	if (!visible) return null;
 
 	const hasSpeed = speedKmh != null && Number.isFinite(speedKmh);
@@ -25,10 +21,8 @@ export default function NavigationSpeedBadge({
 
 	return (
 		<View
-			style={[
-				styles.container,
-				mapControlTheme.button,
-			]}
+			className="px-[18px] py-2.5 rounded-full justify-center items-center shadow shadow-black/12"
+			style={{ backgroundColor: navUi.pillBg }}
 			accessibilityRole="text"
 			accessibilityLabel={
 				displaySpeed != null
@@ -36,30 +30,13 @@ export default function NavigationSpeedBadge({
 					: t("MAP.SPEED_A11Y")
 			}
 		>
-			<Text style={[styles.speedText, { color: mapControlTheme.foreground }]} numberOfLines={1}>
+			<Text
+				className="text-lg font-semibold tracking-wide"
+				style={{ color: navUi.textPrimary }}
+				numberOfLines={1}
+			>
 				{displaySpeed != null ? `${displaySpeed} ${t("MAP.SPEED_UNIT_KMH")}` : "—"}
 			</Text>
 		</View>
 	);
 }
-
-const styles = StyleSheet.create({
-	container: {
-		paddingHorizontal: 20,
-		paddingVertical: 12,
-		borderRadius: 10,
-		borderWidth: 1,
-		justifyContent: "center",
-		alignItems: "center",
-		shadowColor: "#000",
-		shadowOffset: { width: 0, height: 2 },
-		shadowOpacity: 0.12,
-		shadowRadius: 8,
-		elevation: 6,
-	},
-	speedText: {
-		fontSize: 18,
-		fontWeight: "600",
-		letterSpacing: 0.5,
-	},
-});

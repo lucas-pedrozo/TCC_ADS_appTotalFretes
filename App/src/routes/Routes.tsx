@@ -185,7 +185,7 @@ export default function Routes() {
 				<Stack.Screen name="VehicleType" component={PrivateVehicleType} options={{ title: t("ROUTES.VEHICLETYPE") }} />
 				<Stack.Screen name="VehicleData" component={PrivateVehicleData} options={{ title: t("ROUTES.VEHICLEDATA") }} />
 				<Stack.Screen name="Term" component={PrivateTerm} options={{ title: t("ROUTES.TERM") }} />
-				<Stack.Screen name="MapScreen" component={PrivateMapScreen} options={{ title: t("ROUTES.MAPSCREEN") }} />
+				<Stack.Screen name="MapScreen" component={PrivateMapScreen} options={{ headerShown: false }} />
 				
 				<Stack.Screen name="Start" component={Start} options={{ headerShown: false }} />
 				<Stack.Screen name="Login" component={Login} options={{ title: t("ROUTES.LOGIN") }} />
