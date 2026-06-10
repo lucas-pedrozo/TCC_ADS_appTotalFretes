@@ -8,11 +8,14 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useTranslation } from "react-i18next";
 
 import { ButtonApproved } from "@/src/components/form/buttons/ButtonDefault";
+import { useAlertDefault } from "@/src/context/AlertDefaultContext";
 import { useThemeColors } from "@/src/context/ThemeContext";
 import { useCreateProposal } from "@/src/hooks/proposal/useCreateProposal";
+import { useDriverVehicle } from "@/src/hooks/vehicle/useDriverVehicle";
 import type { RootStackParamList } from "@/src/routes/Routes";
 import { maskMoney, parseMoneyToNumber } from "@/src/utils/formMask";
 import { formatWeight, parseAddressLabel } from "@/src/utils/format";
+import { isVehicleCompatibleWithFreight } from "@/src/utils/vehicleFreightCompatibility";
 
 type SendProposalRouteProp = RouteProp<RootStackParamList, "SendProposal">;
 
@@ -34,6 +37,8 @@ const SendProposal = () => {
 	const { t } = useTranslation();
 	const inputRef = useRef<TextInput>(null);
 	const freight = route.params.freight;
+	const { notify } = useAlertDefault();
+	const { driverVehicle } = useDriverVehicle();
 	const { isLoading, handleCreateProposal } = useCreateProposal();
 
 	const referenceValue = freight.finalValue ?? freight.originalValue ?? 0;
@@ -51,6 +56,14 @@ const SendProposal = () => {
 
 	const handleSubmit = async () => {
 		if (proposalNumber <= 0 || isLoading) return;
+
+		if (!isVehicleCompatibleWithFreight(driverVehicle, freight)) {
+			notify({
+				status: "error",
+				message: t("FREIGHT.VALIDATION.VEHICLE_INCOMPATIBLE"),
+			});
+			return;
+		}
 
 		const proposal = await handleCreateProposal({
 			freight_id: freight.id,

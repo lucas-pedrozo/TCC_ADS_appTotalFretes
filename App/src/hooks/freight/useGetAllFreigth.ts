@@ -42,6 +42,7 @@ interface CargoMap {
 	id: number;
 	name: string;
 	imageCargo_id?: number | null;
+	vehicleGroupNome?: string | null;
 	vehicleType?: string;
 	createdAt?: string;
 	updatedAt?: string;

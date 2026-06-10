@@ -1,6 +1,8 @@
 import type { FreightAllMap } from "@/src/hooks/freight/useGetAllFreigth";
 import type { Coordinates } from "@/src/services/location";
 import type { FreightFilterState } from "@/src/types/freightFilter";
+import type { MapVehicle } from "@/src/interfaces/vehicle";
+import { isVehicleCompatibleWithFreight } from "@/src/utils/vehicleFreightCompatibility";
 import * as turf from "@turf/turf";
 
 export function freightEffectiveValue(f: FreightAllMap): number {
@@ -30,7 +32,7 @@ function distanceToOriginM(f: FreightAllMap, user: Coordinates): number {
 }
 
 /**
- * Busca textual + filtro por CNH + ordenação por distância (origem do frete) e/ou valor.
+ * Busca textual + filtro por CNH + compatibilidade de veículo + ordenação.
  */
 export function filterAndSortFreights(
 	items: FreightAllMap[],
@@ -38,6 +40,8 @@ export function filterAndSortFreights(
 	filters: FreightFilterState,
 	user: Coordinates | null,
 	userCnhTypeId: number | null = null,
+	driverVehicle: MapVehicle | null = null,
+	requireVehicleFilter = false,
 ): FreightAllMap[] {
 	const q = searchQuery.trim().toLowerCase();
 	let list = items.filter(isAvailableFreight);
@@ -51,6 +55,14 @@ export function filterAndSortFreights(
 
 	if (userCnhTypeId != null) {
 		list = list.filter((f) => f.cnhType_id == null || f.cnhType_id <= userCnhTypeId);
+	}
+
+	if (requireVehicleFilter && driverVehicle?.vehicleType?.id == null) {
+		return [];
+	}
+
+	if (driverVehicle?.vehicleType?.id != null) {
+		list = list.filter((f) => isVehicleCompatibleWithFreight(driverVehicle, f));
 	}
 
 	const byDistance = (a: FreightAllMap, b: FreightAllMap): number => {

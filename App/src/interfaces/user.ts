@@ -1,3 +1,5 @@
+import type { MapVehicle } from "./vehicle";
+
 export interface MapCnh {
   id: number;
   name: string;
@@ -27,6 +29,7 @@ export interface MapUser {
   cnhNumber: string;
   cnhType_id: number;
   vehicle_id: number | null;
+  Vehicle?: MapVehicle | null;
   CnhType?: MapCnh | null;
   createdAt: string;
   updatedAt: string;

@@ -20,4 +20,8 @@ export interface MapVehicleType {
   length?: number;
   imageVehicle_id?: number;
   groupVehicleType_id?: number;
+  GroupVehicleType?: {
+    id?: number;
+    nome?: string;
+  } | null;
 }

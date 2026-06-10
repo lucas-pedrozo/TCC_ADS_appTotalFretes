@@ -10,7 +10,7 @@ import { CardFreight } from "@/src/components/cards/CardFreight";
 import { InputSearch, ButtonFilter } from "@/src/components/form";
 import ModalFilter from "@/src/components/modal/ModalFilter";
 import { useGetAllFreigth } from "@/src/hooks/freight/useGetAllFreigth";
-import { useGetUser } from "@/src/hooks/user/useGetUser";
+import { useDriverVehicle } from "@/src/hooks/vehicle/useDriverVehicle";
 import { getCurrentCoordinates } from "@/src/services/location";
 import { isUsableGps } from "@/src/utils/googleMapsDirections";
 import { filterAndSortFreights } from "@/src/utils/freightListQuery";
@@ -35,7 +35,14 @@ const Freight = () => {
 	const searchQuery = watch("search");
 
 	const { allFreigth, handleGetAllFreigth, loadMore, isLoading, isLoadingMore } = useGetAllFreigth();
-	const { userData, handleGetUser } = useGetUser();
+	const {
+		userData,
+		driverVehicle,
+		hasRegisteredVehicle,
+		isVehicleFilterReady,
+		isLoadingVehicle,
+		refresh: refreshDriverVehicle,
+	} = useDriverVehicle();
 
 	const handleEndReached = useCallback(() => {
 		void loadMore();
@@ -52,9 +59,30 @@ const Freight = () => {
 	);
 
 	const displayedFreights = useMemo(
-		() => filterAndSortFreights(allFreigth, searchQuery, filters, userCoords, userData?.cnhType_id ?? null),
-		[allFreigth, searchQuery, filters, userCoords, userData?.cnhType_id],
+		() =>
+			filterAndSortFreights(
+				allFreigth,
+				searchQuery,
+				filters,
+				userCoords,
+				userData?.cnhType_id ?? null,
+				driverVehicle,
+				hasRegisteredVehicle,
+			),
+		[
+			allFreigth,
+			searchQuery,
+			filters,
+			userCoords,
+			userData?.cnhType_id,
+			driverVehicle,
+			hasRegisteredVehicle,
+		],
 	);
+
+	const isListPending =
+		(isLoading && allFreigth.length === 0) ||
+		(hasRegisteredVehicle && !isVehicleFilterReady && (isLoadingVehicle || userData == null));
 
 	const regionDisplay =
 		regionLabel === null ? t("MODALFILTER.CITY_LOADING") : regionLabel || t("MODALFILTER.CITY_UNKNOWN");
@@ -95,7 +123,7 @@ const Freight = () => {
 	const handleRefresh = useCallback(async () => {
 		setIsRefreshing(true);
 		try {
-			await handleGetAllFreigth();
+			await Promise.all([handleGetAllFreigth(), refreshDriverVehicle()]);
 			const c = await getCurrentCoordinates();
 			if (c && isUsableGps(c)) {
 				setUserCoords({ latitude: c.latitude, longitude: c.longitude });
@@ -116,7 +144,7 @@ const Freight = () => {
 		} finally {
 			setIsRefreshing(false);
 		}
-	}, [handleGetAllFreigth]);
+	}, [handleGetAllFreigth, refreshDriverVehicle]);
 
 	const handleOpenFilter = useCallback(() => {
 		setShowFilterModal(true);
@@ -134,8 +162,8 @@ const Freight = () => {
 	useFocusEffect(
 		useCallback(() => {
 			void handleGetAllFreigth();
-			void handleGetUser();
-		}, [handleGetAllFreigth, handleGetUser]),
+			void refreshDriverVehicle();
+		}, [handleGetAllFreigth, refreshDriverVehicle]),
 	);
 
 	return (
@@ -151,7 +179,7 @@ const Freight = () => {
 				<ButtonFilter onPress={handleOpenFilter} />
 			</View>
 
-			{isLoading && allFreigth.length === 0 ? (
+			{isListPending ? (
 				<View className="flex-1 items-center justify-center py-24">
 					<ActivityIndicator size="large" color={iconColor} />
 				</View>
