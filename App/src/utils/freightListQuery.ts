@@ -32,7 +32,7 @@ function distanceToOriginM(f: FreightAllMap, user: Coordinates): number {
 }
 
 /**
- * Busca textual + filtro por CNH + compatibilidade de veículo + ordenação.
+ * Busca textual + filtro por CNH + compatibilidade de peso + ordenação.
  */
 export function filterAndSortFreights(
 	items: FreightAllMap[],

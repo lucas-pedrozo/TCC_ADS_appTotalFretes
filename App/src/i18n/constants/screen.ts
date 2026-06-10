@@ -180,7 +180,7 @@ export const screenPT = {
     VALIDATION: {
       NO_VEHICLE: "Usuário não tem Veículo Cadastrado",
       HAS_ONGOING: "Usuário já tem um frete em andamento",
-      VEHICLE_INCOMPATIBLE: "Seu veículo não atende ao tipo exigido pela carga ou à capacidade de peso.",
+      VEHICLE_INCOMPATIBLE: "Seu veículo não suporta o peso desta carga.",
     },
   },
   PROPOSAL: {
@@ -509,7 +509,7 @@ export const screenEN = {
     VALIDATION: {
       NO_VEHICLE: "User has no registered Vehicle",
       HAS_ONGOING: "User already has an ongoing freight",
-      VEHICLE_INCOMPATIBLE: "Your vehicle does not meet the required type or weight capacity for this cargo.",
+      VEHICLE_INCOMPATIBLE: "Your vehicle does not support the weight of this cargo.",
     },
   },
   PROPOSAL: {
