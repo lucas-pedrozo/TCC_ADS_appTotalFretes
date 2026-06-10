@@ -57,7 +57,13 @@ export const CardActivityHome = ({ onPress, freight, AcceptButton = true }: Card
 
       ) : null}
 
-      <TouchableOpacity onPress={onPress} className="flex-1 p-4 rounded-2xl w-full" style={{ backgroundColor: colors.bgNonary, borderColor: colors.bgTertiary, borderWidth: 1 }}>
+      <TouchableOpacity
+        onPress={onPress}
+        activeOpacity={onPress ? 0.7 : 1}
+        disabled={!onPress}
+        className="flex-1 w-full p-4 rounded-2xl"
+        style={{ backgroundColor: colors.bgNonary, borderColor: colors.bgTertiary, borderWidth: 1 }}
+      >
         <View className="flex-1 flex-row items-center gap-3">
           <IconBox name="cube-outline" />
           <View className="flex-1 flex-row justify-between items-center">

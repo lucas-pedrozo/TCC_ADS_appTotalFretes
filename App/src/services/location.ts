@@ -1,5 +1,11 @@
 import axios from 'axios';
 import * as Location from 'expo-location';
+import {
+	MAP_PREVIEW_GPS_DISTANCE_INTERVAL_M,
+	MAP_PREVIEW_GPS_TIME_INTERVAL_MS,
+	NAV_GPS_DISTANCE_INTERVAL_M,
+	NAV_GPS_TIME_INTERVAL_MS,
+} from '@/src/config/navigation';
 
 export interface Coordinates {
 	latitude: number;
@@ -12,6 +18,8 @@ export interface NavigationLocationUpdate {
 	speedMs: number | null;
 	speedKmh: number | null;
 	heading: number | null;
+	/** Raio de incerteza do GPS em metros (null se indisponível). */
+	accuracyM: number | null;
 }
 
 /**
@@ -145,44 +153,49 @@ function resolveSpeedKmh(
 	return Math.min(220, (distanceM / elapsedSec) * 3.6);
 }
 
-/**
- * Atualização contínua de GPS para navegação (alta frequência moderada).
- * Deve ser removido ao sair da navegação para economizar bateria.
- */
-export async function startNavigationLocationWatch(
+function toNavigationLocationUpdate(
+	loc: Location.LocationObject,
+	previousFix: SpeedFix | null,
+): { update: NavigationLocationUpdate; currentFix: SpeedFix } {
+	const currentFix: SpeedFix = {
+		latitude: loc.coords.latitude,
+		longitude: loc.coords.longitude,
+		recordedAt: loc.timestamp ?? Date.now(),
+	};
+	const speedMs = loc.coords.speed;
+	const speedKmh = resolveSpeedKmh(speedMs, previousFix, currentFix);
+	const heading = loc.coords.heading;
+	const accuracy = loc.coords.accuracy;
+
+	return {
+		currentFix,
+		update: {
+			latitude: currentFix.latitude,
+			longitude: currentFix.longitude,
+			speedMs: speedKmh != null ? speedKmh / 3.6 : null,
+			speedKmh,
+			heading: heading != null && Number.isFinite(heading) && heading >= 0 ? heading : null,
+			accuracyM:
+				accuracy != null && Number.isFinite(accuracy) && accuracy > 0
+					? accuracy
+					: null,
+		},
+	};
+}
+
+async function startLocationWatch(
+	options: Location.LocationOptions,
 	onUpdate: (update: NavigationLocationUpdate) => void,
 ): Promise<NavigationLocationWatcher | null> {
 	if ((await requestLocationPermission()) !== 'granted') return null;
 
 	let previousFix: SpeedFix | null = null;
 
-	const sub = await Location.watchPositionAsync(
-		{
-			accuracy: Location.Accuracy.BestForNavigation,
-			timeInterval: 800,
-			distanceInterval: 3,
-		},
-		(loc) => {
-			const currentFix: SpeedFix = {
-				latitude: loc.coords.latitude,
-				longitude: loc.coords.longitude,
-				recordedAt: loc.timestamp ?? Date.now(),
-			};
-			const speedMs = loc.coords.speed;
-			const speedKmh = resolveSpeedKmh(speedMs, previousFix, currentFix);
-			const heading = loc.coords.heading;
-
-			previousFix = currentFix;
-
-			onUpdate({
-				latitude: currentFix.latitude,
-				longitude: currentFix.longitude,
-				speedMs: speedKmh != null ? speedKmh / 3.6 : null,
-				speedKmh,
-				heading: heading != null && Number.isFinite(heading) && heading >= 0 ? heading : null,
-			});
-		},
-	);
+	const sub = await Location.watchPositionAsync(options, (loc) => {
+		const parsed = toNavigationLocationUpdate(loc, previousFix);
+		previousFix = parsed.currentFix;
+		onUpdate(parsed.update);
+	});
 
 	return {
 		remove: () => {
@@ -190,6 +203,39 @@ export async function startNavigationLocationWatch(
 			previousFix = null;
 		},
 	};
+}
+
+/**
+ * Atualização contínua de GPS para navegação (alta frequência).
+ * Deve ser removido ao sair da navegação para economizar bateria.
+ */
+export async function startNavigationLocationWatch(
+	onUpdate: (update: NavigationLocationUpdate) => void,
+): Promise<NavigationLocationWatcher | null> {
+	return startLocationWatch(
+		{
+			accuracy: Location.Accuracy.BestForNavigation,
+			timeInterval: NAV_GPS_TIME_INTERVAL_MS,
+			distanceInterval: NAV_GPS_DISTANCE_INTERVAL_M,
+		},
+		onUpdate,
+	);
+}
+
+/**
+ * GPS contínuo no mapa antes de iniciar a navegação (frequência moderada).
+ */
+export async function startMapPreviewLocationWatch(
+	onUpdate: (update: NavigationLocationUpdate) => void,
+): Promise<NavigationLocationWatcher | null> {
+	return startLocationWatch(
+		{
+			accuracy: Location.Accuracy.High,
+			timeInterval: MAP_PREVIEW_GPS_TIME_INTERVAL_MS,
+			distanceInterval: MAP_PREVIEW_GPS_DISTANCE_INTERVAL_M,
+		},
+		onUpdate,
+	);
 }
 
 const NOMINATIM_USER_AGENT = 'TCC_CursoTADS_App/1.0';

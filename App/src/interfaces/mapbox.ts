@@ -9,4 +9,7 @@ export interface MapRotaResponse {
   proxima_instrucao?: string;
   manobra_modificador?: string | null;
   manobra_tipo?: string | null;
+  proxima_rua?: string | null;
+  manobra_coordenadas?: [number, number] | null;
+  manobra_bearing?: number | null;
 }

@@ -79,6 +79,59 @@ function stripStateFromCity(token: string): string {
     return token.split(/\s-\s/)[0]?.trim() ?? token.trim();
 }
 
+const COUNTRY_LABEL_PATTERN = /^(brazil|brasil|br)$/i;
+const CEP_LABEL_PATTERN = /^\d{5}-?\d{3}$/;
+
+function splitCityStateToken(token: string): { city: string; state: string } | null {
+    const match = token.match(/^(.+?)\s-\s(.+)$/);
+    if (!match) return null;
+    return { city: match[1].trim(), state: match[2].trim() };
+}
+
+function trimTrailingAddressMeta(parts: string[]): string[] {
+    let trimmed = [...parts];
+    while (trimmed.length > 0 && COUNTRY_LABEL_PATTERN.test(trimmed[trimmed.length - 1] ?? "")) {
+        trimmed = trimmed.slice(0, -1);
+    }
+    while (trimmed.length > 0 && CEP_LABEL_PATTERN.test(trimmed[trimmed.length - 1] ?? "")) {
+        trimmed = trimmed.slice(0, -1);
+    }
+    return trimmed;
+}
+
+/**
+ * @description Extrai cidade e estado a partir do label de endereço da API.
+ * @returns Exemplo: "Campinas, SP" ou "Campinas, São Paulo"
+ */
+export function extractCityStateFromAddressLabel(label?: string | null, emptyText = "---"): string {
+    const cleanLabel = label?.trim();
+    if (!cleanLabel) return emptyText;
+
+    const parts = cleanLabel.split(",").map((part) => part.trim()).filter(Boolean);
+    const cityStatePart = parts.find((part) => /\s-\s/.test(part) && !/^\d+$/.test(part));
+    if (cityStatePart) {
+        const parsed = splitCityStateToken(cityStatePart);
+        if (parsed) return `${parsed.city}, ${parsed.state}`;
+    }
+
+    const locationParts = trimTrailingAddressMeta(parts);
+    if (locationParts.length >= 3) {
+        const state = locationParts[locationParts.length - 1];
+        const city = locationParts[locationParts.length - 2];
+        if (city && state && !/^\d+$/.test(city) && !/^\d+$/.test(state)) {
+            return `${stripStateFromCity(city)}, ${state}`;
+        }
+    }
+    if (locationParts.length === 2) {
+        const [city, state] = locationParts;
+        if (city && state && !/^\d+$/.test(city) && !/^\d+$/.test(state)) {
+            return `${stripStateFromCity(city)}, ${state}`;
+        }
+    }
+
+    return extractCityFromAddressLabel(cleanLabel, emptyText);
+}
+
 /**
  * @description Extrai apenas o nome da cidade a partir do label de endereço da API.
  */

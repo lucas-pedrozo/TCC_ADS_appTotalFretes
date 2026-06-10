@@ -41,6 +41,21 @@ export function withCameraEase<T extends Record<string, unknown>>(
 	};
 }
 
+/** Follow contínuo da navegação — animação linear e curta para reduzir atraso visual. */
+export function withCameraFollow<T extends Record<string, unknown>>(
+	config: T,
+	durationMs: number,
+): T & CameraAnimationConfig {
+	if (durationMs <= 0) {
+		return withCameraEase(config, 0);
+	}
+	return {
+		...config,
+		animationDuration: durationMs,
+		animationMode: "linearTo",
+	};
+}
+
 export const ROTA_LINE_STYLE = {
 	lineColor: "#2ECC71",
 	lineWidth: 5,
