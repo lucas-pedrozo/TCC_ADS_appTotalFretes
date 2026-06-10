@@ -69,6 +69,43 @@ export type NavigationLocationWatcher = {
 	remove: () => void;
 };
 
+export type CompassHeadingWatcher = {
+	remove: () => void;
+};
+
+function resolveCompassHeading(
+	trueHeading: number,
+	magHeading: number,
+): number | null {
+	if (Number.isFinite(trueHeading) && trueHeading >= 0) return trueHeading;
+	if (Number.isFinite(magHeading) && magHeading >= 0) return magHeading;
+	return null;
+}
+
+/**
+ * Orientação do aparelho (bússola) para navegação livre no mapa.
+ * Deve ser removido ao sair do modo livre ou da navegação.
+ */
+export async function startCompassHeadingWatch(
+	onUpdate: (heading: number) => void,
+): Promise<CompassHeadingWatcher | null> {
+	if ((await requestLocationPermission()) !== 'granted') return null;
+
+	const sub = await Location.watchHeadingAsync((headingData) => {
+		const heading = resolveCompassHeading(
+			headingData.trueHeading,
+			headingData.magHeading,
+		);
+		if (heading != null) onUpdate(heading);
+	});
+
+	return {
+		remove: () => {
+			sub.remove();
+		},
+	};
+}
+
 type SpeedFix = {
 	latitude: number;
 	longitude: number;
