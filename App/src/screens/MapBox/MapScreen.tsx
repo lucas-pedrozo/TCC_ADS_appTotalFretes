@@ -34,6 +34,7 @@ import {
 import {
 	getCurrentCoordinates,
 	requestLocationPermission,
+	startCompassHeadingWatch,
 	startNavigationLocationWatch,
 	type Coordinates,
 	type NavigationLocationUpdate,
@@ -262,6 +263,8 @@ export default function MapScreen() {
 	const [currentZoom, setCurrentZoom] = useState(USER_ZOOM);
 	const [navState, setNavState] = useState<NavState>("idle");
 	const [navFollowUser, setNavFollowUser] = useState(true);
+	const [freeCompassFollow, setFreeCompassFollow] = useState(true);
+	const [compassHeading, setCompassHeading] = useState<number | null>(null);
 	const [navigationLocation, setNavigationLocation] = useState<NavigationLocationUpdate | null>(null);
 	const [routeProgressAlongM, setRouteProgressAlongM] = useState(0);
 	const [isStartingNav, setIsStartingNav] = useState(false);
@@ -468,6 +471,12 @@ export default function MapScreen() {
 	const followDriverOnRoute =
 		navState === "running" && Boolean(activeCoords && !error && navFollowUser);
 
+	const followFreeNavigationCompass =
+		navState === "running" &&
+		Boolean(activeCoords && !error && !navFollowUser && freeCompassFollow);
+
+	const mapRotatesWithHeading = followDriverOnRoute || followFreeNavigationCompass;
+
 	const totalRouteMeters = useMemo(() => polylineLengthMeters(routeLngLat), [routeLngLat]);
 
 	const { completedRouteCoords, remainingRouteCoords } = useMemo(() => {
@@ -639,6 +648,50 @@ export default function MapScreen() {
 		driverBearing,
 		isMoving,
 	]);
+
+	/** Navegação livre: câmera gira com a orientação física do celular (bússola). */
+	useEffect(() => {
+		if (!followFreeNavigationCompass || !activeCoords) return;
+		if (Date.now() < ignoreMapGestureUnfollowUntilRef.current) return;
+
+		const heading = compassHeading ?? driverBearing;
+
+		cameraRef.current?.setCamera({
+			centerCoordinate: [activeCoords.longitude, activeCoords.latitude],
+			heading,
+			pitch: 0,
+			animationDuration: isMoving ? 260 : 420,
+		});
+	}, [
+		followFreeNavigationCompass,
+		activeCoords?.latitude,
+		activeCoords?.longitude,
+		compassHeading,
+		driverBearing,
+		isMoving,
+	]);
+
+	/** Bússola ativa apenas na navegação livre. */
+	useEffect(() => {
+		if (navState !== "running" || navFollowUser) {
+			setCompassHeading(null);
+			return;
+		}
+
+		let cancelled = false;
+		let watcher: { remove: () => void } | null = null;
+		void (async () => {
+			const w = await startCompassHeadingWatch((heading) => {
+				if (!cancelled) setCompassHeading(heading);
+			});
+			if (!cancelled) watcher = w;
+		})();
+
+		return () => {
+			cancelled = true;
+			watcher?.remove();
+		};
+	}, [navState, navFollowUser]);
 
 	/** Publica telemetria durante a navegação in-app (independente do watcher global). */
 	useEffect(() => {
@@ -995,7 +1048,14 @@ export default function MapScreen() {
 			if (navState !== "running") return;
 			if (Date.now() < ignoreMapGestureUnfollowUntilRef.current) return;
 			if (!state.gestures?.isGestureActive) return;
-			setNavFollowUser((prev) => (prev ? false : prev));
+			setNavFollowUser((prev) => {
+				if (prev) {
+					setFreeCompassFollow(true);
+					return false;
+				}
+				setFreeCompassFollow(false);
+				return prev;
+			});
 		},
 		[navState, syncCurrentZoom],
 	);
@@ -1034,14 +1094,17 @@ export default function MapScreen() {
 			if (next) {
 				applyFollowVehicleCamera();
 			} else {
+				setFreeCompassFollow(true);
+				ignoreMapGestureUnfollowUntilRef.current = Date.now() + 600;
 				cameraRef.current?.setCamera({
+					heading: compassHeading ?? driverBearing,
 					pitch: 0,
 					animationDuration: CAMERA_ANIMATION_MS,
 				});
 			}
 			return next;
 		});
-	}, [navState, applyFollowVehicleCamera]);
+	}, [navState, applyFollowVehicleCamera, compassHeading, driverBearing]);
 
 	const handleCancelarNavegacao = useCallback(() => {
 		LayoutAnimation.configureNext(NAV_UI_LAYOUT_ANIM);
@@ -1089,7 +1152,11 @@ export default function MapScreen() {
 						anchor={{ x: 0.5, y: 0.5 }}
 					>
 						<NavigationDriverMarker
-							bearing={isNavActive && followDriverOnRoute ? 0 : driverBearing}
+							bearing={
+								isNavActive && mapRotatesWithHeading
+									? 0
+									: compassHeading ?? driverBearing
+							}
 						/>
 					</Mapbox.PointAnnotation>
 				) : null}
