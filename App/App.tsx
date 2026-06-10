@@ -19,7 +19,6 @@ const AlertNotificationGlobal = () => {
 
   return (
     <AlertNotification
-      key={`${alert.status}-${alert.message ?? ""}-${alert.visible ? "1" : "0"}`}
       visible={alert.visible}
       status={alert.status}
       message={alert.message}

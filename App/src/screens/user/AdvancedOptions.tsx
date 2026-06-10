@@ -24,6 +24,10 @@ const AdvancedOptions = () => {
 		navigation.navigate("Term");
 	}
 
+	const goToFreightHistory = () => {
+		navigation.navigate("FreightHistory");
+	}
+
 	return (
 		<SafeAreaView style={{ flex: 1, paddingHorizontal: 16, paddingTop: 10, backgroundColor: colors.bg }} edges={["left", "right"]}>
 			<View className="flex-col gap-2.5">
@@ -31,7 +35,7 @@ const AdvancedOptions = () => {
 				<View className="h-0.5 w-full rounded-full" style={{ backgroundColor: colors.bgNonary }} />
 				<Option title={t("ADVANCEDOPTIONS.CANCELACCOUNT")} icon="trash-outline" onPress={goToCancelAccount} critical />
 				<View className="h-0.5 w-full rounded-full" style={{ backgroundColor: colors.bgNonary }} />
-				<Option title={t("ADVANCEDOPTIONS.FREIGHTHISTORY")} icon="list-outline" onPress={() => { }} />
+				<Option title={t("ADVANCEDOPTIONS.FREIGHTHISTORY")} icon="list-outline" onPress={goToFreightHistory} />
 				<View className="h-0.5 w-full rounded-full" style={{ backgroundColor: colors.bgNonary }} />
 				<Option title={t("ADVANCEDOPTIONS.TERMS")} icon="document-text-outline" onPress={goToTerm} />
 				<View className="h-0.5 w-full rounded-full" style={{ backgroundColor: colors.bgNonary }} />

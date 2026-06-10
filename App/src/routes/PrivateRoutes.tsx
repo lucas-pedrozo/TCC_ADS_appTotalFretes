@@ -28,7 +28,9 @@ const PrivateRoute = ({ children }: Props) => {
 		);
 	}
 
-	if (!isAuthenticated) return null;
+	if (!isAuthenticated) {
+		return <View style={{ flex: 1 }} />;
+	}
 
 	return <>{children}</>;
 };

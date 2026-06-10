@@ -55,6 +55,10 @@ function Home() {
 		navigation.navigate("MapScreen");
 	};
 
+	const goToFreightHistory = () => {
+		navigation.navigate("FreightHistory");
+	};
+
 	const goToDetailVehicle = useCallback(() => {
 		if (!vehicleData) return;
 		navigation.navigate("DetailVehicle", { vehicle: vehicleData });
@@ -146,7 +150,7 @@ function Home() {
 					<View className="w-4" />
 					<CardMap onPress={goToMap} />
 					<View className="w-4" />
-					<CardHistory />
+					<CardHistory onPress={goToFreightHistory} />
 				</ScrollView>
 				<View className="px-4">
 					<CardVehicle vehicle={vehicleData} onPress={vehicleData ? goToDetailVehicle : undefined} />

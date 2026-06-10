@@ -12,6 +12,7 @@ import { DetailRow } from "@/src/components/info/DetailRow";
 import { ButtonDefault, ButtonApproved } from "@/src/components/form/buttons/ButtonDefault";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useDriverVehicle } from "@/src/hooks/vehicle/useDriverVehicle";
+import { isFinalizedFreightStatus } from "@/src/utils/freightStatus";
 import { isVehicleCompatibleWithFreight } from "@/src/utils/vehicleFreightCompatibility";
 
 type DetailFreightRouteProp = RouteProp<RootStackParamList, "DetailFreight">;
@@ -34,6 +35,7 @@ const DetailFreight = () => {
 	const hasVehicle = userData?.vehicle_id != null;
 	const vehicleCompatible =
 		hasVehicle && isVehicleCompatibleWithFreight(driverVehicle, freight);
+	const isFinalized = isFinalizedFreightStatus(freight.status?.name);
 
 	const freightValue = freight.finalValue ?? freight.originalValue;
 	const valueText = freightValue != null ? `R$ ${maskMoney(freightValue)}` : t("CARD.ACTIVITY.N_A");
@@ -163,7 +165,7 @@ const DetailFreight = () => {
 				<DetailRow label={t("FREIGHT.DESTINATION")} value={freight.destination_label} />
 			</ScrollView>
 
-			{hasVehicle && !vehicleCompatible && (
+			{!isFinalized && hasVehicle && !vehicleCompatible && (
 				<View
 					className="w-full justify-center items-center my-2.5 p-2 rounded-xl"
 					style={{ backgroundColor: colors.bgSecondary }}
@@ -173,7 +175,7 @@ const DetailFreight = () => {
 					</Text>
 				</View>
 			)}
-			{!hasVehicle && userData != null && (
+			{!isFinalized && !hasVehicle && userData != null && (
 				<View
 					className="w-full justify-center items-center my-2.5 p-2 rounded-xl"
 					style={{ backgroundColor: colors.bgSecondary }}
@@ -183,14 +185,14 @@ const DetailFreight = () => {
 					</Text>
 				</View>
 			)}
-			{!hasVehicle && userData != null ? (
+			{!isFinalized && (!hasVehicle && userData != null ? (
 				<ButtonDefault onPress={goToRegisterVehicle} title={t("FREIGHT.NEXT")} />
 			) : vehicleCompatible ? (
 				<ButtonApproved
 					onPress={() => navigation.navigate("SendProposal", { freight })}
 					title={t("FREIGHT.NEXT")}
 				/>
-			) : null}
+			) : null)}
 		</SafeAreaView>
 	);
 };

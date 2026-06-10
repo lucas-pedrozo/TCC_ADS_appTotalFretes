@@ -7,7 +7,6 @@
     "orientation": "portrait",
     "scheme": "app",
     "userInterfaceStyle": "dark",
-    "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
       "infoPlist": {

@@ -26,3 +26,11 @@ export function isFreightTelemetryStatus(statusName: string | null | undefined):
 	const key = normalizeFreightStatusName(statusName);
 	return TELEMETRY_STATUS_KEYS.has(key);
 }
+
+const FINALIZED_STATUS_KEYS = new Set(["concluido", "cancelado"]);
+
+/** True quando o frete já foi concluído ou cancelado (somente leitura no app). */
+export function isFinalizedFreightStatus(statusName: string | null | undefined): boolean {
+	const key = normalizeFreightStatusName(statusName);
+	return FINALIZED_STATUS_KEYS.has(key);
+}

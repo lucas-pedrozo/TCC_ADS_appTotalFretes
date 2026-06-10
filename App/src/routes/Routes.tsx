@@ -28,6 +28,7 @@ import DetailVehicle from "../screens/freight/DetailVehicle";
 import EditVehicle from "../screens/freight/EditVehicle";
 import SendProposal from "../screens/freight/SendProposal";
 import ProposalDetail from "../screens/freight/ProposalDetail";
+import FreightHistory from "../screens/freight/FreightHistory";
 
 import RenewPassword from "../screens/user/RenewPassword";
 import VehicleGroup from "../screens/freight/VehicleGroup";
@@ -78,6 +79,7 @@ export type RootStackParamList = {
 	VehicleData: undefined;
 	Term: undefined;
 	MapScreen: undefined;
+	FreightHistory: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -146,6 +148,10 @@ function PrivateMapScreen() {
 	return <PrivateRoute><MapScreen /></PrivateRoute>;
 }
 
+function PrivateFreightHistory() {
+	return <PrivateRoute><FreightHistory /></PrivateRoute>;
+}
+
 export default function Routes() {
 	const { theme } = useThemeMode();
 	const { t } = useTranslation();
@@ -186,6 +192,7 @@ export default function Routes() {
 				<Stack.Screen name="VehicleData" component={PrivateVehicleData} options={{ title: t("ROUTES.VEHICLEDATA") }} />
 				<Stack.Screen name="Term" component={PrivateTerm} options={{ title: t("ROUTES.TERM") }} />
 				<Stack.Screen name="MapScreen" component={PrivateMapScreen} options={{ headerShown: false }} />
+				<Stack.Screen name="FreightHistory" component={PrivateFreightHistory} options={{ title: t("ROUTES.FREIGHTHISTORY") }} />
 				
 				<Stack.Screen name="Start" component={Start} options={{ headerShown: false }} />
 				<Stack.Screen name="Login" component={Login} options={{ title: t("ROUTES.LOGIN") }} />
