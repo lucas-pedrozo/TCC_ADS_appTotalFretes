@@ -9,6 +9,7 @@ import { ButtonCancel, ButtonDefault, InputDefault, InputPlate } from "@/src/com
 import { IconBox } from "@/src/components/ui/IconBox";
 import { useThemeColors } from "@/src/context/ThemeContext";
 import { useEditVehicle } from "@/src/hooks/vehicle/useEditVehicle";
+import { getVehicleTypeImage } from "@/src/utils/vehicleTypeImages";
 import type { RootStackParamList } from "@/src/routes/Routes";
 
 type EditVehicleRouteProp = RouteProp<RootStackParamList, "EditVehicle">;
@@ -63,7 +64,7 @@ function EditVehicle() {
 
 				<View className="w-full justify-center items-center py-5">
 					<Image
-						source={require("@/src/assets/veiculo.png")}
+						source={getVehicleTypeImage(vehicle.vehicleType?.nome ?? "")}
 						className="w-full h-32"
 						resizeMode="contain"
 					/>

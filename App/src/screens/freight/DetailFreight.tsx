@@ -1,5 +1,6 @@
 import { useCallback, useMemo } from "react";
-import { Image, ScrollView, Text, View } from "react-native";
+import { ScrollView, Text, View } from "react-native";
+import { CargoTypeImage } from "@/src/components/freight/CargoTypeImage";
 import { useFocusEffect, useNavigation, useRoute, RouteProp } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useTranslation } from "react-i18next";
@@ -76,7 +77,7 @@ const DetailFreight = () => {
 				</Text>
 
 				<View className="w-full justify-center items-center py-5">
-					<Image source={require("@/src/assets/carga.png")} resizeMode="contain" />
+					<CargoTypeImage cargo={freight.cargo} className="w-full h-24" resizeMode="contain" />
 				</View>
 
 				<View className="flex-row gap-2.5 pb-5">

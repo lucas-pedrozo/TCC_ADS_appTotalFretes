@@ -5,6 +5,7 @@ import { InputDefault, InputPlate, ButtonDefault } from "@/src/components/form";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { useRegisterVehicle } from "@/src/hooks/vehicle/useRegisterVehicle";
 import { useRegisterVehicleContext } from "@/src/context/RegisterVehicleContext";
+import { getVehicleTypeImage } from "@/src/utils/vehicleTypeImages";
 
 
 const VehicleData = () => {
@@ -22,19 +23,11 @@ const VehicleData = () => {
 			<Text className="pl-2.5 pb-4" style={{ color: colors.text }}>{t("VEHICLE.DATA_INTRO")}</Text>
 
 			<View className="items-center mb-4">
-				{vehicleType?.image ? (
-					<Image
-						source={{ uri: vehicleType?.image }}
-						className="w-[260px] h-[140px]"
-						resizeMode="contain"
-					/>
-				) : (
-					<Image
-						source={require("@/src/assets/veiculo.png")}
-						className="w-[260px] h-[140px]"
-						resizeMode="contain"
-					/>
-				)}
+				<Image
+					source={getVehicleTypeImage(vehicleType?.name ?? "")}
+					className="w-[260px] h-[140px]"
+					resizeMode="contain"
+				/>
 			</View>
 
 			<Text className="font-semibold text-base pl-2.5 mb-3" style={{ color: colors.text }}>

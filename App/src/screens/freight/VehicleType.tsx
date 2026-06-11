@@ -10,6 +10,7 @@ import http from "@/src/services/http";
 import { useAlertDefault } from "@/src/context/AlertDefaultContext";
 import { AxiosError } from "axios";
 import { useTranslation } from "react-i18next";
+import { getVehicleTypeImage } from "@/src/utils/vehicleTypeImages";
 
 type VehicleTypeApi = {
   id: number;
@@ -32,15 +33,11 @@ const CardType = ({ item, onPress }: { item: VehicleTypeData; onPress: () => voi
       style={{ backgroundColor: colors.bgSecondary, borderWidth: 1, borderColor: colors.bgTertiary }}
     >
       <View className="items-center justify-center p-4 min-h-[120px]">
-        {item.image ? (
-          <Image source={{ uri: item.image }} className="w-full h-[120px]" resizeMode="contain" />
-        ) : (
-          <Image
-            source={require("@/src/assets/veiculo.png")}
-            className="w-full h-[120px]"
-            resizeMode="contain"
-          />
-        )}
+        <Image
+          source={getVehicleTypeImage(item.name)}
+          className="w-full h-[120px]"
+          resizeMode="contain"
+        />
       </View>
 
       <View className="flex-row justify-between px-4 pb-2">

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo } from "react";
 import { ActivityIndicator, Alert, Image, ScrollView, Text, View } from "react-native";
+import { CargoTypeImage } from "@/src/components/freight/CargoTypeImage";
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useTranslation } from "react-i18next";
@@ -182,7 +183,7 @@ const ProposalDetail = () => {
 							<Text className="text-sm font-semibold mb-2" style={{ color: colors.text }}>
 								{freight?.cargo?.name ?? t("COMMON.EMPTY")} / {freight?.weight ?? t("COMMON.N_A")} kg
 							</Text>
-							<Image source={require("@/src/assets/carga.png")} className="w-full h-24" resizeMode="contain" />
+							<CargoTypeImage cargo={freight?.cargo} className="w-full h-24" resizeMode="contain" />
 						</View>
 					</View>
 				</View>

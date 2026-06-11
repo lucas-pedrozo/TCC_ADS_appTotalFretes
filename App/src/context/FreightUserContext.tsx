@@ -48,10 +48,18 @@ export interface FreightMap {
 	proposals?: ProposalMap[];
 }
 
+export interface CargoImageMap {
+	id: number;
+	path?: string;
+	url?: string | null;
+	originalName?: string | null;
+}
+
 export interface CargoMap {
 	id: number;
 	name: string;
 	imageCargo_id?: number | null;
+	CargoImage?: CargoImageMap | null;
 	vehicleType?: string;
 	createdAt?: string;
 	updatedAt?: string;

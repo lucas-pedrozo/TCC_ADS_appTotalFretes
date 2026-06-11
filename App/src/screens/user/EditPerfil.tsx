@@ -26,8 +26,8 @@ const EditPerfil = () => {
 	const insets = useSafeAreaInsets();
 	const route = useRoute<RouteProp<RootStackParamList, "EditPerfil">>();
 	const currentProfileImageUrl = route.params?.userImage;
-	const { imageUri, handlePickFromGallery, handleTakePhoto } = useImagePicker();
-	const { control, handleSubmit, handleEditPerfil, rules } = useEditPerfil({ pendingImageUri: imageUri });
+	const { pickedImage, imageUri, handlePickFromGallery, handleTakePhoto } = useImagePicker();
+	const { control, handleSubmit, handleEditPerfil, rules } = useEditPerfil({ pendingImage: pickedImage });
 
 	const displayImageUri = imageUri ?? currentProfileImageUrl;
 

@@ -20,6 +20,7 @@ import { useGetVehicle } from "@/src/hooks/vehicle/useGetVehicle";
 import { useDeleteVehicle } from "@/src/hooks/vehicle/useDeleteVehicle";
 import { IconBox } from "@/src/components/ui/IconBox";
 import animation from "@/src/utils/animation";
+import { getVehicleTypeImage } from "@/src/utils/vehicleTypeImages";
 import type { RootStackParamList } from "@/src/routes/Routes";
 
 function DetailVehicle() {
@@ -118,7 +119,7 @@ function DetailVehicle() {
 
 						<View className="w-full justify-center items-center py-5">
 							<Image
-								source={require("@/src/assets/veiculo.png")}
+								source={getVehicleTypeImage(vehicle?.vehicleType?.nome ?? "")}
 								className="w-full h-32"
 								resizeMode="contain"
 							/>

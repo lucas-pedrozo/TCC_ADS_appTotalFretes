@@ -3,7 +3,8 @@ import type { FreightMap } from "@/src/hooks/freight/useGetFreightUser";
 import { useThemeColors } from "@/src/context/ThemeContext";
 import { useTranslation } from "react-i18next";
 import { maskMoney } from "@/src/utils/formMask";
-import { Image, Text, TouchableOpacity, View } from "react-native";
+import { CargoTypeImage } from "@/src/components/freight/CargoTypeImage";
+import { Text, TouchableOpacity, View } from "react-native";
 
 type CardFreightProps = {
 	navigateTo?: () => void;
@@ -44,7 +45,7 @@ export const CardFreight = ({ navigateTo, freight }: CardFreightProps) => {
         </View>
 
         <View className="flex-1 justify-end items-end">
-          <Image source={require("@/src/assets/carga.png")} className="w-full" resizeMode="contain" />
+          <CargoTypeImage cargo={freight?.cargo} className="w-full h-20" resizeMode="contain" />
         </View>
       </View>
     </TouchableOpacity>

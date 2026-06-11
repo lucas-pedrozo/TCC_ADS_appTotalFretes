@@ -1,5 +1,6 @@
 import { useMemo, useRef, useState } from "react";
 import { Image, Pressable, Text, TextInput, View } from "react-native";
+import { CargoTypeImage } from "@/src/components/freight/CargoTypeImage";
 import { Feather } from "@expo/vector-icons";
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -105,7 +106,7 @@ const SendProposal = () => {
 								<Text className="text-sm font-semibold mb-2" style={{ color: colors.text }}>
 									{freight.cargo?.name ?? t("COMMON.EMPTY")} / {formatWeight(freight.weight)}
 								</Text>
-								<Image source={require("@/src/assets/carga.png")} className="w-full h-24" resizeMode="contain" />
+								<CargoTypeImage cargo={freight.cargo} className="w-full h-24" resizeMode="contain" />
 							</View>
 						</View>
 					</View>
