@@ -1,16 +1,17 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context"
 import { Platform, RefreshControl, ScrollView, Text, View } from "react-native"
 import * as LocalAuthentication from "expo-local-authentication";
 
 import { useGetUser } from "@/src/hooks/user/useGetUser";
+import { useGetVehicle } from "@/src/hooks/vehicle/useGetVehicle";
 import { useTranslation } from "react-i18next";
 import type { AppLanguage } from "@/src/i18n/resources";
 import { useThemeColors, useThemeMode } from "@/src/context/ThemeContext";
 import { useLanguage } from "@/src/context/LanguageContext";
 
 import { useAuth } from "@/src/context/AuthContext";
-import { useNavigation } from "@react-navigation/native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
 import { RootStackParamList } from "@/src/routes/Routes";
 import { HeaderPerfil } from "@/src/components/header/HeaderPerfil";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -29,6 +30,7 @@ const Perfil = () => {
   const { language, changeLanguage } = useLanguage();
   const navigation = useNavigation<NavigationProp>();
   const { userData, handleGetUser } = useGetUser();
+  const { vehicleData, handleGetVehicle } = useGetVehicle();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const userImageUrl = userData?.UserImage?.path
     ? `${ENV_BASE_URL}${userData.UserImage.path}`
@@ -36,6 +38,10 @@ const Perfil = () => {
 
   const goToAdvancedOptions = () => { navigation.navigate("AdvancedOptions"); }
   const goToVehicleGroup = () => { navigation.navigate("VehicleGroup"); }
+  const goToDetailVehicle = useCallback(() => {
+    if (!vehicleData) return;
+    navigation.navigate("DetailVehicle", { vehicle: vehicleData });
+  }, [navigation, vehicleData]);
 
   const idiomaOptions = [
     { value: "pt", label: t("PERFIL.LANGPT") },
@@ -96,9 +102,19 @@ const Perfil = () => {
     }
   }, [setBiometricsEnabledAsync, t]);
 
-  useEffect(() => {
-    handleGetUser();
-  }, [handleGetUser]);
+  useFocusEffect(
+    useCallback(() => {
+      void handleGetUser();
+    }, [handleGetUser]),
+  );
+
+  useFocusEffect(
+    useCallback(() => {
+      if (userData?.vehicle_id) {
+        void handleGetVehicle(userData.vehicle_id);
+      }
+    }, [handleGetVehicle, userData?.vehicle_id]),
+  );
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.bg }}>
@@ -128,11 +144,11 @@ const Perfil = () => {
           <Option title={t("PERFIL.EDITCNHDATA")} icon="pencil" onPress={goToEditCnh} />
           <View className="h-0.5 w-full rounded-full" style={{ backgroundColor: colors.bgNonary }} />
 
-          {!userData?.vehicle_id ?
+          {!userData?.vehicle_id ? (
             <Option title={t("PERFIL.REGISTERVEHICLE")} icon="car-outline" onPress={goToVehicleGroup} />
-            :
-            <Option title={t("PERFIL.EDITVEHICLE")} icon="car-outline" onPress={goToVehicleGroup} />
-          }
+          ) : (
+            <Option title={t("PERFIL.EDITVEHICLE")} icon="car-outline" onPress={goToDetailVehicle} />
+          )}
 
           <View className="h-0.5 w-full rounded-full" style={{ backgroundColor: colors.bgNonary }} />
           <Option title={t("PERFIL.ADVANCEDOPTIONS")} icon="settings-outline" onPress={goToAdvancedOptions} />

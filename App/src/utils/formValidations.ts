@@ -100,8 +100,12 @@ export const validateIssuingAgencyCnh = (value: string) => {
  * @param value Valor a ser validado
  * @returns true se o valor for valido, false caso contrario
  */
-export const validatePasswordConfirmation = (value: string) => {
-  return validator.isLength(value, { min: 8, max: 16 });
+export const validatePassword = (value: string): boolean => {
+  const hasMinLength = value.length >= 8;
+  const hasUpperCase = /[A-Z]/.test(value);
+  const hasLowerCase = /[a-z]/.test(value);
+
+  return hasMinLength && hasUpperCase && hasLowerCase;
 };
 
 /**
@@ -184,9 +188,15 @@ export const getValidationRules = () => ({
     required: i18n.t("VALIDATION.REQUIREDISSUINGAGENCY"),
     validate: (value: string) => validateIssuingAgencyCnh(value) || i18n.t("VALIDATION.INVALIDISSUINGAGENCY"),
   },
+  loginPassword: {
+    required: i18n.t("VALIDATION.REQUIREDPASSWORD"),
+  },
+  currentPassword: {
+    required: i18n.t("VALIDATION.REQUIREDPASSWORD"),
+  },
   password: {
     required: i18n.t("VALIDATION.REQUIREDPASSWORD"),
-    validate: (value: string) => validatePasswordConfirmation(value) || i18n.t("VALIDATION.INVALIDPASSWORD"),
+    validate: (value: string) => validatePassword(value) || i18n.t("VALIDATION.INVALIDPASSWORD"),
   },
   sex: {
     required: i18n.t("VALIDATION.REQUIREDSEX"),

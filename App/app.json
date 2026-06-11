@@ -2,16 +2,18 @@
   "expo": {
     "name": "Total Fretes",
     "slug": "App",
-    "icon": "./src/assets/logo.jpeg",
+    "icon": "./src/assets/logo.png",
     "version": "1.0.0",
     "orientation": "portrait",
     "scheme": "app",
     "userInterfaceStyle": "dark",
-    "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
+      "infoPlist": {
+        "LSApplicationQueriesSchemes": ["comgooglemaps"]
+      },
       "splash": {
-        "image": "./src/assets/logo.jpeg",
+        "image": "./src/assets/logo.png",
         "resizeMode": "contain",
         "backgroundColor": "#000000"
       }
@@ -19,11 +21,11 @@
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#000000",
-        "image": "./src/assets/logo.jpeg",
+        "image": "./src/assets/logo.png",
         "resizeMode": "contain"
       },
       "softwareKeyboardLayoutMode": "resize",
-      "edgeToEdgeEnabled": true,
+      "edgeToEdgeEnabled": false,
       "predictiveBackGestureEnabled": false,
       "package": "com.lucas_pedrozo.App",
       "usesCleartextTraffic": true
@@ -50,7 +52,7 @@
         "expo-splash-screen",
         {
           "backgroundColor": "#000000",
-          "image": "./src/assets/logo.jpeg",
+          "image": "./src/assets/logo.png",
           "resizeMode": "contain"
         }
       ],
@@ -62,7 +64,8 @@
         {
           "locationAlwaysAndWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location."
         }
-      ]
+      ],
+      "expo-web-browser"
     ],
     "experiments": {
       "typedRoutes": true,

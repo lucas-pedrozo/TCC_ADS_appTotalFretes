@@ -8,7 +8,6 @@ export interface EditPerfilMap {
   sex?: string;
 }
 
-/** Payload de edição de CNH (cnhType_id numérico no PATCH). */
 export interface EditCnhMap {
   cnhNumber: string;
   issuingAgencyCnh: string;

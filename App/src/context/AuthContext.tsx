@@ -1,16 +1,9 @@
 import { createContext, useState, ReactNode, useContext, useEffect } from "react";
 import * as SecureStore from "expo-secure-store";
-import { jwtDecode } from "jwt-decode";
 import { clearAuthToken, setAuthToken, getStoredAuthToken, getBiometricsEnabled, setBiometricsEnabled, clearAuthTokenCacheOnly } from "@/src/services/http";
+import { decodeAuthToken } from "@/src/utils/authToken";
 import type { SavedAccount } from "@/src/utils/savedAccounts";
 import { getSavedAccounts, getLastUsedAccountEmail, addOrUpdateSavedAccount as persistAddSavedAccount, removeSavedAccount as persistRemoveSavedAccount, setLastUsedAccountEmail } from "@/src/utils/savedAccounts";
-
-interface DecodedToken {
-    id: number | string;
-    role?: string;
-    accessLevel?: string;
-    exp?: number;
-}
 
 interface AuthContextType {
     id: number | null;
@@ -46,20 +39,6 @@ const defaultAuthContext: AuthContextType = {
     refreshSavedAccounts: async () => { },
     biometricsEnabled: false,
     setBiometricsEnabledAsync: async () => { },
-};
-
-/** Decodifica JWT e retorna payload se ainda não expirou; caso contrário null. */
-const decodeToken = (token: string) => {
-    try {
-        const decoded: DecodedToken = jwtDecode(token);
-        if (decoded.exp && decoded.exp * 1000 <= Date.now()) {
-            return null;
-        }
-        return decoded;
-    } catch (error) {
-        console.log("Erro ao decodificar token:", error);
-        return null;
-    }
 };
 
 export const AuthContext = createContext<AuthContextType>(defaultAuthContext);
@@ -108,8 +87,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                     return;
                 }
 
-                const decoded = decodeToken(storedToken);
-                if (!decoded?.id || !(decoded.role || decoded.accessLevel)) {
+                const decoded = decodeAuthToken(storedToken);
+                const role = decoded?.role || decoded?.accessLevel;
+                if (!decoded?.id || !role || role === 'COMPANY') {
                     await SecureStore.deleteItemAsync("authToken");
                     await clearAuthToken();
                     setIsAuthenticated(false);
@@ -119,7 +99,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
                 setToken(storedToken);
                 setId(Number(decoded.id));
-                setAccessLevel(decoded.role ?? decoded.accessLevel ?? null);
+                setAccessLevel(role);
                 setIsAuthenticated(true);
                 await setAuthToken(storedToken);
                 await refreshSavedAccounts();
@@ -134,11 +114,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }, []);
 
     const login = async (token: string) => {
-        const decoded = decodeToken(token);
-        if (decoded?.id && (decoded.role || decoded.accessLevel)) {
+        const decoded = decodeAuthToken(token);
+        const role = decoded?.role || decoded?.accessLevel;
+        
+        if (role === 'COMPANY') {
+            throw new Error('Acesso negado: Aplicativo exclusivo para Motoristas e Administradores.');
+        }
+
+        if (decoded?.id && role) {
             setToken(token);
             setId(Number(decoded.id));
-            setAccessLevel(decoded.role ?? decoded.accessLevel ?? null);
+            setAccessLevel(role);
             setIsAuthenticated(true);
             await setAuthToken(token);
         }

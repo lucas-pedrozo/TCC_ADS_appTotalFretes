@@ -1,9 +1,25 @@
 import axios from 'axios';
 import * as Location from 'expo-location';
+import {
+	MAP_PREVIEW_GPS_DISTANCE_INTERVAL_M,
+	MAP_PREVIEW_GPS_TIME_INTERVAL_MS,
+	NAV_GPS_DISTANCE_INTERVAL_M,
+	NAV_GPS_TIME_INTERVAL_MS,
+} from '@/src/config/navigation';
 
 export interface Coordinates {
 	latitude: number;
 	longitude: number;
+}
+
+export interface NavigationLocationUpdate {
+	latitude: number;
+	longitude: number;
+	speedMs: number | null;
+	speedKmh: number | null;
+	heading: number | null;
+	/** Raio de incerteza do GPS em metros (null se indisponível). */
+	accuracyM: number | null;
 }
 
 /**
@@ -36,8 +52,8 @@ export async function getCurrentCoordinates(): Promise<Coordinates | null> {
 	try {
 		const location = await Promise.race([
 			Location.getCurrentPositionAsync({
-				accuracy: Location.Accuracy.Balanced,
-				timeInterval: 10_000,
+				accuracy: Location.Accuracy.BestForNavigation,
+				timeInterval: 5_000,
 			}),
 			timeout(GPS_TIMEOUT_MS),
 		]);
@@ -55,6 +71,171 @@ export async function getCurrentCoordinates(): Promise<Coordinates | null> {
 
 export function clearCoordinatesCache(): void {
 	coordsCache = null;
+}
+
+export type NavigationLocationWatcher = {
+	remove: () => void;
+};
+
+export type CompassHeadingWatcher = {
+	remove: () => void;
+};
+
+function resolveCompassHeading(
+	trueHeading: number,
+	magHeading: number,
+): number | null {
+	if (Number.isFinite(trueHeading) && trueHeading >= 0) return trueHeading;
+	if (Number.isFinite(magHeading) && magHeading >= 0) return magHeading;
+	return null;
+}
+
+/**
+ * Orientação do aparelho (bússola) para navegação livre no mapa.
+ * Deve ser removido ao sair do modo livre ou da navegação.
+ */
+export async function startCompassHeadingWatch(
+	onUpdate: (heading: number) => void,
+): Promise<CompassHeadingWatcher | null> {
+	if ((await requestLocationPermission()) !== 'granted') return null;
+
+	const sub = await Location.watchHeadingAsync((headingData) => {
+		const heading = resolveCompassHeading(
+			headingData.trueHeading,
+			headingData.magHeading,
+		);
+		if (heading != null) onUpdate(heading);
+	});
+
+	return {
+		remove: () => {
+			sub.remove();
+		},
+	};
+}
+
+type SpeedFix = {
+	latitude: number;
+	longitude: number;
+	recordedAt: number;
+};
+
+function haversineMeters(a: Coordinates, b: Coordinates): number {
+	const toRad = (deg: number) => (deg * Math.PI) / 180;
+	const earthRadiusM = 6_371_000;
+	const dLat = toRad(b.latitude - a.latitude);
+	const dLon = toRad(b.longitude - a.longitude);
+	const lat1 = toRad(a.latitude);
+	const lat2 = toRad(b.latitude);
+	const h =
+		Math.sin(dLat / 2) ** 2 +
+		Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) ** 2;
+	return 2 * earthRadiusM * Math.asin(Math.min(1, Math.sqrt(h)));
+}
+
+function resolveSpeedKmh(
+	speedMs: number | null | undefined,
+	previousFix: SpeedFix | null,
+	currentFix: SpeedFix,
+): number | null {
+	if (speedMs != null && Number.isFinite(speedMs) && speedMs >= 0) {
+		return Math.max(0, speedMs * 3.6);
+	}
+
+	if (!previousFix) return null;
+
+	const elapsedSec = (currentFix.recordedAt - previousFix.recordedAt) / 1000;
+	if (elapsedSec < 0.4) return null;
+
+	const distanceM = haversineMeters(previousFix, currentFix);
+	if (distanceM < 0.5) return 0;
+
+	return Math.min(220, (distanceM / elapsedSec) * 3.6);
+}
+
+function toNavigationLocationUpdate(
+	loc: Location.LocationObject,
+	previousFix: SpeedFix | null,
+): { update: NavigationLocationUpdate; currentFix: SpeedFix } {
+	const currentFix: SpeedFix = {
+		latitude: loc.coords.latitude,
+		longitude: loc.coords.longitude,
+		recordedAt: loc.timestamp ?? Date.now(),
+	};
+	const speedMs = loc.coords.speed;
+	const speedKmh = resolveSpeedKmh(speedMs, previousFix, currentFix);
+	const heading = loc.coords.heading;
+	const accuracy = loc.coords.accuracy;
+
+	return {
+		currentFix,
+		update: {
+			latitude: currentFix.latitude,
+			longitude: currentFix.longitude,
+			speedMs: speedKmh != null ? speedKmh / 3.6 : null,
+			speedKmh,
+			heading: heading != null && Number.isFinite(heading) && heading >= 0 ? heading : null,
+			accuracyM:
+				accuracy != null && Number.isFinite(accuracy) && accuracy > 0
+					? accuracy
+					: null,
+		},
+	};
+}
+
+async function startLocationWatch(
+	options: Location.LocationOptions,
+	onUpdate: (update: NavigationLocationUpdate) => void,
+): Promise<NavigationLocationWatcher | null> {
+	if ((await requestLocationPermission()) !== 'granted') return null;
+
+	let previousFix: SpeedFix | null = null;
+
+	const sub = await Location.watchPositionAsync(options, (loc) => {
+		const parsed = toNavigationLocationUpdate(loc, previousFix);
+		previousFix = parsed.currentFix;
+		onUpdate(parsed.update);
+	});
+
+	return {
+		remove: () => {
+			sub.remove();
+			previousFix = null;
+		},
+	};
+}
+
+/**
+ * Atualização contínua de GPS para navegação (alta frequência).
+ * Deve ser removido ao sair da navegação para economizar bateria.
+ */
+export async function startNavigationLocationWatch(
+	onUpdate: (update: NavigationLocationUpdate) => void,
+): Promise<NavigationLocationWatcher | null> {
+	return startLocationWatch(
+		{
+			accuracy: Location.Accuracy.BestForNavigation,
+			timeInterval: NAV_GPS_TIME_INTERVAL_MS,
+			distanceInterval: NAV_GPS_DISTANCE_INTERVAL_M,
+		},
+		onUpdate,
+	);
+}
+
+/**
+ * GPS contínuo no mapa antes de iniciar a navegação (frequência moderada).
+ */
+export async function startMapPreviewLocationWatch(
+	onUpdate: (update: NavigationLocationUpdate) => void,
+): Promise<NavigationLocationWatcher | null> {
+	return startLocationWatch(
+		{
+			accuracy: Location.Accuracy.High,
+			timeInterval: MAP_PREVIEW_GPS_TIME_INTERVAL_MS,
+			distanceInterval: MAP_PREVIEW_GPS_DISTANCE_INTERVAL_M,
+		},
+		onUpdate,
+	);
 }
 
 const NOMINATIM_USER_AGENT = 'TCC_CursoTADS_App/1.0';

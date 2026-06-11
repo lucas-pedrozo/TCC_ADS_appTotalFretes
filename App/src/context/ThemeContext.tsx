@@ -29,7 +29,7 @@ export type ThemeColors = {
 	textTertiary: string;
 	textQuaternary: string;
 	textQuinary: string;
-	textSenary: string;
+	textSenary: string	;
 	textSeptenary: string;
 };
 
@@ -109,7 +109,9 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
 			} finally {
 				if (isMounted.current) {
 					setIsReady(true);
-					SplashScreen.hideAsync().catch(() => { });
+					requestAnimationFrame(() => {
+						SplashScreen.hideAsync().catch(() => { });
+					});
 				}
 			}
 		};
@@ -137,12 +139,10 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
 		},
 	}), [mode]);
 
-	if (!isReady) return null;
-
 	return (
 		<ThemeContext.Provider value={{ mode, colors, theme, toggleMode }}>
 			<View style={{ flex: 1, backgroundColor: BACKGROUND[mode] }}>
-				{children}
+				{isReady ? children : null}
 			</View>
 		</ThemeContext.Provider>
 	);

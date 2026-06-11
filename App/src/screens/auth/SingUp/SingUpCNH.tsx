@@ -2,7 +2,8 @@ import { View } from "react-native";
 
 import { useSignUpCnh } from "@/src/hooks/auth/useSignUpCnh";
 import { StepIndicator } from "@/src/components/header/StepIndicator";
-import { InputDefault, ButtonDefault, InputGroup } from "@/src/components/form";
+import { InputDefault, ButtonDefault, InputGroup, InputSelect } from "@/src/components/form";
+import { BRAZIL_STATE_OPTIONS } from "@/src/constants/brazilianStates";
 
 import { useTranslation } from "react-i18next";
 import { useNavigation } from "@react-navigation/native";
@@ -44,13 +45,13 @@ const SingUpCNH = () => {
 					rules={rules.cnhNumber}
 				/>
 
-				<InputDefault
+				<InputSelect
 					name="issuingAgencyCnh"
 					control={control}
 					placeholder={t("SIGNUP.CNH.ISSUINGAGENCYPLACEHOLDER")}
 					label={t("SIGNUP.CNH.ISSUINGAGENCYLABEL")}
-					maxLength={2}
 					rules={rules.issuingAgencyCnh}
+					options={BRAZIL_STATE_OPTIONS}
 				/>
 
 				<InputGroup

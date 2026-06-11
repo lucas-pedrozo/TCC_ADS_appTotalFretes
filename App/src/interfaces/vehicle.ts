@@ -1,6 +1,3 @@
-/**
- * Veículo do usuário; vehicleType vem do include (pode faltar em respostas mínimas).
- */
 export interface MapVehicle {
   id: number;
   plateNumber: string;
@@ -23,4 +20,8 @@ export interface MapVehicleType {
   length?: number;
   imageVehicle_id?: number;
   groupVehicleType_id?: number;
+  GroupVehicleType?: {
+    id?: number;
+    nome?: string;
+  } | null;
 }

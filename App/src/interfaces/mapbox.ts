@@ -6,4 +6,10 @@ export interface MapRotaResponse {
   coords_destino?: [number, number];
   trecho_ate_carga?: { distancia_km: number; tempo_min: number } | null;
   trecho_carga_ao_destino?: { distancia_km: number; tempo_min: number };
+  proxima_instrucao?: string;
+  manobra_modificador?: string | null;
+  manobra_tipo?: string | null;
+  proxima_rua?: string | null;
+  manobra_coordenadas?: [number, number] | null;
+  manobra_bearing?: number | null;
 }

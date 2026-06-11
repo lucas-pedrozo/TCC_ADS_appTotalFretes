@@ -7,7 +7,10 @@ import i18n from '@/src/i18n';
 
 const baseURL = (`${ENV_BASE_URL}`)
 
-const getCurrentLanguage = () => (i18n.resolvedLanguage || i18n.language || 'pt').split('-')[0];
+export const getRequestLanguage = () =>
+	(i18n.resolvedLanguage || i18n.language || 'pt').split('-')[0];
+
+const getCurrentLanguage = getRequestLanguage;
 
 const isNative = Platform.OS === 'ios' || Platform.OS === 'android';
 
@@ -51,6 +54,16 @@ export const clearAuthTokenCacheOnly = () => {
 	tokenLoaded = false;
 };
 
+export const getActiveAuthToken = async (): Promise<string | null> => {
+	if (authTokenCache) return authTokenCache;
+	const useBiometrics = await getBiometricsEnabled();
+	authTokenCache = useBiometrics
+		? await getStoredAuthTokenSilent()
+		: await getStoredAuthToken({ useBiometrics });
+	tokenLoaded = true;
+	return authTokenCache;
+};
+
 export const getStoredAuthTokenSilent = async (): Promise<string | null> => {
 	try {
 		return await SecureStore.getItemAsync('authToken');
@@ -76,7 +89,7 @@ export const getStoredAuthToken = async ({ useBiometrics }: { useBiometrics: boo
 
 const http = axios.create({
 	baseURL,
-	timeout: 3000,
+	timeout: 30000,
 	headers: {
 		Accept: 'application/json',
 		'accept-language': getCurrentLanguage(),
@@ -88,11 +101,23 @@ http.interceptors.request.use(
 		try {
 			if (!tokenLoaded || authTokenCache === null) {
 				const useBiometrics = await getBiometricsEnabled();
-				if (!useBiometrics) {
-					authTokenCache = await getStoredAuthToken({ useBiometrics });
-				}
+				authTokenCache = useBiometrics
+					? await getStoredAuthTokenSilent()
+					: await getStoredAuthToken({ useBiometrics });
 				tokenLoaded = true;
 			}
+
+			// FormData: deixar o cliente definir Content-Type com boundary (evita 401 no upload).
+			if (typeof FormData !== 'undefined' && config.data instanceof FormData) {
+				if (typeof config.headers.delete === 'function') {
+					config.headers.delete('Content-Type');
+					config.headers.delete('content-type');
+				} else {
+					delete (config.headers as Record<string, unknown>)['Content-Type'];
+					delete (config.headers as Record<string, unknown>)['content-type'];
+				}
+			}
+
 			(config.headers as any)['accept-language'] = getCurrentLanguage();
 			if (authTokenCache) {
 				config.headers.Authorization = `Bearer ${authTokenCache}`;
@@ -118,7 +143,13 @@ http.interceptors.response.use((response: AxiosResponse) => response, async (err
 		}
 
 		if (error.response?.status === 401) {
-			await clearAuthToken();
+			const headers = error.config?.headers;
+			const hadAuthHeader = Boolean(
+				headers && ('Authorization' in headers || 'authorization' in headers)
+			);
+			if (hadAuthHeader) {
+				await clearAuthToken();
+			}
 		}
 		return Promise.reject(error);
 	}

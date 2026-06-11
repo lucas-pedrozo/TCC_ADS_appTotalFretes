@@ -1,5 +1,6 @@
 import "./global.css";
 import "./src/i18n";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
 import Routes from "./src/routes/Routes";
 import { ThemeProvider } from "./src/context/ThemeContext";
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -11,13 +12,13 @@ import { RegisterVehicleProvider } from "./src/context/RegisterVehicleContext";
 import AlertNotification from "./src/components/alert/AlertDefault";
 import { useAlertDefault, AlertDefaultProvider } from "./src/context/AlertDefaultContext";
 import { LanguageProvider } from "./src/context/LanguageContext";
+import { FreightUserProvider } from "./src/context/FreightUserContext";
 
 const AlertNotificationGlobal = () => {
   const { alert, hideAlert } = useAlertDefault();
 
   return (
     <AlertNotification
-      key={`${alert.status}-${alert.message ?? ""}-${alert.visible ? "1" : "0"}`}
       visible={alert.visible}
       status={alert.status}
       message={alert.message}
@@ -28,11 +29,13 @@ const AlertNotificationGlobal = () => {
 
 function App() {
   return (
+    <GestureHandlerRootView style={{ flex: 1 }}>
     <SafeAreaProvider>
       <ThemeProvider>
         <LanguageProvider>
           <AuthProvider>
             <AlertDefaultProvider>
+            <FreightUserProvider>
               <KeyboardProvider>
                 <SingUpProvider>
                   <RegisterVehicleProvider>
@@ -41,11 +44,13 @@ function App() {
                   </RegisterVehicleProvider>
                 </SingUpProvider>
               </KeyboardProvider>
+            </FreightUserProvider>
             </AlertDefaultProvider>
           </AuthProvider>
         </LanguageProvider>
       </ThemeProvider>
     </SafeAreaProvider>
+    </GestureHandlerRootView>
   );
 }
 

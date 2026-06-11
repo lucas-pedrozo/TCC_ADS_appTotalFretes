@@ -4,12 +4,28 @@ import { useThemeColors, useThemeMode } from "@/src/context/ThemeContext";
 import { Text, TouchableOpacity, View } from "react-native";
 import { ProgressBarWithPins } from "./ProgressBarWithPins";
 import { IconBox } from "@/src/components/ui/IconBox";
-import type { FreightUserMap } from "@/src/interfaces/freight";
+import { FreightMap } from "@/src/hooks/freight/useGetFreightUser";
 
 type CardActivityHomeProps = {
   onPress?: () => void;
-  freight: FreightUserMap | null;
+  freight: FreightMap | null;
   AcceptButton?: boolean;
+};
+
+const PROGRESS_STEPS = 6;
+const CANCELED_STATUS_ID = 2;
+
+const getProgressStepFromStatusId = (statusId?: number): number => {
+  if (!statusId || statusId <= 0) {
+    return 0;
+  }
+
+  if (statusId === CANCELED_STATUS_ID) {
+    return 0;
+  }
+
+  const normalizedStep = statusId > CANCELED_STATUS_ID ? statusId - 1 : statusId;
+  return Math.min(Math.max(normalizedStep, 0), PROGRESS_STEPS);
 };
 
 
@@ -19,7 +35,7 @@ export const CardActivityHome = ({ onPress, freight, AcceptButton = true }: Card
   const { mode } = useThemeMode();
   const isDark = mode === "dark";
   const iconColor = isDark ? "#FFFFFF" : "#000000";
-  const currentStep = freight?.status?.id ?? 0;
+  const currentStep = getProgressStepFromStatusId(freight?.status?.id);
 
   return (
     <>
@@ -41,26 +57,32 @@ export const CardActivityHome = ({ onPress, freight, AcceptButton = true }: Card
 
       ) : null}
 
-      <TouchableOpacity onPress={onPress} className="flex-1 p-4 rounded-2xl w-full" style={{ backgroundColor: colors.bgNonary, borderColor: colors.bgTertiary, borderWidth: 1 }}>
+      <TouchableOpacity
+        onPress={onPress}
+        activeOpacity={onPress ? 0.7 : 1}
+        disabled={!onPress}
+        className="flex-1 w-full p-4 rounded-2xl"
+        style={{ backgroundColor: colors.bgNonary, borderColor: colors.bgTertiary, borderWidth: 1 }}
+      >
         <View className="flex-1 flex-row items-center gap-3">
           <IconBox name="cube-outline" />
           <View className="flex-1 flex-row justify-between items-center">
             <Text className="font-semibold text-base" style={{ color: colors.text }}>
-              {freight?.vehicle_group?.name ?? t("CARD.ACTIVITY.NONE")}
+              {freight?.name ?? t("CARD.ACTIVITY.NONE")}
             </Text>
-            <Text className="text-sm" style={{ color: colors.textSecondary}}>
-              {freight?.cargo?.name ?? t("CARD.ACTIVITY.NONE")} / {freight?.cargo?.weight ?? t("CARD.ACTIVITY.N_A")}
+            <Text className="text-sm" style={{ color: colors.textSecondary }}>
+              {freight?.cargo?.name ?? t("CARD.ACTIVITY.NONE")} / {freight?.weight ? `${freight?.weight} kg` : t("CARD.ACTIVITY.N_A")}
             </Text>
           </View>
         </View>
 
         <View className="flex-row justify-between pt-3 w-full">
-          <Text className="text-sm" style={{ color: colors.text }}>
+          <Text className="text-sm" numberOfLines={1} style={{ color: colors.text }}>
             {t("CARD.ACTIVITY.ORIGIN")}: {freight?.origin_label ?? t("CARD.ACTIVITY.NONE")}
           </Text>
         </View>
         <View className="flex-row justify-between pt-1 w-full">
-          <Text className="text-sm" style={{ color: colors.text }}>
+          <Text className="text-sm" numberOfLines={1} style={{ color: colors.text }}>
             {t("CARD.ACTIVITY.DESTINATION")}: {freight?.destination_label ?? t("CARD.ACTIVITY.NONE")}
           </Text>
         </View>
@@ -70,11 +92,11 @@ export const CardActivityHome = ({ onPress, freight, AcceptButton = true }: Card
             {t("CARD.ACTIVITY.STATUS")}: {freight?.status?.name ?? "---"}
           </Text>
           <Text className="text-sm" style={{ color: colors.text }}>
-            {t("CARD.ACTIVITY.DEADLINE")}: {freight?.time_limit ?? "---"}
+            {t("CARD.ACTIVITY.DEADLINE")}: {`${freight?.daysLimit ?? "---"} dias`}
           </Text>
         </View>
 
-        <ProgressBarWithPins steps={5} currentStep={currentStep} isDark={isDark} />
+        <ProgressBarWithPins steps={PROGRESS_STEPS} currentStep={currentStep} isDark={isDark} />
       </TouchableOpacity >
     </>
   );

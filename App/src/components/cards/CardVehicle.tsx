@@ -5,6 +5,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { IconBox } from "@/src/components/ui/IconBox";
 import { MapVehicle } from "@/src/interfaces/vehicle";
 import { useIconColor, useThemeColors } from "@/src/context/ThemeContext";
+import { maskPlate } from "@/src/utils/formMask";
 
 type CardVehicleProps = {
   vehicle: MapVehicle | null;
@@ -50,7 +51,7 @@ export const CardVehicle = ({ vehicle, onPress }: CardVehicleProps) => {
               {t("CARD.VEHICLE.MODEL")}: {vehicle?.model || "---"}
             </Text>
             <Text className="text-sm" style={{ color: colors.text }}>
-              {t("CARD.VEHICLE.PLATE")}: {vehicle?.plateNumber || "---"}
+              {t("CARD.VEHICLE.PLATE")}: {maskPlate(vehicle?.plateNumber || '') || "---"}
             </Text>
             <Text className="text-sm" style={{ color: colors.text }}>
               {t("CARD.VEHICLE.BRAND")}: {vehicle?.mark || "---"}

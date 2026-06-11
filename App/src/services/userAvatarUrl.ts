@@ -2,7 +2,11 @@ import http from "@/src/services/http";
 import { ENV_BASE_URL } from "@env";
 import type { MapUser } from "@/src/interfaces";
 
-/** GET /user/:id e monta URL da foto; ENV_BASE_URL já inclui /api, evita duplicar. */
+/**
+ * Obtém a URL da foto do usuário.
+ * @param userId - ID do usuário.
+ * @returns URL da foto do usuário ou undefined em caso de erro.
+ */
 export async function fetchUserAvatarUrl(userId: number): Promise<string | undefined> {
   try {
     const { data } = await http.get<MapUser>(`/user/${userId}`);

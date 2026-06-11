@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 
 import { useSignUp } from "./useSignUp";
 import { SingUpPasswordData, useSingUpContext } from "@/src/context/SingUpContext";
+import i18n from "@/src/i18n";
 import { getValidationRules, validatePasswordConfirmationMatch } from "@/src/utils/formValidations";
 
 type UseSignUpPasswordOptions = {
@@ -31,8 +32,10 @@ export function useSignUpPassword(options?: UseSignUpPasswordOptions) {
   const rules = {
     password: validationRules.password,
     confirmPassword: {
-      ...validationRules.confirmPassword,
-      validate: (value: string) => validatePasswordConfirmationMatch(value, watch("password")),
+      required: validationRules.confirmPassword.required,
+      validate: (value: string) =>
+        validatePasswordConfirmationMatch(value, watch("password")) ||
+        i18n.t("VALIDATION.INVALIDCONFIRMPASSWORD"),
     },
   };
 

@@ -5,7 +5,8 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { Image } from "expo-image";
 import { Feather } from "@expo/vector-icons";
 
-import { InputGroup, InputDefault, ButtonDefault } from "@/src/components/form";
+import { InputGroup, InputDefault, ButtonDefault, InputSelect } from "@/src/components/form";
+import { BRAZIL_STATE_OPTIONS } from "@/src/constants/brazilianStates";
 import { DetailRow } from "@/src/components/info/DetailRow";
 import { useEditCnh } from "@/src/hooks/user/useEditCnh";
 import { useThemeColors } from "@/src/context/ThemeContext";
@@ -43,13 +44,13 @@ const EditCnh = () => {
 					rules={rules.cnhNumber}
 				/>
 
-				<InputDefault
+				<InputSelect
 					name="issuingAgencyCnh"
 					control={control}
 					placeholder={t("SIGNUP.CNH.ISSUINGAGENCYPLACEHOLDER")}
 					label={t("SIGNUP.CNH.ISSUINGAGENCYLABEL")}
-					maxLength={2}
 					rules={rules.issuingAgencyCnh}
+					options={BRAZIL_STATE_OPTIONS}
 				/>
 
 				<InputGroup

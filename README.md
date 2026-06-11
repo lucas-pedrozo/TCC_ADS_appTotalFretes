@@ -1,110 +1,212 @@
-# TCC_CursoTADS
+# 🚛 Total Fretes App
 
-Aplicativo mobile desenvolvido com React Native + Expo para o projeto de TCC, com foco em fluxo de autenticação e cadastro de usuário (incluindo etapas de dados pessoais, CNH e senha).
+**Aplicativo mobile para gerenciamento de fretes**
 
-## Sobre o projeto
+Desenvolvido com **Expo** e **React Native**
 
-O app atual possui:
-- Tela inicial com acesso para login e cadastro
-- Fluxo de login
-- Fluxo de cadastro em múltiplas etapas
-- Estrutura de contexto global para autenticação, tema, cadastro e notificações
-- Navegação por stack entre telas públicas e privadas
+---
 
-## Tecnologias usadas
+## 📋 Índice
 
-### Base
-- React 19
-- React Native 0.81
-- Expo SDK 54
-- TypeScript
+- [Visão Geral](#-visão-geral)
+- [Pré-requisitos](#-pré-requisitos)
+- [Configuração do Ambiente](#-configuração-do-ambiente)
+- [Instalação e Execução](#-instalação-e-execução)
+- [Fluxo de Desenvolvimento](#-fluxo-de-desenvolvimento)
+- [Padrão de Commits](#-padrão-de-commits)
+- [Pull Requests](#-pull-requests)
 
-### Navegação
-- `@react-navigation/native`
-- `@react-navigation/native-stack`
+---
 
-### Estilo e UI
-- NativeWind
-- Tailwind CSS
-- `react-native-safe-area-context`
-- `react-native-gesture-handler`
-- `react-native-reanimated`
+## 🌐 Visão Geral
 
-### Formulários e validação
-- `react-hook-form`
-- `validator`
-- `cpf-cnpj-validator`
-- `emailvalid`
+O **Total Fretes App** é um aplicativo mobile que integra rastreamento de rotas via Mapbox e comunicação com API REST para gestão de fretes. Construído com Expo e React Native, oferece uma experiência nativa em dispositivos Android.
 
-### Comunicação com API
-- Axios
+---
 
-### Segurança e utilitários
-- `expo-secure-store`
-- `jwt-decode`
+## ✅ Pré-requisitos
 
-### Qualidade e padronização
-- ESLint
-- Commitlint
-- Husky
-- Prettier (com plugin Tailwind)
+Antes de iniciar, certifique-se de ter instalado em sua máquina:
 
-## Tecnologias instaladas mas não usadas diretamente no código atual
+- [Node.js](https://nodejs.org/) (versão LTS recomendada)
+- [Git](https://git-scm.com/)
+- [Android Studio](https://developer.android.com/studio) ou um dispositivo Android físico
+- Conta no [Mapbox](https://account.mapbox.com/)
+- Token de acesso ao repositório no GitHub (`GIT_TOKEN`)
 
-- `expo-router` (o projeto utiliza navegação com React Navigation)
+---
 
-## Estrutura principal
+## ⚙️ Configuração do Ambiente
 
-```text
-TCC_CursoTADS/
-├─ App/
-│  ├─ src/
-│  │  ├─ components/
-│  │  ├─ context/
-│  │  ├─ hooks/
-│  │  ├─ routes/
-│  │  ├─ screens/
-│  │  ├─ service/
-│  │  └─ utils/
-│  └─ App.tsx
-└─ README.md
+O projeto utiliza dois arquivos `.env` distintos. Utilize os respectivos `.env.example` como referência.
+
+### 1. `.env` — Raiz do projeto
+
+Crie o arquivo `.env` na raiz do repositório e defina o token do GitHub. Ele é exigido pelo hook do Husky antes de cada commit:
+
+```env
+GIT_TOKEN=seu_github_token_aqui
 ```
 
-## Como rodar o projeto
+---
 
-### 1) Instalar dependências da raiz
-```bash
-npm install
+### 2. `App/.env` — Configurações do aplicativo
+
+Crie o arquivo `App/.env` com as variáveis necessárias para comunicação com a API e exibição de mapas.
+
+#### 🔗 URL da API (`ENV_BASE_URL`)
+
+Ao testar em dispositivo físico ou emulador, **não utilize** `localhost` ou `127.0.0.1` — o dispositivo precisa alcançar o backend pela rede local.
+
+**Como configurar:**
+
+1. Descubra o IP da sua máquina na rede Wi-Fi (ex.: `192.168.0.10`)
+2. Garanta que o backend esteja rodando e acessível nesse IP
+3. Defina a variável no `App/.env`:
+
+```env
+ENV_BASE_URL=http://SEU_IP:PORTA/api
 ```
 
-### 2) Instalar dependências do app mobile
+#### 🗺️ Token do Mapbox (`MAPBOX_PUBLIC_TOKEN`)
+
+O app utiliza Mapbox para exibição de rotas e mapas.
+
+**Como obter o token:**
+
+1. Acesse [account.mapbox.com](https://account.mapbox.com/) e faça login (ou crie uma conta)
+2. Em **Access Tokens**, copie o **Default public token** ou crie um novo
+3. Adicione ao `App/.env`:
+
+```env
+MAPBOX_PUBLIC_TOKEN=pk.seu_token_aqui
+```
+
+#### Exemplo completo do `App/.env`
+
+```env
+ENV_BASE_URL=http://192.168.0.10/api
+MAPBOX_PUBLIC_TOKEN=pk.seu_token_aqui
+```
+
+---
+
+## 🚀 Instalação e Execução
+
+### Android (dispositivo físico ou emulador)
+
 ```bash
 cd App
 npm install
+npx expo run:android
 ```
 
-### 3) Iniciar o app
+> O comando compila o app e instala no dispositivo/emulador Android. Na **primeira execução**, o processo pode levar alguns minutos.
+
+> **⚠️ Windows:** se o build falhar por caminho maior que 260 caracteres, consulte [`App/docs/BUILD_ANDROID_WINDOWS.md`](App/docs/BUILD_ANDROID_WINDOWS.md).
+
+---
+
+## 🔀 Fluxo de Desenvolvimento
+
+Este projeto adota **Conventional Commits** com validação automática via **commitlint** e execução de lint a cada commit pelo hook do Husky.
+
+### Criando uma nova branch
+
+Sempre crie sua branch a partir da branch principal **`develop`**:
+
 ```bash
-npm run start
+git checkout develop
+git pull
+git checkout -b tipo/descricao-curta
 ```
 
-Opcional:
-- `npm run android`
-- `npm run ios`
-- `npm run web`
+### Padrão de nomenclatura de branches
 
-## Scripts úteis
+```
+tipo/descricao-curta
+```
 
-No diretório `App/`:
-- `npm run start` → inicia Expo
-- `npm run android` → abre no Android
-- `npm run ios` → abre no iOS
-- `npm run web` → roda versão web
-- `npm run lint` → valida lint
+| Tipo | Uso |
+|---|---|
+| `feat` | Nova funcionalidade |
+| `fix` | Correção de bug |
+| `docs` | Documentação |
+| `refactor` | Refatoração sem mudança de comportamento |
+| `chore` | Tarefas de manutenção |
+| `test` | Testes |
 
-Na raiz:
-- `npm run prepare` → configura hooks do Husky
+**Exemplos:**
 
-## Status atual
+```
+feat/login-com-biometria
+fix/validacao-do-formulario
+docs/guia-de-commit
+refactor/auth-context
+```
 
-Projeto em evolução, com base de autenticação e cadastro já estruturada e pronto para expansão das funcionalidades privadas (ex.: dashboard/home completa).
+> Use nomes **curtos**, **objetivos** e em **letras minúsculas**, com palavras separadas por `-`. Evite nomes genéricos como `teste`, `alteracao` ou `novo`.
+
+---
+
+## 📝 Padrão de Commits
+
+Formato:
+
+```
+tipo: mensagem objetiva
+```
+
+**Exemplos válidos:**
+
+```bash
+feat: criar tela de login
+fix: corrigir validacao do botao
+docs: adicionar guia de branches
+refactor: simplificar auth context
+```
+
+> A mensagem de commit é validada automaticamente pelo hook **commit-msg** (commitlint) e o hook **pre-commit** executa `npm run lint` dentro da pasta `App`.
+
+---
+
+## 🔃 Pull Requests
+
+Após finalizar suas alterações:
+
+```bash
+# Adicione os arquivos
+git add .
+
+# Crie o commit
+git commit -m "tipo: descricao objetiva"
+
+# Envie a branch
+git push -u origin tipo/descricao-curta
+```
+
+Abra um **Pull Request** da sua branch para `develop`.
+
+### Modelo de PR
+
+| Campo | Exemplo |
+|---|---|
+| **Título** | `docs: adicionar guia de branches` |
+| **Descrição** | Resumo das mudanças, impacto esperado e observações de validação |
+| **Base** | `develop` |
+
+---
+
+## 📌 Resumo rápido
+
+| Etapa | Padrão |
+|---|---|
+| Branch | `tipo/descricao-curta` |
+| Commit | `tipo: mensagem objetiva` |
+| Pull Request | Título curto, descrição clara, apontando para `develop` |
+
+---
+
+<div align="center">
+  <sub>Desenvolvido com ❤️ pela equipe Total Fretes</sub>
+</div>

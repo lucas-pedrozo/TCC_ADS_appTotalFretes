@@ -1,15 +1,19 @@
 import React, { useCallback, useRef } from "react";
 import { View, TouchableOpacity, Text } from "react-native";
+import { useTranslation } from "react-i18next";
 
 import Mapbox from "@rnmapbox/maps";
 import { Ionicons } from "@expo/vector-icons";
 
-import { useThemeColors } from "@/src/context/ThemeContext";
+import { useThemeColors, useThemeMode } from "@/src/context/ThemeContext";
+import { getMapControlTheme } from "@/src/utils/mapControlTheme";
 import {
   CAMERA_ANIMATION_MS,
+  CAMERA_ANIMATION_MODE,
   ROTA_LINE_STYLE,
   THEME_COLORS,
   getMapStyleURL,
+  withCameraEase,
 } from "@/src/config/mapbox";
 import type { MapRotaResponse } from "@/src/interfaces/mapbox";
 
@@ -29,16 +33,23 @@ export const MapRouteView = React.memo(function MapRouteView({
   darkMode,
 }: MapRouteViewProps) {
   const colors = useThemeColors();
+  const { mode } = useThemeMode();
+  const mapControlTheme = getMapControlTheme(mode, colors);
+  const { t } = useTranslation();
   const cameraRef = useRef<CameraRef>(null);
   const themeColor = darkMode ? THEME_COLORS.dark : THEME_COLORS.light;
   const styleURL = getMapStyleURL(darkMode);
 
   const handleCentralizar = useCallback(() => {
-    cameraRef.current?.setCamera({
-      centerCoordinate: cameraCenter,
-      zoomLevel: cameraZoom,
-      animationDuration: CAMERA_ANIMATION_MS,
-    });
+    cameraRef.current?.setCamera(
+      withCameraEase(
+        {
+          centerCoordinate: cameraCenter,
+          zoomLevel: cameraZoom,
+        },
+        CAMERA_ANIMATION_MS,
+      ),
+    );
   }, [cameraCenter, cameraZoom]);
 
   const coordinates = rotaData?.geometria?.coordinates;
@@ -50,6 +61,7 @@ export const MapRouteView = React.memo(function MapRouteView({
           ref={cameraRef}
           zoomLevel={cameraZoom}
           centerCoordinate={cameraCenter}
+          animationMode={CAMERA_ANIMATION_MODE}
           animationDuration={CAMERA_ANIMATION_MS}
         />
 
@@ -66,7 +78,7 @@ export const MapRouteView = React.memo(function MapRouteView({
           <Mapbox.PointAnnotation
             id="marker-voce"
             coordinate={coordinates[0]}
-            title="Você está aqui"
+            title={t("MAP.MARKER_YOU_ARE_HERE")}
           >
             <Ionicons name="person" size={24} color={themeColor} />
           </Mapbox.PointAnnotation>
@@ -76,7 +88,7 @@ export const MapRouteView = React.memo(function MapRouteView({
           <Mapbox.PointAnnotation
             id="marker-carga"
             coordinate={rotaData.coords_carga}
-            title="Carga"
+            title={t("MAP.MARKER_CARGO")}
           >
             <Ionicons name="cube" size={24} color={themeColor} />
           </Mapbox.PointAnnotation>
@@ -86,7 +98,7 @@ export const MapRouteView = React.memo(function MapRouteView({
           <Mapbox.PointAnnotation
             id="marker-destino"
             coordinate={rotaData.coords_destino}
-            title="Destino"
+            title={t("MAP.MARKER_DESTINATION")}
           >
             <Ionicons name="flag" size={24} color={themeColor} />
           </Mapbox.PointAnnotation>
@@ -95,15 +107,15 @@ export const MapRouteView = React.memo(function MapRouteView({
 
       <TouchableOpacity
         className="absolute top-2.5 right-2.5 flex-row items-center gap-1.5 py-2 px-3 rounded-xl shadow shadow-black/20"
-        style={{ backgroundColor: colors.bgTertiary, borderColor: colors.bgNonary, borderWidth: 1 }}
+        style={mapControlTheme.button}
         onPress={handleCentralizar}
         activeOpacity={0.8}
         accessibilityRole="button"
-        accessibilityLabel="Centralizar mapa na rota"
+        accessibilityLabel={t("MAP.CENTER_MAP_A11Y")}
       >
-        <Ionicons name="locate" size={24} color={themeColor} />
-        <Text className="text-sm font-semibold" style={{ color: colors.text }}>
-          Centralizar
+        <Ionicons name="locate" size={24} color={mapControlTheme.foreground} />
+        <Text className="text-sm font-semibold" style={{ color: mapControlTheme.foreground }}>
+          {t("MAP.CENTER")}
         </Text>
       </TouchableOpacity>
     </View>

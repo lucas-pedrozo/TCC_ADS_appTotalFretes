@@ -2,7 +2,6 @@ import { Feather } from "@expo/vector-icons";
 import { useTranslation } from "react-i18next";
 import { useIconColor, useThemeColors } from "@/src/context/ThemeContext";
 import { Text, TouchableOpacity, View } from "react-native";
-import { formatNameSobrenome } from "@/src/utils/format";
 import { IconBox } from "@/src/components/ui/IconBox";
 
 type CardHistoryProps = {
@@ -26,10 +25,10 @@ export const CardHistory = ({ onPress }: CardHistoryProps) => {
       </View>
 
       <Text className="text-sm mt-4" style={{ color: colors.text }}>
-        Ver Histórico
+        {t("CARD.HISTORY.TITLE")}
       </Text>
       <Text className="text-sm mt-1" style={{ color: colors.textSecondary }}>
-        Veja quais fretes voce Já aceitou ou cancelou
+        {t("CARD.HISTORY.SUBTITLE")}
       </Text>
     </TouchableOpacity>
   );

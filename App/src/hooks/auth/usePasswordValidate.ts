@@ -37,7 +37,7 @@ export function usePasswordValidate() {
         message: i18n.t("NOTIFICATIONS.CODEVALIDATIONLOADING"),
       });
 
-      const response = await http.post<ValidateCodeResponse>("auth/validate-code", { email, data });
+      const response = await http.post<ValidateCodeResponse>("auth/validate-code", { email, code: data.code });
       const resetToken = response.data.resetToken;
 
       if (!resetToken) {

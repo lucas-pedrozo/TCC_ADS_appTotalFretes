@@ -1,13 +1,16 @@
 import { Image, Text, View } from "react-native";
+import { useTranslation } from "react-i18next";
 import { useThemeColors } from "@/src/context/ThemeContext";
 import { InputDefault, InputPlate, ButtonDefault } from "@/src/components/form";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { useRegisterVehicle } from "@/src/hooks/vehicle/useRegisterVehicle";
 import { useRegisterVehicleContext } from "@/src/context/RegisterVehicleContext";
+import { getVehicleTypeImage } from "@/src/utils/vehicleTypeImages";
 
 
 const VehicleData = () => {
 	const colors = useThemeColors();
+	const { t } = useTranslation();
 	const { control, handleSubmit, handleRegisterVehicle, rules } = useRegisterVehicle();
 	const { vehicleType } = useRegisterVehicleContext();
 
@@ -17,36 +20,34 @@ const VehicleData = () => {
 			keyboardShouldPersistTaps="handled"
 			showsVerticalScrollIndicator={false}
 		>
-			<Text className="pl-2.5 pb-4" style={{ color: colors.text }}>Informe os dados do veículo</Text>
+			<Text className="pl-2.5 pb-4" style={{ color: colors.text }}>{t("VEHICLE.DATA_INTRO")}</Text>
 
 			<View className="items-center mb-4">
-				{vehicleType?.image ? (
-					<Image
-						source={{ uri: vehicleType?.image }}
-						className="w-[260px] h-[140px]"
-						resizeMode="contain"
-					/>
-				) : (
-					<Image
-						source={require("@/src/assets/veiculo.png")}
-						className="w-[260px] h-[140px]"
-						resizeMode="contain"
-					/>
-				)}
+				<Image
+					source={getVehicleTypeImage(vehicleType?.name ?? "")}
+					className="w-[260px] h-[140px]"
+					resizeMode="contain"
+				/>
 			</View>
 
 			<Text className="font-semibold text-base pl-2.5 mb-3" style={{ color: colors.text }}>
-				Informações sobre a placa do veículo
+				{t("VEHICLE.PLATE_SECTION")}
 			</Text>
 
 			<View className="gap-4">
-				<InputPlate control={control} name="plate" label="Placa" placeholder="ABC1D23" rules={rules.plate} />
+				<InputPlate
+					control={control}
+					name="plate"
+					label={t("VEHICLE.PLATE_LABEL")}
+					placeholder={t("VEHICLE.PLATE_PLACEHOLDER")}
+					rules={rules.plate}
+				/>
 
 				<InputDefault
 					control={control}
 					name="chassisNumber"
-					label="Número do chassi (VIN)"
-					placeholder="Ex: 9BWZZZ377VT004251"
+					label={t("VEHICLE.CHASSIS_LABEL")}
+					placeholder={t("VEHICLE.CHASSIS_PLACEHOLDER")}
 					maxLength={17}
 					rules={rules.chassisNumber}
 				/>
@@ -54,46 +55,46 @@ const VehicleData = () => {
 				<InputDefault
 					control={control}
 					name="model"
-					label="Modelo do caminhão"
-					placeholder="Ex: FH16"
+					label={t("VEHICLE.MODEL_LABEL")}
+					placeholder={t("VEHICLE.MODEL_PLACEHOLDER")}
 					rules={rules.model}
 				/>
 
 				<InputDefault
 					control={control}
 					name="mark"
-					label="Marca do caminhão"
-					placeholder="Ex: Mercedes-Benz"
+					label={t("VEHICLE.MARK_LABEL")}
+					placeholder={t("VEHICLE.MARK_PLACEHOLDER")}
 					rules={rules.mark}
 				/>
 
 				<InputDefault
 					control={control}
 					name="country"
-					label="País"
-					placeholder="Brasil"
+					label={t("VEHICLE.COUNTRY_LABEL")}
+					placeholder={t("VEHICLE.COUNTRY_PLACEHOLDER")}
 					rules={rules.country}
 				/>
 
 				<InputDefault
 					control={control}
 					name="state"
-					label="Estado"
-					placeholder="Estado"
+					label={t("VEHICLE.STATE_LABEL")}
+					placeholder={t("VEHICLE.STATE_PLACEHOLDER")}
 					rules={rules.state}
 				/>
 
 				<InputDefault
 					control={control}
 					name="city"
-					label="Município"
-					placeholder="Município"
+					label={t("VEHICLE.CITY_LABEL")}
+					placeholder={t("VEHICLE.CITY_PLACEHOLDER")}
 					rules={rules.city}
 				/>
 			</View>
 
 			<View className="flex-1 justify-end pt-5">
-				<ButtonDefault title="Confirmar" onPress={handleSubmit(handleRegisterVehicle)} />
+				<ButtonDefault title={t("COMMON.CONFIRM")} onPress={handleSubmit(handleRegisterVehicle)} />
 			</View>
 		</KeyboardAwareScrollView>
 	);

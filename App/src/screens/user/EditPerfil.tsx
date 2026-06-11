@@ -26,8 +26,8 @@ const EditPerfil = () => {
 	const insets = useSafeAreaInsets();
 	const route = useRoute<RouteProp<RootStackParamList, "EditPerfil">>();
 	const currentProfileImageUrl = route.params?.userImage;
-	const { imageUri, handlePickFromGallery, handleTakePhoto } = useImagePicker();
-	const { control, handleSubmit, handleEditPerfil, rules } = useEditPerfil({ pendingImageUri: imageUri });
+	const { pickedImage, imageUri, handlePickFromGallery, handleTakePhoto } = useImagePicker();
+	const { control, handleSubmit, handleEditPerfil, rules } = useEditPerfil({ pendingImage: pickedImage });
 
 	const displayImageUri = imageUri ?? currentProfileImageUrl;
 
@@ -51,8 +51,8 @@ const EditPerfil = () => {
 					)
 				}
 				<View className="flex-row gap-3">
-					<ButtonOutline title="Tirar" onPress={handleTakePhoto} />
-					<ButtonOutline title="Buscar" onPress={handlePickFromGallery} />
+					<ButtonOutline title={t("EDITPERFIL.TAKE_PHOTO")} onPress={handleTakePhoto} />
+					<ButtonOutline title={t("EDITPERFIL.PICK_GALLERY")} onPress={handlePickFromGallery} />
 				</View>
 			</View>
 

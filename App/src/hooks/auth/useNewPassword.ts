@@ -6,7 +6,7 @@ import { useNavigation, useRoute, RouteProp, NavigationProp } from "@react-navig
 import { RootStackParamList } from "@/src/routes/Routes";
 import { useAlertDefault } from "@/src/context/AlertDefaultContext";
 import i18n from "@/src/i18n";
-import { getValidationRules } from "@/src/utils/formValidations";
+import { getValidationRules, validatePasswordConfirmationMatch } from "@/src/utils/formValidations";
 
 export interface NewPasswordForm {
   oldPassword: string;
@@ -21,7 +21,7 @@ export function useNewPassword() {
   const route = useRoute<RouteProp<RootStackParamList, "NewPassword">>();
 
   const resetToken = route.params?.resetToken ?? "";
-  const { control, handleSubmit, formState: { errors } } = useForm<NewPasswordForm>({ mode: "onSubmit" });
+  const { control, handleSubmit, formState: { errors }, watch } = useForm<NewPasswordForm>({ mode: "onSubmit" });
 
   const handleResetPassword = useCallback(async (data: NewPasswordForm) => {
     if (!resetToken) {
@@ -54,9 +54,16 @@ export function useNewPassword() {
     }
   }, [resetToken, notify, navigation]);
 
+  const validationRules = getValidationRules();
   const rules = {
-    password: getValidationRules().password,
-    confirmPassword: getValidationRules().confirmPassword,
+    oldPassword: validationRules.currentPassword,
+    password: validationRules.password,
+    confirmPassword: {
+      required: validationRules.confirmPassword.required,
+      validate: (value: string) =>
+        validatePasswordConfirmationMatch(value, watch("password")) ||
+        i18n.t("VALIDATION.INVALIDCONFIRMPASSWORD"),
+    },
   };
 
   return {

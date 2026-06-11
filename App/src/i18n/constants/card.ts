@@ -38,6 +38,10 @@ export const cardPT = {
       DESTINATION: "Destino",
       FREIGHT: "Frete",
     },
+    HISTORY: {
+      TITLE: "Ver Histórico",
+      SUBTITLE: "Veja quais fretes você já aceitou ou cancelou",
+    },
   },
 } as const;
 
@@ -76,6 +80,10 @@ export const cardEN = {
       ORIGIN: "Origin",
       DESTINATION: "Destination",
       FREIGHT: "Freight",
+    },
+    HISTORY: {
+      TITLE: "View History",
+      SUBTITLE: "See which freights you have accepted or cancelled",
     },
   },
 } as const;

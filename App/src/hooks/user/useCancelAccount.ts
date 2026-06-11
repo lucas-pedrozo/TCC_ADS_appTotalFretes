@@ -1,8 +1,9 @@
 import { useCallback, useState } from "react";
-import { AxiosError } from "axios";
 import http from "@/src/services/http";
+import { getApiErrorMessage } from "@/src/utils/apiError";
 import { useAuth } from "@/src/context/AuthContext";
 import { useAlertDefault } from "@/src/context/AlertDefaultContext";
+import i18n from "@/src/i18n";
 
 export function useDeleteUser() {
 	const { id, logout,lastUsedAccount, removeSavedAccount } = useAuth();
@@ -17,22 +18,22 @@ export function useDeleteUser() {
 		try {
 			await notify({
 				status: "loading",
-				message: "Deletando usuário...",
+				message: i18n.t("NOTIFICATIONS.DELETEUSERLOADING"),
 			});
 			setIsdisabled(true);
 
 			await http.delete(`user/${id}`);
 			await notify({
 				status: "success",
-				message: "Usuário deletado com sucesso!",
+				message: i18n.t("NOTIFICATIONS.DELETEUSERSUCCESS"),
 			});
 			handleRemoveSavedAccount();
 			logout();
 		} catch (error) {
-			const message = (error as AxiosError<{ message: string }>).response?.data?.message ?? "";
-			if (message) {
-				await notify({ status: "error", message });
-			}
+			await notify({
+				status: "error",
+				message: getApiErrorMessage(error),
+			});
 		} finally {
 			setIsdisabled(false);
 		}

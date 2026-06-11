@@ -10,6 +10,7 @@ import type { RootStackParamList } from "@/src/routes/Routes";
 import http from "@/src/services/http";
 import { useAlertDefault } from "@/src/context/AlertDefaultContext";
 import { AxiosError } from "axios";
+import { useTranslation } from "react-i18next";
 
 type GroupItem = { id: number; nome: string; key: VehicleGroupType };
 
@@ -17,6 +18,7 @@ const nomeToKey: Record<string, VehicleGroupType> = {
   Caminhão: "caminhao",
   Carreta: "carreta",
   Bitrem: "bitrem",
+  "Para carga de líquidos": "liquidos",
 };
 
 const CardVehicleGroup = ({ title, onPress }: { title: string; onPress: () => void }) => {
@@ -37,6 +39,7 @@ const CardVehicleGroup = ({ title, onPress }: { title: string; onPress: () => vo
 
 const VehicleGroup = () => {
   const colors = useThemeColors();
+  const { t } = useTranslation();
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { setGroup, setGroupVehicleTypeId } = useRegisterVehicleContext();
   const { notify } = useAlertDefault();
@@ -55,12 +58,12 @@ const VehicleGroup = () => {
         .filter((g): g is GroupItem => g != null);
       setGroups(mapped);
     } catch (err) {
-      const message = (err as AxiosError<{ message?: string }>).response?.data?.message ?? "Erro ao carregar grupos.";
+      const message = (err as AxiosError<{ message?: string }>).response?.data?.message ?? t("VEHICLE.LOAD_GROUPS_ERROR");
       notify({ status: "error", message });
     } finally {
       setLoading(false);
     }
-  }, [notify]);
+  }, [notify, t]);
 
   useEffect(() => {
     fetchGroups();
@@ -74,7 +77,7 @@ const VehicleGroup = () => {
 
   return (
     <SafeAreaView edges={["left", "right"]} className="flex-1 px-4" style={{ backgroundColor: colors.bg }}>
-      <Text className="pl-2.5 pb-5" style={{ color: colors.text }}>Selecione o Grupo de Veículo</Text>
+      <Text className="pl-2.5 pb-5" style={{ color: colors.text }}>{t("VEHICLE.GROUP_SELECT")}</Text>
 
       {loading ? (
         <View className="items-center py-8">

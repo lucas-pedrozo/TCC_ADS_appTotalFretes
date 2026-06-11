@@ -6,6 +6,7 @@ import { getValidationRules } from "@/src/utils/formValidations";
 import { maskEmailForDisplay } from "@/src/utils/formMask";
 import type { LoginResponse } from "@/src/types/api";
 import { fetchUserAvatarUrl } from "@/src/services/userAvatarUrl";
+import { getUserIdFromAuthToken } from "@/src/utils/authToken";
 import i18n from "@/src/i18n";
 import { AxiosError } from "axios";
 import { useAuth } from "@/src/context/AuthContext";
@@ -43,11 +44,11 @@ export function useLogin(options: UseLoginOptions = {}) {
       const password = data.password;
       const payload = { email, password };
 
-      const { token, user: loginUser } = (await http.post<LoginResponse>("auth/login", payload)).data;
+      const { token } = (await http.post<LoginResponse>("auth/login", payload)).data;
       await login(token);
 
-      const uid = loginUser?.id != null ? Number(loginUser.id) : NaN;
-      const userImageUrl = Number.isFinite(uid) ? await fetchUserAvatarUrl(uid) : undefined;
+      const imageId = getUserIdFromAuthToken(token);
+      const userImageUrl = Number.isFinite(imageId) ? await fetchUserAvatarUrl(imageId) : undefined;
       await addSavedAccount(email.trim().toLowerCase(), maskEmailForDisplay(email), userImageUrl);
 
       if (getEnableBiometricsAfterLogin?.()) {
@@ -67,7 +68,7 @@ export function useLogin(options: UseLoginOptions = {}) {
     } catch (error) {
       notify({
         status: "error",
-        message: (error as AxiosError<{ message: string }>).response?.data?.message ?? i18n.t("NOTIFICATIONS.ERROR"),
+        message: (error as AxiosError<{ message: string }>).response?.data?.message ?? "Erro ao fazer login",
       });
     } finally {
       setIsDisabled(false);
@@ -77,7 +78,7 @@ export function useLogin(options: UseLoginOptions = {}) {
   const validationRules = getValidationRules();
   const rules = {
     email: validationRules.email,
-    password: validationRules.password,
+    password: validationRules.loginPassword,
   };
 
   return {
