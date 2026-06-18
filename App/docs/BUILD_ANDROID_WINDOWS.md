@@ -19,6 +19,10 @@ New-Item -ItemType Junction -Path "D:\TCP" -Target "D:\TCC\TCC_ADS_appTotalFrete
 
 Ou via CMD (como Administrador):
 
+
+eas build --profile development --platform android
+
+
 ```cmd
 mklink /J D:\TCC D:\ProjetosDev\TCC\TCC_CursoTADS
 ```

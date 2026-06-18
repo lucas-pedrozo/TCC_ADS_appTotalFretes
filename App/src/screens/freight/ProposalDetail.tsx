@@ -7,6 +7,7 @@ import { useTranslation } from "react-i18next";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { ButtonApproved, ButtonCancel } from "@/src/components/form/buttons/ButtonDefault";
+import { FreightCompanyContact } from "@/src/components/freight/FreightCompanyContact";
 import { DetailRow } from "@/src/components/info/DetailRow";
 import { useIconColor, useThemeColors } from "@/src/context/ThemeContext";
 import { getProposalFreight } from "@/src/hooks/proposal/useGetProposals";
@@ -215,6 +216,10 @@ const ProposalDetail = () => {
 					<DetailRow label={t("FREIGHT.DEADLINE")} value={freight?.daysLimit != null ? t("FREIGHT.DEADLINE_VALUE", { days: freight.daysLimit }) : t("COMMON.EMPTY")} />
 					<DetailRow label={t("PROPOSAL.CARGO_TYPE")} value={freight?.cargo?.name ?? t("COMMON.EMPTY")} />
 				</View>
+
+				<View className="h-5" />
+
+				<FreightCompanyContact company={freight?.Company} />
 			</ScrollView>
 
 			{isAwaitingDriver ? (

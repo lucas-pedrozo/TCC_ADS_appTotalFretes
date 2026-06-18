@@ -7,6 +7,8 @@ import i18n from "@/src/i18n";
 type CreateProposalBody = {
 	freight_id: number;
 	value: number;
+	submitted_lat: number;
+	submitted_lng: number;
 };
 
 type CreateProposalResponse = {
