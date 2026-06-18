@@ -9,6 +9,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { useTranslation } from "react-i18next";
 
 import { ButtonApproved } from "@/src/components/form/buttons/ButtonDefault";
+import { FreightCompanyContact } from "@/src/components/freight/FreightCompanyContact";
 import { useAlertDefault } from "@/src/context/AlertDefaultContext";
 import { useThemeColors } from "@/src/context/ThemeContext";
 import { useCreateProposal } from "@/src/hooks/proposal/useCreateProposal";

@@ -1,11 +1,10 @@
 import { useCallback, useState } from "react";
 import { useAlertDefault } from "@/src/context/AlertDefaultContext";
 import { getApiErrorMessage } from "@/src/utils/apiError";
-import type { FreightAllMap } from "@/src/hooks/freight/useGetAllFreigth";
 import http from "@/src/services/http";
 import i18n from "@/src/i18n";
 import type { ProposalMap } from "./useGetProposals";
-import { getProposalFreight } from "./useGetProposals";
+import { hydrateProposalFreight } from "./hydrateProposalFreight";
 
 export function useProposalDetail() {
 	const { notify } = useAlertDefault();
@@ -18,22 +17,9 @@ export function useProposalDetail() {
 			try {
 				setIsLoading(true);
 				const { data } = await http.get<ProposalMap>(`proposal/${proposalId}`);
-				const currentFreight = getProposalFreight(data);
-
-				if (currentFreight?.cargo != null) {
-					setProposal(data);
-					return data;
-				}
-
-				try {
-					const { data: freight } = await http.get<FreightAllMap>(`freight/${data.freight_id}`);
-					const hydratedProposal = { ...data, Freight: freight };
-					setProposal(hydratedProposal);
-					return hydratedProposal;
-				} catch {
-					setProposal(data);
-					return data;
-				}
+				const hydratedProposal = await hydrateProposalFreight(data);
+				setProposal(hydratedProposal);
+				return hydratedProposal;
 			} catch (error) {
 				notify({
 					status: "error",

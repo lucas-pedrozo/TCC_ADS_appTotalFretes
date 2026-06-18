@@ -13,6 +13,7 @@ import {
 	resolveProposalStatusApiParam,
 	sortProposalsByPriority,
 } from "@/src/utils/proposalListQuery";
+import { hydrateProposalFreight } from "./hydrateProposalFreight";
 
 export type ProposalMap = {
 	id: number;
@@ -49,17 +50,7 @@ export function useGetProposals(
 			const filteredProposals = filterProposalsByStatus(proposalList, statusFilter);
 
 			const hydratedProposals = await Promise.all(
-				filteredProposals.map(async (proposal) => {
-					const currentFreight = getProposalFreight(proposal);
-					if (currentFreight?.cargo != null) return proposal;
-
-					try {
-						const { data: freight } = await http.get<FreightAllMap>(`freight/${proposal.freight_id}`);
-						return { ...proposal, Freight: freight };
-					} catch {
-						return proposal;
-					}
-				}),
+				filteredProposals.map((proposal) => hydrateProposalFreight(proposal)),
 			);
 
 			setProposals(sortProposalsByPriority(hydratedProposals));

@@ -36,6 +36,7 @@ interface CompanyMap {
 	id: number;
 	name: string;
 	city?: string | null;
+	phoneNumber?: string | null;
 }
 
 interface CargoImageMap {

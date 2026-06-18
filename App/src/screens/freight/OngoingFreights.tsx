@@ -12,6 +12,7 @@ import { useIconColor, useThemeColors } from "@/src/context/ThemeContext";
 import { DetailRow } from "@/src/components/info/DetailRow";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { CardFreight } from "@/src/components/cards/CardFreight";
+import { FreightCompanyContact } from "@/src/components/freight/FreightCompanyContact";
 import { CardActivityHome } from "@/src/components/cards/CardActivityHome";
 import { useTranslation } from "react-i18next";
 import { useFocusEffect, useNavigation } from "@react-navigation/native";
@@ -191,6 +192,10 @@ function OngoingFreights() {
 						</Text>
 					</TouchableOpacity>
 				</View>
+
+				<View className="h-7" />
+
+				<FreightCompanyContact company={freightUser?.Company} />
 
 				<Text className="font-semibold text-base pl-2.5 mb-4 mt-5" style={{ color: colors.text }}>
 					{t("FREIGHT.MORE_DETAILS")}

@@ -183,6 +183,10 @@ export const screenPT = {
     WAITING_COMPANY_CONFIRMATION: "Aguardando confirmação da empresa",
     COMPANY: "Empresa",
     COMPANY_CITY: "Cidade",
+    COMPANY_PHONE: "Telefone",
+    CALL_COMPANY: "Ligar para a empresa",
+    CALL_COMPANY_A11Y: "Ligar para a empresa responsável pelo frete",
+    CALL_COMPANY_ERROR: "Não foi possível abrir o discador. Tente novamente.",
     VALIDATION: {
       NO_VEHICLE: "Usuário não tem Veículo Cadastrado",
       HAS_ONGOING: "Usuário já tem um frete em andamento",
@@ -530,6 +534,10 @@ export const screenEN = {
     WAITING_COMPANY_CONFIRMATION: "Awaiting company confirmation",
     COMPANY: "Company",
     COMPANY_CITY: "City",
+    COMPANY_PHONE: "Phone",
+    CALL_COMPANY: "Call company",
+    CALL_COMPANY_A11Y: "Call the company responsible for this freight",
+    CALL_COMPANY_ERROR: "Could not open the phone dialer. Please try again.",
     VALIDATION: {
       NO_VEHICLE: "User has no registered Vehicle",
       HAS_ONGOING: "User already has an ongoing freight",

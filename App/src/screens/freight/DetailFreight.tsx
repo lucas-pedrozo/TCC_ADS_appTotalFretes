@@ -9,6 +9,7 @@ import { useThemeColors } from "@/src/context/ThemeContext";
 import { maskMoney } from "@/src/utils/formMask";
 import { extractCityFromAddressLabel } from "@/src/utils/format";
 import { IconBox } from "@/src/components/ui/IconBox";
+import { FreightCompanyContact } from "@/src/components/freight/FreightCompanyContact";
 import { DetailRow } from "@/src/components/info/DetailRow";
 import { ButtonDefault, ButtonApproved } from "@/src/components/form/buttons/ButtonDefault";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -127,20 +128,7 @@ const DetailFreight = () => {
 
 				<View className="h-5" />
 
-				<View
-					style={{ backgroundColor: colors.bgSecondary, borderColor: colors.bgTertiary, borderWidth: 1 }}
-					className="p-4 rounded-xl gap-2.5"
-				>
-					<IconBox name="business-outline" />
-					<View>
-						<Text style={{ color: colors.text }} className="text-sm font-semibold opacity-80">
-							{t("FREIGHT.COMPANY")}: {freight.Company?.name?.trim() || t("COMMON.EMPTY")}
-						</Text>
-						<Text style={{ color: colors.text }} className="text-sm font-semibold opacity-80">
-							{t("FREIGHT.COMPANY_CITY")}: {freight.Company?.city?.trim() || t("COMMON.EMPTY")}
-						</Text>
-					</View>
-				</View>
+				<FreightCompanyContact company={freight.Company} />
 
 				<Text style={{ color: colors.text }} className="text-base font-semibold py-5">
 					{t("FREIGHT.MORE_DETAILS")}
