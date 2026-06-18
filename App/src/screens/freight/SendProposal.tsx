@@ -18,6 +18,7 @@ import type { RootStackParamList } from "@/src/routes/Routes";
 import { maskMoney, parseMoneyToNumber } from "@/src/utils/formMask";
 import { formatWeight, parseAddressLabel } from "@/src/utils/format";
 import { isVehicleCompatibleWithFreight } from "@/src/utils/vehicleFreightCompatibility";
+import { getCurrentCoordinates } from "@/src/services/location";
 
 type SendProposalRouteProp = RouteProp<RootStackParamList, "SendProposal">;
 
@@ -67,9 +68,20 @@ const SendProposal = () => {
 			return;
 		}
 
+		const coords = await getCurrentCoordinates();
+		if (!coords) {
+			notify({
+				status: "error",
+				message: t("PROPOSAL.LOCATION_REQUIRED"),
+			});
+			return;
+		}
+
 		const proposal = await handleCreateProposal({
 			freight_id: freight.id,
 			value: proposalNumber,
+			submitted_lat: coords.latitude,
+			submitted_lng: coords.longitude,
 		});
 
 		if (proposal) {
