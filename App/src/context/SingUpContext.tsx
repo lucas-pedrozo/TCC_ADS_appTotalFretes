@@ -1,4 +1,5 @@
 import React, { createContext, useCallback, useContext, useMemo, useState } from "react";
+import type { ApiFieldIssue } from "@/src/utils/apiFieldErrors";
 
 /**
  * @description Interface de dados de pessoa
@@ -48,10 +49,13 @@ type SingUpContextValue = {
     persona: SingUpPersonaData;
     cnh: SingUpCnhData;
     password: SingUpPasswordData;
+    fieldErrors: ApiFieldIssue[];
 
     setPersona: (data: SingUpPersonaData) => void;
     setCnh: (data: SingUpCnhData) => void;
     setPassword: (data: SingUpPasswordData) => void;
+    setFieldErrors: (errors: ApiFieldIssue[]) => void;
+    clearFieldErrors: () => void;
     getPayload: () => SingUpDraftData;
     reset: () => void;
 };
@@ -101,10 +105,13 @@ export function SingUpProvider({ children }: { children: React.ReactNode }) {
     const [persona, setPersonaState] = useState<SingUpPersonaData>(defaultPersona);
     const [cnh, setCnhState] = useState<SingUpCnhData>(defaultCnh);
     const [password, setPasswordState] = useState<SingUpPasswordData>(defaultPassword);
+    const [fieldErrors, setFieldErrorsState] = useState<ApiFieldIssue[]>([]);
 
     const setPersona = useCallback((data: SingUpPersonaData) => setPersonaState(data), []);
     const setCnh = useCallback((data: SingUpCnhData) => setCnhState(data), []);
     const setPassword = useCallback((data: SingUpPasswordData) => setPasswordState(data), []);
+    const setFieldErrors = useCallback((errors: ApiFieldIssue[]) => setFieldErrorsState(errors), []);
+    const clearFieldErrors = useCallback(() => setFieldErrorsState([]), []);
 
     const getPayload = useCallback(() => ({ ...persona, ...cnh, ...password }), [persona, cnh, password]);
 
@@ -128,6 +135,7 @@ export function SingUpProvider({ children }: { children: React.ReactNode }) {
             password: "",
             confirmPassword: "",
         });
+        setFieldErrorsState([]);
     }, []);
 
     const value = useMemo(
@@ -135,13 +143,16 @@ export function SingUpProvider({ children }: { children: React.ReactNode }) {
             persona,
             cnh,
             password,
+            fieldErrors,
             setPersona,
             setCnh,
             setPassword,
+            setFieldErrors,
+            clearFieldErrors,
             getPayload,
             reset,
         }),
-        [persona, cnh, password, setPersona, setCnh, setPassword, getPayload, reset],
+        [persona, cnh, password, fieldErrors, setPersona, setCnh, setPassword, setFieldErrors, clearFieldErrors, getPayload, reset],
     );
 
     return <SingUpContext.Provider value={value}>{children}</SingUpContext.Provider>;

@@ -6,6 +6,7 @@ import { getValidationRules } from "@/src/utils/formValidations";
 import { useAlertDefault } from "@/src/context/AlertDefaultContext";
 import i18n from "@/src/i18n";
 import { getApiErrorMessage } from "@/src/utils/apiError";
+import { applyRhfFieldErrors, parseApiFieldErrors } from "@/src/utils/apiFieldErrors";
 
 import { RootStackParamList } from "@/src/routes/Routes";
 import { RouteProp, useRoute } from "@react-navigation/native";
@@ -21,7 +22,7 @@ export function useEditCnh() {
   const userName = route.params?.userName ?? "";
   const userImageUrl = route.params?.userImageUrl;
 
-  const { control, handleSubmit, formState: { errors } } = useForm<EditCnhMap>({
+  const { control, handleSubmit, setError, formState: { errors } } = useForm<EditCnhMap>({
     defaultValues: {
       cnhNumber: editCnhData?.cnhNumber ?? "",
       issuingAgencyCnh: editCnhData?.issuingAgencyCnh ?? "",
@@ -47,12 +48,18 @@ export function useEditCnh() {
         message: i18n.t("NOTIFICATIONS.EDITCNHSUCCESS"),
       });
     } catch (error) {
+      const parsed = parseApiFieldErrors(error);
+      if (parsed?.fieldErrors.length) {
+        applyRhfFieldErrors(setError, parsed.fieldErrors, {
+          cnhType_id: "cnhType_id",
+        });
+      }
       notify({
         status: "error",
         message: getApiErrorMessage(error),
       });
     }
-  }, [notify, id]);
+  }, [notify, id, setError]);
 
   const validationRules = getValidationRules();
   const rules = {

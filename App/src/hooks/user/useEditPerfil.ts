@@ -9,6 +9,7 @@ import type { EditPerfilMap } from "@/src/interfaces/profile";
 import { uploadUserImage, type PickedUserImage } from "@/src/services/userImageUpload";
 import { useAlertDefault } from "@/src/context/AlertDefaultContext";
 import { getApiErrorMessage } from "@/src/utils/apiError";
+import { applyRhfFieldErrors, parseApiFieldErrors } from "@/src/utils/apiFieldErrors";
 
 import { RootStackParamList } from "@/src/routes/Routes";
 import { getValidationRules } from "@/src/utils/formValidations";
@@ -28,7 +29,7 @@ export function useEditPerfil(options: UseEditPerfilOptions = {}) {
   const editPerfilData = route.params?.editPerfilData;
   const isSubmittingRef = useRef(false);
 
-  const { control, handleSubmit, formState: { errors } } = useForm<EditPerfilMap>({
+  const { control, handleSubmit, setError, formState: { errors } } = useForm<EditPerfilMap>({
     defaultValues: {
       name: editPerfilData?.name ?? "",
       email: editPerfilData?.email ?? "",
@@ -85,6 +86,10 @@ export function useEditPerfil(options: UseEditPerfilOptions = {}) {
 
       navigation.navigate("Home" as never);
     } catch (error) {
+      const parsed = parseApiFieldErrors(error);
+      if (parsed?.fieldErrors.length) {
+        applyRhfFieldErrors(setError, parsed.fieldErrors);
+      }
       notify({
         status: "error",
         message: getApiErrorMessage(error, i18n.t("NOTIFICATIONS.ERROR"), {
@@ -94,7 +99,7 @@ export function useEditPerfil(options: UseEditPerfilOptions = {}) {
     } finally {
       isSubmittingRef.current = false;
     }
-  }, [notify, id, token, pendingImage, navigation, addSavedAccount]);
+  }, [notify, id, token, pendingImage, navigation, addSavedAccount, setError]);
 
   const validationRules = getValidationRules();
 

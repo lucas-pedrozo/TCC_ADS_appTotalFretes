@@ -1,5 +1,6 @@
 import { isAxiosError, type AxiosError } from "axios";
 import i18n from "@/src/i18n";
+import { parseApiFieldErrors } from "@/src/utils/apiFieldErrors";
 
 type ApiErrorBody = {
 	message?: string;
@@ -66,6 +67,11 @@ export function getApiErrorMessage(
 
 	if (isNetworkError(error)) {
 		return options?.networkMessage ?? DEFAULT_NETWORK_MESSAGE;
+	}
+
+	const parsed = parseApiFieldErrors(error);
+	if (parsed?.fieldErrors.length) {
+		return parsed.summary;
 	}
 
 	return (
