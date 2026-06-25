@@ -39,7 +39,7 @@ export function useSignUp() {
         status: "loading",
         message: i18n.t("NOTIFICATIONS.SIGNUPLOADING"),
       });
-      console.log(data);
+
       await http.post<SingUpFormData>("user/end-account", {
         ...data,
         account_type_id: 1,
