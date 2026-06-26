@@ -59,14 +59,6 @@ export function useEditPerfil(options: UseEditPerfilOptions = {}) {
         if (id == null) {
           throw new Error(i18n.t("NOTIFICATIONS.ERROR"));
         }
-        if (__DEV__) {
-          console.log("[useEditPerfil] upload.start", {
-            userId: id,
-            hasToken: Boolean(token),
-            tokenLength: token?.length ?? 0,
-            imageUri: pendingImage.uri,
-          });
-        }
         const userImage = await uploadUserImage(pendingImage, Number(id), token);
         payload.userImage_id = userImage.id;
       }
