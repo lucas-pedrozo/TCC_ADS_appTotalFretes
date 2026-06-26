@@ -64,8 +64,33 @@ export const validateBirthDate = (value: string) => {
  * @param value Valor a ser validado
  * @returns true se o valor for valido, false caso contrario
  */
-export const validateCnhNumber = (value: string) => {
-  return validator.isLength(value, { min: 11, max: 11 });
+export const validateCnhNumber = (value: string): boolean => {
+  const cnh = value.replace(/\D/g, '');
+
+  // Usando validator para as checagens básicas
+  if (!validator.isLength(cnh, { min: 11, max: 11 })) return false;
+  if (!validator.isNumeric(cnh)) return false;
+  if (/^(\d)\1+$/.test(cnh)) return false;
+
+  // Dígitos verificadores (não tem como fugir, tem que implementar)
+  let sum = 0;
+  for (let i = 0, j = 9; i < 9; i++, j--) {
+    sum += Number(cnh[i]) * j;
+  }
+
+  let firstDigit = sum % 11;
+  let st = 0;
+  if (firstDigit >= 10) { firstDigit = 0; st = 2; }
+
+  sum = 0;
+  for (let i = 0, j = 1; i < 9; i++, j++) {
+    sum += Number(cnh[i]) * j;
+  }
+
+  let secondDigit = sum % 11;
+  if (secondDigit >= 10 || st === 2) secondDigit = 0;
+
+  return firstDigit === Number(cnh[9]) && secondDigit === Number(cnh[10]);
 };
 
 /**
