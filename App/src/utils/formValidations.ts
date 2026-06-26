@@ -60,19 +60,17 @@ export const validateBirthDate = (value: string) => {
 };
 
 /**
- * @description Validacao de CNH
+ * @description Validacao de CNH | não oficial só para fins de teste e para apresentação do projeto, não deve ser usado em produção
  * @param value Valor a ser validado
  * @returns true se o valor for valido, false caso contrario
  */
 export const validateCnhNumber = (value: string): boolean => {
   const cnh = value.replace(/\D/g, '');
 
-  // Usando validator para as checagens básicas
   if (!validator.isLength(cnh, { min: 11, max: 11 })) return false;
   if (!validator.isNumeric(cnh)) return false;
   if (/^(\d)\1+$/.test(cnh)) return false;
 
-  // Dígitos verificadores (não tem como fugir, tem que implementar)
   let sum = 0;
   for (let i = 0, j = 9; i < 9; i++, j--) {
     sum += Number(cnh[i]) * j;
