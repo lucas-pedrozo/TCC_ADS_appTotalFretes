@@ -70,7 +70,8 @@ function AlertDefault({ visible, status, message, onDismiss }: AlertDefaultProps
 
     useEffect(() => {
         if (!visible || !onDismiss || status === "loading") return;
-        const id = setTimeout(onDismiss, 1000);
+        const dismissMs = status === "error" ? 4000 : 1000;
+        const id = setTimeout(onDismiss, dismissMs);
         return () => clearTimeout(id);
     }, [visible, status, onDismiss]);
 

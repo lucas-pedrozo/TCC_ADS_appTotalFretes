@@ -23,8 +23,6 @@ export type PickedUserImage = {
 };
 
 const UPLOAD_TIMEOUT_MS = 60_000;
-const LOG_PREFIX = "[userImageUpload]";
-
 const getMimeTypeFromUri = (uri: string): string => {
   const ext = uri.split(".").pop()?.toLowerCase();
   const mime: Record<string, string> = {
@@ -63,10 +61,8 @@ const buildUploadUrl = () => {
   return `${base}/user-images/upload`;
 };
 
-const logUpload = (step: string, details: Record<string, unknown>) => {
-  if (__DEV__) {
-    console.log(LOG_PREFIX, step, details);
-  }
+const logUploadError = (step: string, details: Record<string, unknown>) => {
+  console.error("[userImageUpload]", step, details);
 };
 
 class UploadHttpError extends Error {
@@ -118,7 +114,7 @@ function uploadWithXhr(
 
     xhr.onerror = () => {
       clearTimeout(timeoutId);
-      logUpload("xhr.onerror", { url, readyState: xhr.readyState, status: xhr.status });
+      logUploadError("xhr.onerror", { url, readyState: xhr.readyState, status: xhr.status });
       reject(new Error("XHR_UPLOAD_NETWORK_ERROR"));
     };
 
@@ -127,11 +123,6 @@ function uploadWithXhr(
       reject(new Error("XHR_UPLOAD_ABORTED"));
     };
 
-    logUpload("xhr.send", {
-      url,
-      hasToken: Boolean(token),
-      tokenLength: token.length,
-    });
     xhr.send(formData);
   });
 }
@@ -160,19 +151,8 @@ export async function uploadUserImage(
   const token = tokenFromContext ?? await getActiveAuthToken();
   const uploadUrl = buildUploadUrl();
 
-  logUpload("start", {
-    uploadUrl,
-    ownerId,
-    hasContextToken: Boolean(tokenFromContext),
-    hasResolvedToken: Boolean(token),
-    tokenLength: token?.length ?? 0,
-    imageUriScheme: image.uri.split(":")[0] ?? "unknown",
-    mimeType: getMimeType(image),
-    fileName: getNameFromImage(image),
-  });
-
   if (!token) {
-    logUpload("abort.no-token", { ownerId, uploadUrl });
+    logUploadError("abort.no-token", { ownerId, uploadUrl });
     throw new Error(i18n.t("NOTIFICATIONS.TOKENINVALID"));
   }
 
@@ -180,11 +160,6 @@ export async function uploadUserImage(
 
   try {
     const { status, body } = await uploadWithXhr(uploadUrl, formData, token);
-
-    logUpload("response", {
-      status,
-      bodyPreview: body.slice(0, 200),
-    });
 
     let data: UploadUserImageResponse | { message?: string } = {};
     if (body) {
@@ -200,22 +175,21 @@ export async function uploadUserImage(
     }
 
     if (!("userImage" in data) || !data.userImage) {
-      logUpload("abort.invalid-payload", { status, data });
+      logUploadError("abort.invalid-payload", { status, data });
       throw new Error(i18n.t("NOTIFICATIONS.IMAGEUPLOADFAILED"));
     }
 
-    logUpload("success", { imageId: data.userImage.id, fileName: data.userImage.fileName });
     return data.userImage;
   } catch (error) {
     if (error instanceof UploadHttpError) {
-      logUpload("http-error", { status: error.status, message: error.message });
+      logUploadError("http-error", { status: error.status, message: error.message });
       throw error;
     }
     if (error instanceof Error && error.message === "XHR_UPLOAD_TIMEOUT") {
-      logUpload("timeout", { uploadUrl, ownerId });
+      logUploadError("timeout", { uploadUrl, ownerId });
       throw new Error(i18n.t("NOTIFICATIONS.IMAGEUPLOADTIMEOUT"));
     }
-    logUpload("unexpected-error", {
+    logUploadError("unexpected-error", {
       message: error instanceof Error ? error.message : String(error),
     });
     throw error;
